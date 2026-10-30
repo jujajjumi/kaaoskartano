@@ -1,0 +1,2399 @@
+<!doctype html><html lang="fi"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}[hidden]{display:none!important}img{max-width:100%}</style></head><body><title>Kaaoskartano</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bungee&family=Rubik:wght@400;600;800&display=swap">
+<style>
+/* Layout: haunted game-show marquee. Host = projector stage (header / stage / player rail). Player = one-hand controller with four buzzer pads. Single dark look on purpose (projector + spooky mansion). */
+:root{
+  --ink:#120b1a; --wall:#1e1329; --wall2:#2b1c3b; --line:#43305a;
+  --bone:#f5ede0; --dim:#b3a3c6; --blood:#ff3b5c; --ghost:#a6ecff;
+  --b:#2f7dff; --o:#ff8a1f; --g:#22c46b; --y:#ffd23a;
+  --on-b:#ffffff; --on-o:#1a0d05; --on-g:#06200f; --on-y:#241a00;
+  --f-display:'Bungee','Impact','Arial Black',sans-serif;
+  --f-body:'Rubik',system-ui,'Segoe UI',Roboto,sans-serif;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+html,body{height:100%}
+body{margin:0;background:var(--ink);color:var(--bone);font-family:var(--f-body);font-size:16px;line-height:1.4;overflow:hidden}
+body::after{content:"";position:fixed;inset:0;pointer-events:none;background:radial-gradient(ellipse at 50% 40%,transparent 45%,rgba(0,0,0,.55) 100%);z-index:1}
+#app{position:relative;z-index:2;height:100%;overflow:auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:12px;
+  background-image:radial-gradient(circle at 20% 10%,rgba(255,59,92,.08),transparent 40%),radial-gradient(circle at 85% 90%,rgba(47,125,255,.09),transparent 45%),
+  repeating-linear-gradient(90deg,rgba(255,255,255,.018) 0 2px,transparent 2px 46px)}
+button{font:inherit;color:inherit;cursor:pointer;border:0;background:none}
+button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible{outline:3px solid var(--y);outline-offset:2px}
+input,select,textarea{font:inherit;color:var(--bone);background:var(--ink);border:2px solid var(--line);border-radius:10px;padding:10px 12px;width:100%}
+h1,h2,h3{font-family:var(--f-display);font-weight:400;margin:0;text-wrap:balance;letter-spacing:.01em}
+.dim{color:var(--dim)}
+.label{font-size:.78rem;text-transform:uppercase;letter-spacing:.14em;color:var(--dim);font-weight:600}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:12px 20px;border-radius:999px;font-weight:800;background:var(--wall2);border:2px solid var(--line);transition:transform .08s}
+.btn:hover{transform:translateY(-1px)}
+.btn:active{transform:translateY(1px)}
+.btn.primary{background:var(--blood);border-color:var(--blood);color:#fff;box-shadow:0 6px 0 #8f1029}
+.btn.primary:active{box-shadow:0 2px 0 #8f1029}
+.btn.small{padding:7px 14px;font-size:.9rem}
+.btn[disabled]{opacity:.45;cursor:not-allowed}
+.logo{font-family:var(--f-display);letter-spacing:.02em;line-height:.95}
+.logo .a{color:var(--y);text-shadow:0 0 18px rgba(255,210,58,.35)}
+.logo .b{color:var(--blood);text-shadow:0 0 18px rgba(255,59,92,.35)}
+
+/* ---------- landing ---------- */
+.landing{min-height:100%;display:grid;place-items:center;text-align:center}
+.landing .inner{display:grid;gap:22px;max-width:640px;justify-items:center;padding-block:24px}
+.landing .logo{font-size:clamp(2.6rem,9vw,5.4rem)}
+.landing p{max-width:52ch;margin:0}
+.roles{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px;width:100%}
+.role{padding:22px 18px;border-radius:18px;background:var(--wall);border:2px solid var(--line);display:grid;gap:6px;text-align:left}
+.role b{font-family:var(--f-display);font-weight:400;font-size:1.25rem}
+.role:hover{border-color:var(--y)}
+.role.play{border-color:var(--blood)}
+
+/* ---------- host ---------- */
+.host{height:100%;display:grid;grid-template-rows:auto 1fr auto;gap:12px}
+.hbar{display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+.hbar .logo{font-size:1.6rem}
+.codechip{font-family:var(--f-display);font-size:1.3rem;background:var(--y);color:var(--on-y);padding:4px 14px;border-radius:10px;letter-spacing:.12em}
+.hbar .grow{flex:1}
+.stage{position:relative;min-height:0;display:grid;align-items:safe center;justify-items:center;overflow:auto;border-radius:22px;background:linear-gradient(180deg,var(--wall),var(--ink));border:2px solid var(--line);padding:clamp(14px,2.5vw,36px)}
+.stage>.center{width:100%;max-width:1200px;display:grid;gap:clamp(12px,2vw,26px);justify-items:center;text-align:center}
+.rail{display:flex;gap:10px;flex-wrap:wrap;justify-content:center;min-height:56px}
+.chip{display:flex;align-items:center;gap:8px;padding:6px 12px 6px 6px;border-radius:999px;background:var(--wall);border:2px solid var(--line);font-weight:600;position:relative}
+.chip .av{font-size:1.5rem;width:38px;height:38px;display:grid;place-items:center;border-radius:50%;background:var(--wall2)}
+.chip .sc{font-variant-numeric:tabular-nums;color:var(--y);font-weight:800}
+.chip .cards{font-size:.8rem;letter-spacing:-.2em}
+.chip.ghost{border-color:var(--ghost);color:var(--ghost);background:rgba(166,236,255,.06)}
+.chip.ghost .av{filter:none}
+.chip.off{opacity:.4}
+.chip .st{font-weight:800}
+.chip .st.ok{color:var(--g)} .chip .st.bad{color:var(--blood)}
+.chip .kick{margin-left:2px;width:22px;height:22px;border-radius:50%;background:var(--wall2);font-size:.8rem;color:var(--dim)}
+.host-bubble{display:flex;gap:14px;align-items:flex-start;max-width:900px;text-align:left}
+.host-bubble .face{font-size:clamp(2.4rem,4vw,3.6rem);line-height:1;filter:drop-shadow(0 0 12px rgba(255,59,92,.4))}
+.host-bubble .txt{background:var(--bone);color:var(--ink);padding:14px 18px;border-radius:4px 18px 18px 18px;font-size:clamp(1rem,1.6vw,1.35rem);font-weight:600}
+.host-bubble .who{font-family:var(--f-display);font-size:.8rem;color:var(--blood);display:block;margin-bottom:2px}
+.bigcode{font-family:var(--f-display);font-size:clamp(4rem,13vw,10rem);color:var(--y);line-height:1;letter-spacing:.12em;text-shadow:0 0 40px rgba(255,210,58,.35)}
+.lobbygrid{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,1fr);gap:28px;width:100%;align-items:start;text-align:left}
+@media (max-width:820px){.lobbygrid{grid-template-columns:1fr}}
+.panel{background:var(--wall);border:2px solid var(--line);border-radius:18px;padding:18px;display:grid;gap:12px}
+.joinsteps{display:grid;gap:10px;font-size:clamp(1rem,1.5vw,1.25rem)}
+.joinsteps .url{font-weight:800;color:var(--ghost);word-break:break-all}
+.lobbyplayers{display:flex;flex-wrap:wrap;gap:10px}
+.settings{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px}
+.settings label{display:grid;gap:4px;font-size:.85rem;color:var(--dim)}
+.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.netstat{font-size:.85rem;padding:6px 12px;border-radius:999px;background:var(--wall2)}
+.netstat.ok{color:var(--g)} .netstat.err{color:var(--blood)}
+
+.roundcard{display:grid;gap:10px;justify-items:center}
+.roundcard .em{font-size:clamp(4rem,9vw,7rem);line-height:1;animation:pop .5s cubic-bezier(.2,1.6,.4,1)}
+.roundcard h2{font-size:clamp(2rem,5vw,4rem);color:var(--y)}
+.roundcard p{font-size:clamp(1.05rem,1.8vw,1.5rem);max-width:40ch;margin:0}
+.cat{display:inline-block;padding:4px 14px;border-radius:999px;border:2px solid var(--ghost);color:var(--ghost);font-weight:800;text-transform:uppercase;letter-spacing:.12em;font-size:.85rem}
+.qtext{font-size:clamp(1.6rem,3.6vw,3.2rem);font-weight:800;line-height:1.15;max-width:28ch;text-wrap:balance}
+.opts{display:grid;grid-template-columns:1fr 1fr;gap:clamp(10px,1.4vw,18px);width:100%}
+.opt{display:flex;align-items:center;gap:14px;padding:clamp(12px,1.6vw,22px);border-radius:20px;font-weight:800;font-size:clamp(1.1rem,2.1vw,1.9rem);text-align:left;position:relative;box-shadow:inset 0 -6px 0 rgba(0,0,0,.25),inset 0 6px 0 rgba(255,255,255,.18)}
+.opt .dot{flex:none;width:clamp(30px,3vw,46px);height:clamp(30px,3vw,46px);border-radius:50%;background:rgba(255,255,255,.35);display:grid;place-items:center;font-family:var(--f-display);font-size:.8em}
+.c0{background:var(--b);color:var(--on-b)} .c1{background:var(--o);color:var(--on-o)} .c2{background:var(--g);color:var(--on-g)} .c3{background:var(--y);color:var(--on-y)}
+.opt.dimmed{opacity:.22;filter:grayscale(.6)}
+.opt.right{outline:6px solid var(--bone);outline-offset:3px;animation:pulse 1s ease-in-out infinite}
+.opt .pickers{margin-left:auto;font-size:.85em;letter-spacing:-.1em}
+.timerbar{width:100%;height:14px;border-radius:999px;background:var(--wall2);overflow:hidden}
+.timerbar>i{display:block;height:100%;background:linear-gradient(90deg,var(--blood),var(--y));border-radius:inherit;transition:width .1s linear}
+.secs{font-family:var(--f-display);font-size:clamp(1.6rem,3vw,2.6rem);color:var(--y);font-variant-numeric:tabular-nums}
+.cellar h2{font-size:clamp(3rem,9vw,7.5rem);color:var(--blood);text-shadow:0 0 50px rgba(255,59,92,.5);animation:shake .6s}
+.victims{display:flex;gap:16px;flex-wrap:wrap;justify-content:center}
+.victim{display:grid;justify-items:center;gap:4px;font-weight:800;font-size:clamp(1rem,1.6vw,1.4rem);min-width:110px}
+.victim .av{font-size:clamp(2.6rem,5vw,4.4rem);line-height:1}
+.victim .res{font-size:.9em;color:var(--dim);font-weight:600}
+.victim.dead .av{filter:grayscale(1) brightness(.7)}
+.victim.dead{color:var(--blood)}
+.victim.alive{color:var(--g)}
+.mgname{font-size:clamp(1.8rem,4vw,3.4rem);color:var(--y)}
+.track{width:100%;display:grid;gap:8px}
+.lane{display:grid;grid-template-columns:minmax(90px,160px) 1fr;gap:10px;align-items:center;text-align:left;font-weight:700}
+.lane .cells{display:grid;grid-template-columns:repeat(var(--n),1fr) auto;gap:4px;align-items:center}
+.cell{height:clamp(26px,3vw,40px);border-radius:8px;background:var(--wall2);display:grid;place-items:center;font-size:clamp(1rem,2vw,1.6rem)}
+.cell.me{background:var(--line)}
+.lane.ghost{color:var(--ghost)}
+.exit{font-size:clamp(1.4rem,2.6vw,2.2rem)}
+.podium{display:grid;gap:8px;justify-items:center}
+.podium .crown{font-size:clamp(3rem,7vw,5.5rem);line-height:1;animation:pop .6s cubic-bezier(.2,1.6,.4,1)}
+.podium h2{font-size:clamp(2rem,4.5vw,3.8rem);color:var(--y)}
+.scoreboard{display:grid;gap:6px;width:min(560px,100%)}
+.scoreboard .r{display:flex;gap:12px;align-items:center;padding:8px 14px;border-radius:12px;background:var(--wall);font-weight:700}
+.scoreboard .r b{margin-left:auto;color:var(--y);font-variant-numeric:tabular-nums}
+#toasts{position:fixed;right:max(16px,env(safe-area-inset-right,0px));top:calc(70px + env(safe-area-inset-top,0px));display:grid;gap:8px;z-index:20;width:min(420px,calc(100% - 32px));pointer-events:none}
+.toast{background:var(--bone);color:var(--ink);padding:10px 14px;border-radius:14px;font-weight:700;box-shadow:0 8px 24px rgba(0,0,0,.4);animation:slidein .35s cubic-bezier(.2,1.4,.4,1);display:flex;gap:10px;align-items:center}
+.toast .e{font-size:1.6rem}
+.toast.red{background:var(--blood);color:#fff}
+#floaters{position:fixed;inset:0;pointer-events:none;z-index:15;overflow:hidden}
+.floater{position:absolute;bottom:-60px;font-size:2.6rem;animation:floatup 3.2s ease-out forwards}
+.floater small{display:block;font-size:.8rem;font-weight:700;color:var(--bone);text-align:center}
+.qpanel{position:fixed;inset:0;z-index:30;background:rgba(10,5,15,.85);display:grid;place-items:center;padding:16px}
+.qpanel .panel{width:min(760px,100%);max-height:90%;overflow:auto}
+.qpanel textarea{min-height:240px;font-size:.9rem;font-family:ui-monospace,Consolas,monospace}
+
+/* ---------- player ---------- */
+.player{min-height:100%;display:grid;grid-template-rows:auto 1fr auto;gap:12px;max-width:760px;margin:0 auto}
+.pbar{display:flex;align-items:center;gap:10px;padding:8px 12px;border-radius:16px;background:var(--wall);border:2px solid var(--line)}
+.pbar .av{font-size:1.8rem}
+.pbar .nm{font-weight:800}
+.pbar .sc{margin-left:auto;font-family:var(--f-display);color:var(--y);font-variant-numeric:tabular-nums}
+.pmain{display:grid;align-content:center;gap:16px;text-align:center;min-height:0}
+.pmain h2{font-size:clamp(1.6rem,6vw,2.6rem)}
+.pmain .big{font-size:clamp(3.5rem,14vw,6rem);line-height:1}
+.pads{display:grid;grid-template-columns:1fr 1fr;gap:12px;position:relative}
+.pad{min-height:clamp(90px,18vh,160px);border-radius:22px;font-weight:800;font-size:clamp(1rem,3.4vw,1.4rem);padding:14px;display:grid;place-items:center;text-align:center;box-shadow:inset 0 -8px 0 rgba(0,0,0,.28),inset 0 8px 0 rgba(255,255,255,.2),0 6px 0 rgba(0,0,0,.35);transition:transform .06s,filter .2s}
+.pad:active{transform:translateY(4px)}
+.pad[disabled]{cursor:not-allowed}
+.pad.picked{outline:5px solid var(--bone);outline-offset:3px}
+.pads.locked .pad:not(.picked){opacity:.3}
+.pads.mirror{transform:scaleX(-1)}
+.pads.frozen .pad{filter:saturate(.2) brightness(1.4) hue-rotate(160deg)}
+.ink{position:absolute;inset:0;pointer-events:none;z-index:3}
+.ink i{position:absolute;border-radius:50%;background:radial-gradient(circle at 40% 40%,#0b0610 0 55%,rgba(11,6,16,.9) 60%,transparent 72%)}
+.ice{position:absolute;inset:-6px;border-radius:24px;z-index:4;display:grid;place-items:center;background:rgba(166,236,255,.25);backdrop-filter:blur(2px);font-family:var(--f-display);font-size:1.6rem;color:var(--ink);pointer-events:none}
+.effects{display:flex;gap:8px;flex-wrap:wrap;justify-content:center}
+.effect{background:var(--blood);color:#fff;padding:6px 12px;border-radius:999px;font-weight:700;font-size:.9rem}
+.hand{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px}
+.card{padding:14px;border-radius:16px;background:var(--wall2);border:2px solid var(--line);display:grid;gap:4px;text-align:left}
+.card .e{font-size:2rem;line-height:1}
+.card b{font-family:var(--f-display);font-weight:400}
+.card small{color:var(--dim);font-size:.8rem}
+.card.sel{border-color:var(--y);background:#3a2a1a}
+.card.passive{opacity:.75;cursor:default}
+.targets{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:8px}
+.target{padding:12px;border-radius:14px;background:var(--wall);border:2px solid var(--blood);font-weight:800;display:flex;gap:8px;align-items:center;justify-content:center}
+.bets{display:flex;gap:8px;flex-wrap:wrap;justify-content:center}
+.bet{padding:10px 16px;border-radius:999px;background:var(--wall2);border:2px solid var(--line);font-weight:800}
+.bet.sel{background:var(--y);color:var(--on-y);border-color:var(--y)}
+.reacts{display:flex;gap:8px;justify-content:center;flex-wrap:wrap}
+.reacts button{font-size:1.7rem;width:54px;height:54px;border-radius:50%;background:var(--wall);border:2px solid var(--line)}
+.reactbox{height:min(52vh,360px);border-radius:24px;display:grid;place-items:center;font-family:var(--f-display);font-size:clamp(1.8rem,8vw,3rem);background:var(--blood);color:#fff;user-select:none}
+.reactbox.go{background:var(--g);color:var(--on-g)}
+.reactbox.done{background:var(--wall2);color:var(--bone)}
+.mpads{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.mpad{height:clamp(90px,20vh,150px);border-radius:22px;opacity:.45;transition:opacity .1s,transform .1s}
+.mpad.lit{opacity:1;transform:scale(1.04);box-shadow:0 0 40px currentColor}
+.doors{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+.door{height:clamp(150px,34vh,260px);border-radius:60px 60px 8px 8px;background:linear-gradient(180deg,#5a3a24,#3a2414);border:4px solid #2a180c;font-family:var(--f-display);font-size:2rem;color:var(--y);position:relative}
+.door::after{content:"";position:absolute;right:16%;top:55%;width:12px;height:12px;border-radius:50%;background:var(--y)}
+.door.sel{outline:5px solid var(--y);outline-offset:3px}
+.mathq{font-family:var(--f-display);font-size:clamp(2.2rem,9vw,3.6rem);color:var(--y)}
+.mathrow{display:flex;gap:10px;max-width:360px;margin:0 auto;width:100%}
+.mathrow input{font-size:1.6rem;text-align:center}
+.joinform{display:grid;gap:14px;max-width:440px;margin:0 auto;width:100%;text-align:left}
+.joinform .codein{font-family:var(--f-display);font-size:2.2rem;text-align:center;letter-spacing:.3em;text-transform:uppercase}
+.emojis{display:grid;grid-template-columns:repeat(6,1fr);gap:6px}
+.emojis button{font-size:1.7rem;height:52px;border-radius:12px;background:var(--wall);border:2px solid var(--line)}
+.emojis button.sel{border-color:var(--y);background:var(--wall2)}
+.err{color:var(--blood);font-weight:700}
+body.is-ghost #app{background-color:#0d1420}
+body.is-ghost .pbar{border-color:var(--ghost)}
+
+.guesshint{font-size:clamp(1.2rem,2.4vw,2rem);font-weight:800;color:var(--ghost);padding:18px 26px;border:3px dashed var(--ghost);border-radius:20px}
+.guesslist{display:grid;gap:6px;width:min(820px,100%)}
+.guesslist .g{display:grid;grid-template-columns:2.2em minmax(0,1fr) auto auto 4.5em;gap:12px;align-items:center;padding:8px 14px;border-radius:12px;background:var(--wall);font-weight:700;text-align:left;font-size:clamp(.95rem,1.6vw,1.25rem)}
+.guesslist .g .m{font-size:1.4em}
+.guesslist .gv{font-family:var(--f-display);color:var(--bone);font-variant-numeric:tabular-nums}
+.guesslist .gd{color:var(--dim);font-size:.85em}
+.guesslist .g b{color:var(--g);text-align:right;font-variant-numeric:tabular-nums}
+.guesslist .g.best{background:#2a2410;outline:2px solid var(--y)}
+.guesslist .g.worst{background:#33101a;outline:2px solid var(--blood)}
+.guessbox{font-family:var(--f-display);font-size:clamp(2.2rem,10vw,3.4rem);color:var(--y);background:var(--ink);border:3px solid var(--line);border-radius:18px;padding:8px 14px;min-height:1.6em;font-variant-numeric:tabular-nums;overflow-x:auto}
+.keypad{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.keypad.mirror{transform:scaleX(-1)}
+.keypad.frozen .key{filter:saturate(.2) brightness(1.4) hue-rotate(160deg)}
+.key{height:clamp(52px,9vh,70px);border-radius:14px;background:var(--wall2);border:2px solid var(--line);font-family:var(--f-display);font-size:1.5rem;box-shadow:0 4px 0 rgba(0,0,0,.35)}
+.key:active{transform:translateY(3px);box-shadow:none}
+@media (max-width:560px){.guesslist .g{grid-template-columns:2em minmax(0,1fr) auto;}.guesslist .gd,.guesslist .g b{display:none}}
+.packs{display:grid;gap:6px}
+.packrow{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:8px}
+.pack{display:grid;grid-template-columns:auto 1fr;grid-template-rows:auto auto;column-gap:8px;align-items:center;text-align:left;padding:8px 12px;border-radius:14px;background:var(--ink);border:2px solid var(--line);font-weight:700;font-size:.92rem}
+.pack .pe{grid-row:span 2;font-size:1.5rem}
+.pack small{color:var(--dim);font-weight:600}
+.pack.on{border-color:var(--y);background:#2e2512}
+.pack.on small{color:var(--y)}
+.pack[disabled]{opacity:.4;cursor:not-allowed}
+.pq{font-size:clamp(1.1rem,4vw,1.5rem);font-weight:800}
+.mirror{transform:scaleX(-1)}
+.frozen>button,.frozen input{filter:saturate(.2) brightness(1.4) hue-rotate(160deg)}
+.olist{display:grid;gap:8px;position:relative}
+.oitem{display:flex;align-items:center;gap:12px;padding:12px 14px;border-radius:16px;background:var(--wall2);border:2px solid var(--line);font-weight:700;font-size:clamp(1rem,3.6vw,1.2rem);text-align:left;min-height:58px}
+.oitem .onum{flex:none;width:34px;height:34px;border-radius:50%;border:2px dashed var(--line);display:grid;place-items:center;font-family:var(--f-display);color:var(--ink)}
+.oitem.on{border-color:var(--y);background:#2e2512}
+.oitem.on .onum{background:var(--y);border-color:var(--y)}
+.olist.locked .oitem{opacity:.85}
+.ocards{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px;width:100%}
+.ocard{padding:16px;border-radius:16px;background:var(--wall2);border:2px solid var(--line);font-weight:800;font-size:clamp(1rem,1.8vw,1.5rem)}
+.orev{list-style:none;margin:0;padding:0;display:grid;gap:8px;width:min(860px,100%);text-align:left}
+.orev li{display:flex;align-items:center;gap:12px;padding:10px 14px;border-radius:14px;background:var(--wall);font-weight:700;font-size:clamp(1rem,1.8vw,1.4rem)}
+.orev li .on{flex:none;width:36px;height:36px;border-radius:50%;background:var(--y);color:var(--ink);display:grid;place-items:center;font-family:var(--f-display)}
+.orev li b{margin-left:auto;color:var(--y);font-variant-numeric:tabular-nums;white-space:nowrap}
+.orev li .pickers{font-size:.9em;letter-spacing:-.1em}
+.orev.small li{font-size:.95rem;padding:8px 10px}
+.tfstate{font-size:clamp(1.2rem,4.6vw,1.7rem);font-weight:800;padding:18px;border-radius:18px;background:var(--wall);border:2px solid var(--line);min-height:5.5em;display:grid;place-items:center}
+.tfstate.flip{animation:pop .3s ease-out}
+.tfbtns{display:flex;gap:12px;position:relative}
+.tfb{flex:1;min-height:clamp(80px,16vh,130px);border-radius:22px;font-family:var(--f-display);font-size:clamp(1.3rem,5vw,1.9rem);box-shadow:inset 0 -8px 0 rgba(0,0,0,.28),0 6px 0 rgba(0,0,0,.35)}
+.tfb.yes{background:var(--g);color:var(--on-g)} .tfb.no{background:var(--blood);color:#fff}
+.tfb:active{transform:translateY(4px)}
+.tfprog{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:10px;width:100%}
+.tp{display:grid;gap:4px;text-align:left;font-weight:700}
+.tp .bar{height:12px;border-radius:999px;background:var(--wall2);overflow:hidden}
+.tp .bar i{display:block;height:100%;background:var(--g);transition:width .3s}
+.tp.ghost{color:var(--ghost)}
+.tfrev{display:grid;gap:8px;width:min(900px,100%);text-align:left}
+.tfrev .tr{display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:12px;align-items:center;padding:10px 14px;border-radius:14px;background:var(--wall);font-size:clamp(.95rem,1.6vw,1.2rem)}
+.tfrev .tr small{display:block;color:var(--dim);font-weight:500;margin-top:2px}
+.tfrev.small .tr{font-size:.9rem;padding:8px 10px}
+.badge{font-family:var(--f-display);font-size:.8em;padding:4px 10px;border-radius:999px}
+.badge.yes{background:var(--g);color:var(--on-g)} .badge.no{background:var(--blood);color:#fff}
+.listform{display:flex;gap:8px;position:relative}
+.listform input{font-size:1.3rem}
+.wobble{animation:wobble 1.2s ease-in-out infinite}
+.lchips{display:flex;flex-wrap:wrap;gap:6px;justify-content:center;max-height:30vh;overflow:auto}
+.lchip{padding:5px 11px;border-radius:999px;font-weight:700;font-size:.92rem;background:var(--wall2)}
+.lchip.ok{background:#123a24;color:#7dffb0} .lchip.no{background:#3a1220;color:#ff9fb0;text-decoration:line-through} .lchip.dup{color:var(--dim)}
+.lgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:6px;width:100%}
+.lc{padding:8px 10px;border-radius:12px;background:var(--wall2);font-weight:700;text-align:left;display:grid;gap:2px}
+.lc small{font-size:1.1rem;letter-spacing:-.1em;min-height:1.2em}
+.lc.none{opacity:.35}
+.lc.uniq{background:#2e2512;outline:2px solid var(--y)}
+.reslist{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;width:100%}
+.rr{display:flex;gap:10px;align-items:center;padding:6px 12px;border-radius:999px;background:var(--wall);font-weight:700}
+.rr b{color:var(--g);font-variant-numeric:tabular-nums}
+.rr.worst{outline:2px solid var(--blood);background:#33101a}
+.stroop{font-family:var(--f-display);font-size:clamp(2.4rem,11vw,4rem);padding:20px 0;letter-spacing:.03em}
+.vbtns{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.vbtn{padding:20px 10px;border-radius:16px;background:var(--wall2);border:2px solid var(--line);font-family:var(--f-display);font-size:clamp(1rem,4vw,1.3rem)}
+.vbtn.wrong{background:var(--blood);color:#fff}
+.chests{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+.chest{aspect-ratio:1;max-width:100%;border-radius:16px;background:linear-gradient(180deg,#5a3a24,#3a2414);border:3px solid #2a180c;font-size:clamp(1.8rem,8vw,2.6rem);display:grid;place-items:center;line-height:1}
+.chest small{font-size:.9rem;font-weight:800;color:var(--y)}
+.chest.opening{animation:shake .5s infinite}
+.chest.open{background:#2e2512;border-color:var(--y)}
+.chest.trap{background:var(--blood);border-color:#8f1029}
+@keyframes wobble{0%,100%{transform:rotate(-3deg)}50%{transform:rotate(3deg)}}
+.setchips{display:flex;flex-wrap:wrap;gap:6px}
+.setchip{padding:7px 12px;border-radius:999px;background:var(--ink);border:2px solid var(--line);font-weight:700;font-size:.9rem}
+.setchip small{color:var(--dim);margin-left:4px}
+.setchip.sel{border-color:var(--y);background:#2e2512}
+.setchip.add{border-style:dashed}
+.qhelp{background:var(--ink);border-radius:12px;padding:8px 12px}
+.qhelp summary{cursor:pointer;font-weight:700}
+.qhelp[open]{display:grid;gap:8px}
+.qcode{background:var(--wall2);padding:8px 10px;border-radius:8px;display:block;overflow-x:auto;white-space:pre;font-size:.85rem}
+.btn.danger{border-color:var(--blood);color:var(--blood)}
+.pack.own{border-style:dashed}
+.pack.own.on{border-style:solid}
+.addpack{border-style:dashed;color:var(--dim)}
+.addpack .pe{color:var(--y)}
+@keyframes pop{0%{transform:scale(.2);opacity:0}100%{transform:scale(1);opacity:1}}
+@keyframes pulse{50%{outline-color:var(--y)}}
+@keyframes shake{0%,100%{transform:translateX(0)}20%{transform:translateX(-14px) rotate(-2deg)}40%{transform:translateX(12px) rotate(2deg)}60%{transform:translateX(-8px)}80%{transform:translateX(6px)}}
+@keyframes slidein{from{transform:translateX(60px);opacity:0}to{transform:none;opacity:1}}
+@keyframes floatup{0%{transform:translateY(0) scale(.6);opacity:0}15%{opacity:1;transform:translateY(-15vh) scale(1.1)}100%{transform:translateY(-95vh) scale(1);opacity:0}}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+@media (max-width:560px){.opts{grid-template-columns:1fr}.lane{grid-template-columns:80px 1fr}}
+</style>
+
+<div id="app"></div>
+<div id="toasts"></div>
+<div id="floaters"></div>
+
+<script>
+"use strict";
+/* ================= utilities ================= */
+const $ = (s, r = document) => r.querySelector(s);
+const $$ = (s, r = document) => [...r.querySelectorAll(s)];
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const rnd = n => Math.floor(Math.random() * n);
+const pick = a => a[rnd(a.length)];
+const shuffle = a => { a = a.slice(); for (let i = a.length - 1; i > 0; i--) { const j = rnd(i + 1); [a[i], a[j]] = [a[j], a[i]]; } return a; };
+const uid = () => Math.random().toString(36).slice(2, 10) + Date.now().toString(36).slice(-4);
+const fmt = (s, o) => s.replace(/\{(\w+)\}/g, (_, k) => o[k] ?? '');
+const store = {
+  get(k, d) { try { const v = localStorage.getItem(k); return v == null ? d : JSON.parse(v); } catch (e) { return d; } },
+  set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) {} }
+};
+const sstore = {
+  get(k, d) { try { const v = sessionStorage.getItem(k); return v == null ? d : JSON.parse(v); } catch (e) { return d; } },
+  set(k, v) { try { sessionStorage.setItem(k, JSON.stringify(v)); } catch (e) {} }
+};
+const app = $('#app');
+const LETTERS = 'ABCDEFGHJKLMNPRSTUVYZ';
+const newCode = () => Array.from({length: 4}, () => pick(LETTERS)).join('');
+/* ---- relay connection: MQTT over secure WebSocket via public brokers (works where peer-to-peer is blocked) ---- */
+const BROKERS = (() => {
+  try { const q = new URLSearchParams(location.search).get('broker'); if (q) return q.split(',').map((u, i) => ({name: 'Testi' + (i + 1), url: u})); } catch (e) {}
+  return [
+    {name: 'EMQX', url: 'wss://broker.emqx.io:8084/mqtt'},
+    {name: 'HiveMQ', url: 'wss://broker.hivemq.com:8884/mqtt'},
+    {name: 'Mosquitto', url: 'wss://test.mosquitto.org:8081/mqtt'},
+  ];
+})();
+const TOPIC = code => 'kaaoskartano/v2/' + code;
+const TE = new TextEncoder(), TD = new TextDecoder();
+const mstr = s => { const b = TE.encode(s); const o = new Uint8Array(b.length + 2); o[0] = b.length >> 8; o[1] = b.length & 255; o.set(b, 2); return o; };
+const mcat = (...parts) => { const n = parts.reduce((a, p) => a + p.length, 0); const o = new Uint8Array(n); let i = 0; for (const p of parts) { o.set(p, i); i += p.length; } return o; };
+function mpkt(h, body) {
+  const len = []; let n = body.length;
+  do { let d = n % 128; n = Math.floor(n / 128); if (n > 0) d |= 128; len.push(d); } while (n > 0);
+  return mcat([h], len, body);
+}
+class MiniMqtt {
+  constructor(url) { this.url = url; this.buf = new Uint8Array(0); this.pid = 1; this.open = false; this.onmessage = null; this.onclose = null; }
+  connect(ms = 7000) {
+    return new Promise((res, rej) => {
+      let done = false;
+      const fin = (ok, e) => { if (done) return; done = true; clearTimeout(t); if (ok) res(this); else { rej(e || new Error('fail')); this.close(); } };
+      const t = setTimeout(() => fin(false, new Error('timeout')), ms);
+      let ws; try { ws = new WebSocket(this.url, ['mqtt']); } catch (e) { return fin(false, e); }
+      this.ws = ws; ws.binaryType = 'arraybuffer';
+      this._connack = rc => { if (rc === 0) { this.open = true; this.ping = setInterval(() => this._send(new Uint8Array([0xC0, 0])), 25000); fin(true); } else fin(false, new Error('refused ' + rc)); };
+      ws.onopen = () => this._send(mpkt(0x10, mcat(mstr('MQTT'), [4, 0x02, 0, 60], mstr('kk' + Math.random().toString(36).slice(2, 14)))));
+      ws.onmessage = e => this._data(new Uint8Array(e.data));
+      ws.onerror = () => fin(false, new Error('ws'));
+      ws.onclose = () => { const was = this.open; this.open = false; clearInterval(this.ping); fin(false, new Error('closed')); if (was && this.onclose) this.onclose(); };
+    });
+  }
+  _send(b) { try { if (this.ws && this.ws.readyState === 1) this.ws.send(b); } catch (e) {} }
+  _data(chunk) {
+    this.buf = mcat(this.buf, chunk);
+    while (this.buf.length >= 2) {
+      let mult = 1, len = 0, i = 1, byte;
+      do { if (i >= this.buf.length) return; byte = this.buf[i++]; len += (byte & 127) * mult; mult *= 128; } while (byte & 128);
+      if (this.buf.length < i + len) return;
+      const h = this.buf[0], body = this.buf.subarray(i, i + len); this.buf = this.buf.slice(i + len);
+      const type = h >> 4;
+      if (type === 2 && this._connack) this._connack(body[1]);
+      if (type === 3) {
+        const tl = (body[0] << 8) | body[1]; const topic = TD.decode(body.subarray(2, 2 + tl));
+        const off = 2 + tl + (((h >> 1) & 3) ? 2 : 0);
+        if (this.onmessage) try { this.onmessage(topic, TD.decode(body.subarray(off))); } catch (e) { console.error(e); }
+      }
+    }
+  }
+  subscribe(topic) { const id = this.pid++ & 0xffff || 1; this._send(mpkt(0x82, mcat([id >> 8, id & 255], mstr(topic), [0]))); }
+  publish(topic, str) { this._send(mpkt(0x30, mcat(mstr(topic), TE.encode(str)))); }
+  close() { this.open = false; clearInterval(this.ping); try { this._send(new Uint8Array([0xE0, 0])); this.ws && this.ws.close(); } catch (e) {} }
+}
+const BTNS = ['Sininen', 'Oranssi', 'Vihreä', 'Keltainen'];
+const EMOJIS = ['👽','🦇','🧛','🧟','🤡','🐸','🦄','🐙','🤖','🎃','🐈‍⬛','🦉'];
+const TRACK = 10;
+
+/* ================= game content ================= */
+const QBANK = [
+ ['Mikä on Suomen pisin kokonaan Suomessa virtaava joki?','Kemijoki','Tornionjoki','Oulujoki','Kokemäenjoki','Maantieto'],
+ ['Montako luuta aikuisen ihmisen luurangossa on?','206','186','226','312','Tiede'],
+ ['Mikä planeetta on lähimpänä Aurinkoa?','Merkurius','Venus','Mars','Maa','Tiede'],
+ ['Minä vuonna Suomi julistautui itsenäiseksi?','1917','1918','1905','1939','Historia'],
+ ['Mikä on veden kemiallinen kaava?','H₂O','CO₂','H₂O₂','HO','Tiede'],
+ ['Kuka maalasi Mona Lisan?','Leonardo da Vinci','Michelangelo','Rafael','Botticelli','Kulttuuri'],
+ ['Mikä on maailman suurin valtameri?','Tyynimeri','Atlantti','Intian valtameri','Pohjoinen jäämeri','Maantieto'],
+ ['Mikä on Australian pääkaupunki?','Canberra','Sydney','Melbourne','Perth','Maantieto'],
+ ['Montako sydäntä mustekalalla on?','3','1','2','8','Tiede'],
+ ['Minkä alkuaineen kemiallinen merkki on Fe?','Rauta','Fluori','Fosfori','Francium','Tiede'],
+ ['Mikä on Suomen suurin järvi?','Saimaa','Päijänne','Inarijärvi','Oulujärvi','Maantieto'],
+ ['Kuka kirjoitti romaanin Seitsemän veljestä?','Aleksis Kivi','J. L. Runeberg','Juhani Aho','Minna Canth','Kulttuuri'],
+ ['Montako pelaajaa jalkapallojoukkueella on kentällä yhtä aikaa?','11','10','9','12','Urheilu'],
+ ['Mikä on maailman korkein vuori merenpinnasta mitattuna?','Mount Everest','K2','Kilimanjaro','Mont Blanc','Maantieto'],
+ ['Mikä kaasu muodostaa suurimman osan maapallon ilmakehästä?','Typpi','Happi','Hiilidioksidi','Argon','Tiede'],
+ ['Missä maassa Machu Picchu sijaitsee?','Peru','Meksiko','Bolivia','Chile','Maantieto'],
+ ['Kuinka nopeasti valo kulkee tyhjiössä (noin)?','300 000 km/s','30 000 km/s','3 000 km/s','3 000 000 km/s','Tiede'],
+ ['Montako minuuttia on vuorokaudessa?','1440','1240','1600','1340','Sekalaiset'],
+ ['Mikä on maailman suurin eläin?','Sinivalas','Afrikannorsu','Valashai','Kaskelotti','Tiede'],
+ ['Minä vuonna ihminen kävi ensimmäisen kerran Kuussa?','1969','1965','1972','1961','Historia'],
+ ['Mikä on Japanin valuutta?','Jeni','Juan','Won','Rupia','Sekalaiset'],
+ ['Kuka sävelsi Finlandian?','Jean Sibelius','Fredrik Pacius','Oskar Merikanto','Leevi Madetoja','Kulttuuri'],
+ ['Mikä on ihmiskehon suurin elin?','Iho','Maksa','Aivot','Keuhkot','Tiede'],
+ ['Mikä valtio on pinta-alaltaan maailman suurin?','Venäjä','Kanada','Kiina','Yhdysvallat','Maantieto'],
+ ['Mikä on Euroopan pisin joki?','Volga','Tonava','Rein','Dnepr','Maantieto'],
+ ['Kuka kehitti suhteellisuusteorian?','Albert Einstein','Isaac Newton','Niels Bohr','Galileo Galilei','Tiede'],
+ ['Mikä näistä on suurin luku?','2⁵','3³','5²','4²','Matematiikka'],
+ ['Montako tuntia on viikossa?','168','148','172','186','Sekalaiset'],
+ ['Mikä on Ruotsin pääkaupunki?','Tukholma','Göteborg','Malmö','Uppsala','Maantieto'],
+ ['Mikä planeetta tunnetaan punaisena planeettana?','Mars','Jupiter','Venus','Saturnus','Tiede'],
+ ['Montako itsenäistä valtiota Pohjoismaihin kuuluu?','5','4','6','3','Maantieto'],
+ ['Mikä on kullan kemiallinen merkki?','Au','Ag','Go','Gd','Tiede'],
+ ['Kuka oli Suomen ensimmäinen presidentti?','K. J. Ståhlberg','P. E. Svinhufvud','C. G. E. Mannerheim','L. K. Relander','Historia'],
+ ['Mikä on kolmion kulmien summa?','180°','360°','90°','270°','Matematiikka'],
+ ['Kuka Shakespearen henkilöistä pohtii kysymystä ”ollako vai eikö olla”?','Hamlet','Macbeth','Othello','Romeo','Kulttuuri'],
+ ['Mikä on maailman suurin kuuma aavikko?','Sahara','Gobi','Kalahari','Atacama','Maantieto'],
+ ['Montako hammasta aikuisella on, kun viisaudenhampaat lasketaan mukaan?','32','28','30','36','Tiede'],
+ ['Mitä ruokasuola on kemialliselta nimeltään?','Natriumkloridi','Kaliumkloridi','Natriumkarbonaatti','Kalsiumkloridi','Tiede'],
+ ['Minä vuonna Suomi voitti ensimmäisen miesten jääkiekon MM-kultansa?','1995','2011','1992','2019','Urheilu'],
+ ['Mikä on binääriluku 1010 kymmenjärjestelmässä?','10','8','12','5','Matematiikka'],
+ ['Mikä on maailmankaikkeuden yleisin alkuaine?','Vety','Helium','Happi','Hiili','Tiede'],
+ ['Mikä kaupunki oli Suomen suuriruhtinaskunnan pääkaupunki ennen Helsinkiä?','Turku','Tampere','Porvoo','Hämeenlinna','Historia'],
+ ['Montako senttimetriä on yhdessä kilometrissä?','100 000','10 000','1 000 000','1 000','Matematiikka'],
+ ['Mikä on Kanadan pääkaupunki?','Ottawa','Toronto','Vancouver','Montreal','Maantieto'],
+ ['Minkä värinen on smaragdi?','Vihreä','Sininen','Punainen','Violetti','Sekalaiset'],
+];
+
+const NUMBANK = [
+ ['Minä vuonna Berliinin muuri murtui?', 1989, 'Historia'],
+ ['Minä vuonna Eiffel-torni valmistui?', 1889, 'Historia'],
+ ['Montako jäsenmaata Euroopan unionissa on?', 27, 'Yhteiskunta'],
+ ['Minä vuonna Titanic upposi?', 1912, 'Historia'],
+ ['Mikä on veden kiehumispiste Fahrenheit-asteina?', 212, 'Tiede'],
+ ['Minä vuonna Kolumbus saapui Amerikkaan?', 1492, 'Historia'],
+ ['Minä vuonna talvisota alkoi?', 1939, 'Historia'],
+ ['Kuinka korkea on Mount Everest metreinä?', 8849, 'Maantieto'],
+ ['Kuinka pitkä on maapallon ympärysmitta päiväntasaajaa pitkin kilometreinä (noin)?', 40075, 'Maantieto'],
+ ['Minä vuonna ensimmäinen iPhone julkaistiin?', 2007, 'Tekniikka'],
+ ['Montako luuta on yhdessä ihmisen kädessä ranne mukaan lukien?', 27, 'Tiede'],
+ ['Minä vuonna Suomi liittyi Euroopan unioniin?', 1995, 'Historia'],
+ ['Montako kosketinta tavallisessa pianossa on?', 88, 'Kulttuuri'],
+ ['Minä vuonna Kalevalan ensimmäinen laitos (Vanha Kalevala) julkaistiin?', 1835, 'Kulttuuri'],
+ ['Kuinka monta neliökilometriä on Suomen pinta-ala (noin)?', 338000, 'Maantieto'],
+ ['Montako sekuntia on vuorokaudessa?', 86400, 'Matematiikka'],
+ ['Minä vuonna toinen maailmansota päättyi?', 1945, 'Historia'],
+ ['Kuinka monta kilometriä maratonilla juostaan?', 42.195, 'Urheilu'],
+ ['Minä vuonna C. G. E. Mannerheim syntyi?', 1867, 'Historia'],
+ ['Montako kirjainta suomen aakkosissa on?', 29, 'Kieli'],
+ ['Kuinka korkea on Burj Khalifa metreinä?', 828, 'Maantieto'],
+ ['Minä vuonna Helsingissä järjestettiin kesäolympialaiset?', 1952, 'Urheilu'],
+ ['Montako päivää on karkausvuodessa?', 366, 'Sekalaiset'],
+ ['Montako minuuttia jalkapallo-ottelun varsinainen peliaika kestää?', 90, 'Urheilu'],
+];
+const PACKS = {
+ yleis: {name: 'Yleistieto', emoji: '🧠', mc: QBANK, num: NUMBANK},
+ historia: {name: 'Historia', emoji: '📜', mc: [
+  ['Kuka Ranskan keisari hävisi Waterloon taistelun vuonna 1815?','Napoleon Bonaparte','Ludvig XIV','Kaarle Suuri','Napoleon III'],
+  ['Mikä sota käytiin Suomessa vuosina 1941–1944?','Jatkosota','Talvisota','Lapin sota','Sisällissota'],
+  ['Minä vuonna Suomen sisällissota käytiin?','1918','1917','1919','1939'],
+  ['Kuka johti Neuvostoliittoa talvisodan aikana?','Josif Stalin','Vladimir Lenin','Nikita Hruštšov','Leonid Brežnev'],
+  ['Minä vuonna Ranskan vallankumous alkoi?','1789','1776','1815','1848'],
+  ['Kuka oli Yhdysvaltain ensimmäinen presidentti?','George Washington','Thomas Jefferson','Abraham Lincoln','John Adams'],
+  ['Mille valtiolle Ruotsi menetti Suomen vuonna 1809?','Venäjälle','Tanskalle','Preussille','Norjalle'],
+  ['Minä vuonna suomalaiset naiset saivat äänioikeuden ja oikeuden asettua ehdolle?','1906','1917','1921','1945'],
+  ['Kuka oli Suomen ensimmäinen naispresidentti?','Tarja Halonen','Sanna Marin','Elisabeth Rehn','Anneli Jäätteenmäki'],
+  ['Mihin kaupunkiin pudotettiin ensimmäinen sodassa käytetty atomipommi?','Hiroshima','Nagasaki','Tokio','Osaka'],
+  ['Kuka oli Rooman valtakunnan ensimmäinen keisari?','Augustus','Julius Caesar','Nero','Caligula'],
+  ['Minä vuonna Neuvostoliitto hajosi?','1991','1989','1985','1993'],
+  ['Kuka julkaisi 95 teesiään vuonna 1517?','Martti Luther','Jean Calvin','Mikael Agricola','Paavi Leo X'],
+  ['Kuka loi pohjan suomen kirjakielelle?','Mikael Agricola','Elias Lönnrot','J. V. Snellman','Aleksis Kivi'],
+  ['Kenen johtama retkikunta purjehti ensimmäisenä maapallon ympäri?','Ferdinand Magellanin','Kristoffer Kolumbuksen','Vasco da Gaman','James Cookin'],
+  ['Millä nimellä tunnetaan talvisodan päättänyt rauhansopimus?','Moskovan rauha','Pariisin rauha','Tarton rauha','Turun rauha'],
+  ['Mikä tapahtuma laukaisi ensimmäisen maailmansodan?','Franz Ferdinandin murha Sarajevossa','Saksan hyökkäys Puolaan','Pearl Harborin isku','Bastiljin valtaus'],
+  ['Mikä maa hyökkäsi Puolaan 1.9.1939 ja aloitti toisen maailmansodan?','Saksa','Neuvostoliitto','Italia','Japani'],
+  ['Mitkä kaksi supervaltaa olivat vastakkain kylmässä sodassa?','Yhdysvallat ja Neuvostoliitto','Iso-Britannia ja Saksa','Kiina ja Japani','Ranska ja Venäjä'],
+  ['Mikä muinainen kulttuuri rakensi Gizan pyramidit?','Egyptiläiset','Roomalaiset','Kreikkalaiset','Mayat'],
+  ['Kuka oli Suomen ensimmäinen presidentti?','K. J. Ståhlberg','P. E. Svinhufvud','C. G. E. Mannerheim','L. K. Relander'],
+  ['Mikä kaupunki oli Suomen pääkaupunki ennen Helsinkiä?','Turku','Tampere','Porvoo','Hämeenlinna'],
+ ], num: [
+  ['Montako päivää talvisota kesti?', 105],
+  ['Montako vuotta satavuotinen sota todellisuudessa kesti?', 116],
+  ['Minä vuonna Turun palo tuhosi suuren osan Turusta?', 1827],
+  ['Minä vuonna Lapin sota päättyi?', 1945],
+  ['Minä vuonna Berliinin muuri murtui?', 1989],
+  ['Minä vuonna Titanic upposi?', 1912],
+  ['Minä vuonna Kolumbus saapui Amerikkaan?', 1492],
+  ['Minä vuonna C. G. E. Mannerheim syntyi?', 1867],
+ ]},
+ maantieto: {name: 'Maantieto', emoji: '🌍', mc: [
+  ['Mikä on Afrikan väkirikkain valtio?','Nigeria','Egypti','Etiopia','Etelä-Afrikka'],
+  ['Mikä on maailman pienin valtio?','Vatikaani','Monaco','San Marino','Liechtenstein'],
+  ['Mikä on Suomen korkein kohta?','Halti','Saana','Pallastunturi','Ylläs'],
+  ['Mikä on Suomen pohjoisin kunta?','Utsjoki','Inari','Enontekiö','Sodankylä'],
+  ['Mikä merenlahti on Suomen ja Viron välissä?','Suomenlahti','Pohjanlahti','Saaristomeri','Riianlahti'],
+  ['Mikä on Suomen itsehallinnollinen maakunta?','Ahvenanmaa','Lappi','Kainuu','Pohjois-Karjala'],
+  ['Mikä on Islannin pääkaupunki?','Reykjavík','Oslo','Nuuk','Tórshavn'],
+  ['Mikä on Brasilian virallinen kieli?','Portugali','Espanja','Ranska','Englanti'],
+  ['Missä maassa Kilimanjaro sijaitsee?','Tansania','Kenia','Uganda','Etiopia'],
+  ['Mikä on maailman väkirikkain valtio?','Intia','Kiina','Yhdysvallat','Indonesia'],
+  ['Mikä kaupunki sijaitsee sekä Euroopassa että Aasiassa?','Istanbul','Kairo','Ateena','Teheran'],
+  ['Mikä on Suomen toiseksi suurin kaupunki asukasluvultaan?','Espoo','Tampere','Vantaa','Turku'],
+  ['Mitä vuoristoa pidetään Euroopan ja Aasian rajana?','Ural','Alpit','Pyreneet','Karpaatit'],
+  ['Mikä joki virtaa Egyptin halki?','Niili','Kongo','Niger','Eufrat'],
+  ['Mikä on Euroopan suurin valtio kokonaan Euroopassa sijaitsevista?','Ukraina','Ranska','Espanja','Ruotsi'],
+  ['Missä maanosassa Atacaman autiomaa sijaitsee?','Etelä-Amerikassa','Afrikassa','Aasiassa','Australiassa'],
+  ['Mikä on Kreikan pääkaupunki?','Ateena','Thessaloniki','Sparta','Kreeta'],
+  ['Mikä on maailman suurin saari?','Grönlanti','Uusi-Guinea','Borneo','Madagaskar'],
+  ['Mikä valtameri on Afrikan ja Australian välissä?','Intian valtameri','Tyynimeri','Atlantti','Eteläinen jäämeri'],
+  ['Mikä on Suomen suurin maakunta pinta-alaltaan?','Lappi','Pohjois-Pohjanmaa','Kainuu','Uusimaa'],
+ ], num: [
+  ['Montako valtiota Afrikassa on?', 54],
+  ['Montako aikavyöhykettä Venäjällä on?', 11],
+  ['Kuinka korkea on Suomen korkein kohta Halti metreinä?', 1324],
+  ['Kuinka korkea on Mount Everest metreinä?', 8849],
+  ['Kuinka pitkä on maapallon ympärysmitta päiväntasaajaa pitkin kilometreinä (noin)?', 40075],
+  ['Kuinka monta neliökilometriä on Suomen pinta-ala (noin)?', 338000],
+  ['Kuinka korkea on Burj Khalifa metreinä?', 828],
+ ]},
+ urheilu: {name: 'Urheilu', emoji: '🏅', mc: [
+  ['Montako rengasta olympialipussa on?','5','4','6','7'],
+  ['Missä kaupungissa järjestettiin kesäolympialaiset 2024?','Pariisi','Lontoo','Tokio','Los Angeles'],
+  ['Kuka suomalainen voitti F1-maailmanmestaruuden vuonna 2007?','Kimi Räikkönen','Mika Häkkinen','Valtteri Bottas','Keke Rosberg'],
+  ['Mikä on Suomen miesten jääkiekkomaajoukkueen lempinimi?','Leijonat','Huuhkajat','Susijengi','Kotkat'],
+  ['Mikä on Suomen miesten koripallomaajoukkueen lempinimi?','Susijengi','Leijonat','Huuhkajat','Karhut'],
+  ['Mikä on Suomen miesten jalkapallomaajoukkueen lempinimi?','Huuhkajat','Leijonat','Susijengi','Kotkat'],
+  ['Montako pistettä koripallossa saa kolmen pisteen viivan takaa heitetystä korista?','3','2','4','1'],
+  ['Missä lajissa käytetään termejä birdie ja eagle?','Golf','Tennis','Jääkiekko','Keilailu'],
+  ['Kuka on ”Lentävä suomalainen”, jolla on yhdeksän olympiakultaa?','Paavo Nurmi','Lasse Virén','Hannes Kolehmainen','Ville Ritola'],
+  ['Missä maassa pelattiin jalkapallon miesten MM-kisat 2022?','Qatar','Venäjä','Brasilia','Saudi-Arabia'],
+  ['Montako erää on jääkiekko-ottelun varsinaisessa peliajassa?','3','2','4','5'],
+  ['Mikä tennisturnaus pelataan nurmikentillä Lontoossa?','Wimbledon','Roland Garros','US Open','Australian Open'],
+  ['Kuka kehitti pesäpallon?','Lauri ”Tahko” Pihkala','Paavo Nurmi','Urho Kekkonen','Hannes Kolehmainen'],
+  ['Kuinka pitkä on olympiauima-allas?','50 m','25 m','100 m','33 m'],
+  ['Mikä maa on voittanut eniten jalkapallon miesten MM-kultia?','Brasilia','Saksa','Italia','Argentiina'],
+  ['Montako pelaajaa lentopallojoukkueella on kentällä kerrallaan?','6','5','7','9'],
+  ['Missä lajissa kilpaillaan Tour de Francessa?','Pyöräily','Juoksu','Purjehdus','Ralli'],
+  ['Mikä on keihäänheiton miesten kilpailukeihään paino?','800 g','600 g','1 kg','700 g'],
+  ['Montako pelaajaa on kentällä yhdellä joukkueella jääkiekossa normaalitilanteessa maalivahti mukaan lukien?','6','5','7','11'],
+  ['Missä kaupungissa järjestettiin talviolympialaiset 2026?','Milano ja Cortina d’Ampezzo','Oslo','Peking','Sotši'],
+ ], num: [
+  ['Mikä on Usain Boltin 100 metrin maailmanennätys sekunteina?', 9.58],
+  ['Kuinka korkealla koripallokori on senttimetreinä?', 305],
+  ['Montako olympiakultaa Lasse Virén voitti?', 4],
+  ['Montako reikää tavallisella golfkierroksella pelataan?', 18],
+  ['Kuinka monta kilometriä maratonilla juostaan?', 42.195],
+  ['Minä vuonna Suomi voitti ensimmäisen miesten jääkiekon MM-kultansa?', 1995],
+  ['Minä vuonna Helsingissä järjestettiin kesäolympialaiset?', 1952],
+ ]},
+ musiikki: {name: 'Musiikki', emoji: '🎸', mc: [
+  ['Montako viivaa nuottiviivastossa on?','5','4','6','7'],
+  ['Mikä suomalainen yhtye voitti Euroviisut vuonna 2006?','Lordi','Nightwish','HIM','The Rasmus'],
+  ['Millä kappaleella Käärijä kilpaili Euroviisuissa 2023?','Cha Cha Cha','Hard Rock Hallelujah','Bada Bing','Hula Hula'],
+  ['Montako kieltä tavallisessa kitarassa on?','6','4','5','7'],
+  ['Kuka säveltäjä oli lähes kuuro säveltäessään yhdeksännen sinfoniansa?','Ludwig van Beethoven','Wolfgang Amadeus Mozart','Johann Sebastian Bach','Frédéric Chopin'],
+  ['Mistä kaupungista The Beatles oli kotoisin?','Liverpool','Lontoo','Manchester','Birmingham'],
+  ['Mikä näistä on jousisoitin?','Sello','Klarinetti','Käyrätorvi','Marimba'],
+  ['Mikä on Suomen kansallissoitin?','Kantele','Jouhikko','Harmonikka','Pikkolohuilu'],
+  ['Ketä kutsutaan rock’n’rollin kuninkaaksi?','Elvis Presley','Chuck Berry','Little Richard','Johnny Cash'],
+  ['Mistä maasta K-pop on lähtöisin?','Etelä-Korea','Japani','Kiina','Thaimaa'],
+  ['Mikä on Michael Jacksonin myydyin albumi?','Thriller','Bad','Off the Wall','Dangerous'],
+  ['Mitä merkintä forte tarkoittaa nuoteissa?','Voimakkaasti','Hiljaa','Nopeasti','Hitaasti'],
+  ['Mikä on Daruden maailmanhitti vuodelta 1999?','Sandstorm','Levels','Titanium','Animals'],
+  ['Kuka on Nightwishin perustaja ja kosketinsoittaja?','Tuomas Holopainen','Marko Hietala','Ville Valo','Mr. Lordi'],
+  ['Missä maassa reggae syntyi?','Jamaika','Brasilia','Kuuba','Yhdysvallat'],
+  ['Mikä Taylor Swiftin kiertue rikkoi kaikkien aikojen tuottoennätyksen?','The Eras Tour','Reputation Tour','1989 World Tour','Fearless Tour'],
+  ['Mikä rumpusetin rumpu soitetaan jalkapedaalilla?','Bassorumpu','Virvelirumpu','Tomi','Hi-hat-symbaali'],
+  ['Kuka sävelsi Finlandian?','Jean Sibelius','Fredrik Pacius','Oskar Merikanto','Leevi Madetoja'],
+  ['Mikä soitin on puhallinsoitin, vaikka se on tehty metallista?','Huilu','Harppu','Ksylofoni','Kontrabasso'],
+  ['Montako soitinta on kvartetissa?','4','3','5','8'],
+ ], num: [
+  ['Montako sinfoniaa Beethoven sävelsi?', 9],
+  ['Minä vuonna Wolfgang Amadeus Mozart syntyi?', 1756],
+  ['Minä vuonna Jean Sibelius syntyi?', 1865],
+  ['Minä vuonna The Beatles hajosi?', 1970],
+  ['Montako kosketinta tavallisessa pianossa on?', 88],
+  ['Minä vuonna Lordi voitti Euroviisut?', 2006],
+ ]},
+ some: {name: 'Some ja nuoret', emoji: '📱', mc: [
+  ['Mistä maasta TikTok on lähtöisin?','Kiina','Yhdysvallat','Etelä-Korea','Japani'],
+  ['Mikä yhtiö omistaa Instagramin?','Meta','Google','Microsoft','Snap'],
+  ['Mikä yhtiö omistaa YouTuben?','Google','Meta','Amazon','Netflix'],
+  ['Mitä FOMO tarkoittaa?','Pelkoa jäädä jostain paitsi','Ihastumista someprofiiliin','Liiallista pelaamista','Tykkäysten ostamista'],
+  ['Minkä sovelluksen logossa on haamu?','Snapchat','Discord','Telegram','BeReal'],
+  ['Mitä tarkoittaa cringe?','Myötähäpeää aiheuttavaa','Todella siistiä','Väsynyttä','Vihaista'],
+  ['Mitä lyhenne IRL tarkoittaa?','In real life','I really laugh','In rare luck','It runs late'],
+  ['Mikä suomalainen yhtiö teki Angry Birdsin?','Rovio','Supercell','Remedy','Housemarque'],
+  ['Minkä suomalaisen pelistudion peli on Clash of Clans?','Supercell','Rovio','Remedy','Colossal Order'],
+  ['Mikä on kaikkien aikojen myydyin videopeli?','Minecraft','Tetris','GTA V','Fortnite'],
+  ['Mikä on Twitterin nykyinen nimi?','X','Threads','Bluesky','Meta'],
+  ['Kuka osti Twitterin vuonna 2022?','Elon Musk','Mark Zuckerberg','Jeff Bezos','Bill Gates'],
+  ['Mitä ghostaaminen tarkoittaa?','Yhteydenpidon katkaisemista yhtäkkiä selittämättä','Kauhuvideoiden tekemistä','Anonyymiä kommentointia','Profiilin piilottamista'],
+  ['Mitä NPC tarkoittaa peleissä?','Hahmoa, jota kukaan pelaaja ei ohjaa','Uutta pelaajaa','Pelin pääpahista','Maksullista lisäosaa'],
+  ['Mitä on doomscrollaus?','Loputonta ahdistavien sisältöjen selaamista','Pelien pelaamista yöllä','Videoiden nopeuttamista','Kauhuelokuvien katsomista'],
+  ['Mitä on tietojenkalastelu?','Huijausta, jolla urkitaan tunnuksia tai rahaa','Kalastusvideoiden jakamista','Laillista tietojen keräämistä','Virustorjuntaa'],
+  ['Mitä on deepfake?','Tekoälyllä väärennetty kuva, video tai ääni','Salainen someprofiili','Syvä keskustelu','Hakkerointiohjelma'],
+  ['Mitä GOAT tarkoittaa?','Greatest of all time','Go out and travel','Game over, all teams','Got only a text'],
+  ['Mikä palvelu sai alkunsa ennen kaikkea pelaajien puhe- ja chattisovelluksena?','Discord','LinkedIn','Pinterest','Tumblr'],
+  ['Minkä ikäisenä nuori voi Suomessa itse antaa suostumuksen tietojensa käsittelyyn somepalvelussa?','13','15','16','18'],
+ ], num: [
+  ['Minä vuonna Instagram julkaistiin?', 2010],
+  ['Minä vuonna YouTube perustettiin?', 2005],
+  ['Minä vuonna Facebook perustettiin?', 2004],
+  ['Minä vuonna WhatsApp julkaistiin?', 2009],
+  ['Minä vuonna Minecraftin täysversio julkaistiin?', 2011],
+  ['Minä vuonna Fortnite julkaistiin?', 2017],
+  ['Minä vuonna ensimmäinen iPhone julkaistiin?', 2007],
+ ]},
+};
+/* Lisätehtävät: order = [ohje, [kohteet oikeassa järjestyksessä, "teksti|selite"]], tf = [väite, tosi?, selitys], list = [ohje, ["vastaus/vaihtoehto", ...]] */
+PACKS.teollistuminen = {name: 'Teollistuminen', emoji: '🏭',
+ mc: [
+  ['Missä maassa teollinen vallankumous alkoi 1700-luvun lopulla?','Iso-Britannia','Ranska','Saksa','Yhdysvallat'],
+  ['Kuka paransi höyrykonetta ratkaisevasti 1760–1770-luvuilla?','James Watt','Thomas Edison','George Stephenson','Henry Ford'],
+  ['Mikä teollisuudenala koneellistui ensimmäisenä?','Tekstiiliteollisuus','Autoteollisuus','Elektroniikkateollisuus','Lentokoneteollisuus'],
+  ['Mikä oli Britannian teollistumisen tärkein energianlähde?','Kivihiili','Öljy','Sähkö','Tuulivoima'],
+  ['Mikä keksintö mullisti langan kehräämisen 1760-luvulla?','Kehruu-Jenny','Ompelukone','Lennätin','Höyrylaiva'],
+  ['Minkä kaupunkien välille avattiin vuonna 1830 maailman ensimmäinen kaupunkien välinen höyryrautatie?','Liverpool ja Manchester','Lontoo ja Birmingham','Glasgow ja Edinburgh','Lontoo ja Brighton'],
+  ['Mitä luddiitit tekivät 1810-luvun Englannissa?','Rikkoivat tehtaiden koneita','Keksivät kutomakoneen','Rakensivat rautateitä','Perustivat ensimmäisen pankin'],
+  ['Millaiset työpäivät olivat tavallisia varhaisissa tehtaissa?','12–16 tuntia','6 tuntia','8 tuntia','4 tuntia'],
+  ['Mitä kaupungistuminen tarkoittaa?','Ihmisten muuttoa maalta kaupunkeihin','Kaupunkien muuria','Kaupunkien tuhoutumista','Muuttoa kaupungista maalle'],
+  ['Kuka kirjoitti yhdessä Friedrich Engelsin kanssa Kommunistisen manifestin (1848)?','Karl Marx','Adam Smith','Charles Dickens','Vladimir Lenin'],
+  ['Kuka kirjoitti teoksen Kansojen varallisuus (1776)?','Adam Smith','Karl Marx','David Ricardo','John Locke'],
+  ['Minkä kaupunkien välillä kulki Suomen ensimmäinen rautatie (1862)?','Helsinki–Hämeenlinna','Turku–Toijala','Helsinki–Pietari','Tampere–Oulu'],
+  ['Mihin kaupunkiin James Finlayson perusti puuvillatehtaan vuonna 1820?','Tampere','Turku','Helsinki','Vaasa'],
+  ['Mikä raaka-aine nosti Suomen teollisuuden 1800-luvun loppupuolella ("vihreä kulta")?','Puu','Kivihiili','Rautamalmi','Öljy'],
+  ['Miksi höyrykone oli tehtaille niin tärkeä?','Tehtaan ei enää tarvinnut sijaita kosken tai joen varrella','Se teki sähköä koteihin','Se korvasi kaikki työntekijät','Se oli ilmainen'],
+  ['Mitä Britannian tehdaslaki vuonna 1833 kielsi?','Alle 9-vuotiaiden työn tekstiilitehtaissa','Kaiken lapsityön','Ammattiliitot','Höyrykoneet kaupungeissa'],
+  ['Kuka otti liukuhihnan käyttöön autotehtaassaan vuonna 1913?','Henry Ford','Karl Benz','Gottlieb Daimler','Enzo Ferrari'],
+  ['Mitä työväenliike ajoi?','Lyhyempää työaikaa ja parempia työoloja','Aatelin etuoikeuksia','Kuninkaan yksinvaltaa','Lapsityön lisäämistä'],
+  ['Mitkä kaksi voimanlähdettä nousivat esiin 1800-luvun lopun toisessa teollisessa vallankumouksessa?','Sähkö ja öljy','Kivihiili ja vesi','Tuuli ja aurinko','Ydinvoima ja maakaasu'],
+  ['Kuka patentoi puhelimen vuonna 1876?','Alexander Graham Bell','Thomas Edison','Nikola Tesla','Guglielmo Marconi'],
+  ['Millä nimellä kutsuttiin tehdaskaupunkien ahtaita ja likaisia työläisasuinalueita?','Slummit','Kartanot','Esikaupunkihuvilat','Linnoitukset'],
+ ],
+ num: [
+  ['Minä vuonna James Watt patentoi höyrykoneen erillisen lauhduttimen?', 1769],
+  ['Minä vuonna Suomen ensimmäinen rautatie avattiin?', 1862],
+  ['Minä vuonna Finlaysonin tehdas perustettiin Tampereelle?', 1820],
+  ['Minä vuonna Liverpool–Manchester-rautatie avattiin?', 1830],
+  ['Kuinka monta km/h Stephensonin Rocket-veturi kulki parhaimmillaan vuonna 1829 (noin)?', 48],
+  ['Minä vuonna Kommunistinen manifesti julkaistiin?', 1848],
+  ['Minä vuonna Suomeen säädettiin 8 tunnin työaikalaki?', 1917],
+ ],
+ order: [
+  ['Järjestä keksinnöt vanhimmasta uusimpaan', ['Kehruu-Jenny|n. 1764', 'Wattin höyrykone|1769', 'Liverpool–Manchester-rautatie|1830', 'Puhelin|1876']],
+  ['Järjestä Suomen tapahtumat vanhimmasta uusimpaan', ['Finlaysonin tehdas Tampereelle|1820', 'Rautatie Helsinki–Hämeenlinna|1862', 'Elinkeinovapaus Suomeen|1879', '8 tunnin työaikalaki|1917']],
+  ['Järjestä vanhimmasta uusimpaan', ['Adam Smithin Kansojen varallisuus|1776', 'Luddiittien kapina alkaa|1811', 'Kommunistinen manifesti|1848', 'Fordin liukuhihna|1913']],
+  ['Järjestä keksinnöt vanhimmasta uusimpaan', ['Höyrylaiva Clermont|1807', 'Morsen lennätinlinja|1844', 'Edisonin hehkulamppu|1879', 'Benzin auto|1886']],
+ ],
+ tf: [
+  ['Teollinen vallankumous alkoi Ranskasta.', false, 'Se alkoi Isosta-Britanniasta.'],
+  ['Tekstiiliteollisuus koneellistui ensimmäisten alojen joukossa.', true, 'Puuvillan kehruu ja kutominen koneellistuivat ensin.'],
+  ['James Watt keksi maailman ensimmäisen höyrykoneen.', false, 'Newcomenin höyrykone oli olemassa jo 1712. Watt paransi sitä.'],
+  ['Lapset tekivät yleisesti töitä tehtaissa ja kaivoksissa.', true, 'Lapsia käytettiin halpana työvoimana.'],
+  ['Luddiitit olivat keksijöitä, jotka kehittivät kutomakoneita.', false, 'Luddiitit rikkoivat koneita, jotka veivät heidän työnsä.'],
+  ['Kivihiili oli Britannian teollistumisen tärkein energianlähde.', true, 'Hiili pyöritti höyrykoneita.'],
+  ['Suomen ensimmäinen rautatie kulki Helsingistä Turkuun.', false, 'Se kulki Helsingistä Hämeenlinnaan.'],
+  ['Teollistuminen sai ihmiset muuttamaan maalta kaupunkeihin.', true, 'Tätä kutsutaan kaupungistumiseksi.'],
+  ['Ensimmäiset tehtaat toimivat usein vesivoimalla jokien varsilla.', true, 'Höyrykone vapautti tehtaat jokien varsilta.'],
+  ['Karl Marx omisti itse suuria puuvillatehtaita.', false, 'Marx oli filosofi ja kirjoittaja. Tehtailija oli hänen ystävänsä Engelsin perhe.'],
+  ['Puhelin keksittiin ennen höyryveturia.', false, 'Höyryvetureita oli jo 1800-luvun alussa, puhelin vasta 1876.'],
+  ['Työläisten oloja alettiin parantaa laeilla jo 1800-luvulla.', true, 'Esimerkiksi Britannian tehdaslait rajoittivat lapsityötä.'],
+  ['Tamperetta on kutsuttu Suomen Manchesteriksi.', true, 'Nimi tuli kaupungin tekstiilitehtaista.'],
+ ],
+ list: [
+  ['Nimeä teollistumisen ajan keksintöjä tai koneita', ['Höyrykone', 'Höyryveturi/Veturi', 'Rautatie/Juna', 'Kehruu-Jenny/Kehruukone', 'Kutomakone/Mekaaninen kutomakone/Kangaspuut', 'Höyrylaiva', 'Lennätin', 'Puhelin', 'Hehkulamppu/Sähkölamppu', 'Auto', 'Ompelukone', 'Polkupyörä', 'Kamera/Valokuvaus', 'Dynamo/Generaattori', 'Liukuhihna', 'Vesiratas', 'Polttomoottori']],
+  ['Nimeä teollistumiseen liittyviä henkilöitä', ['James Watt/Watt', 'George Stephenson/Stephenson', 'Adam Smith/Smith', 'Karl Marx/Marx', 'Friedrich Engels/Engels', 'Richard Arkwright/Arkwright', 'James Hargreaves/Hargreaves', 'Thomas Edison/Edison', 'Alexander Graham Bell/Bell', 'Henry Ford/Ford', 'James Finlayson/Finlayson', 'Samuel Morse/Morse', 'Robert Owen/Owen', 'Thomas Newcomen/Newcomen', 'Charles Dickens/Dickens', 'Karl Benz/Benz']],
+ ]};
+
+const EXTRA = {
+ yleis: {
+  order: [['Järjestä planeetat pienimmästä suurimpaan', ['Merkurius', 'Mars', 'Maa', 'Jupiter']]],
+  tf: [
+   ['Hämähäkki on hyönteinen.', false, 'Hämähäkki on hämähäkkieläin, sillä on kahdeksan jalkaa.'],
+   ['Venus on Aurinkokunnan kuumin planeetta.', true, 'Paksu ilmakehä pitää lämmön, vaikka Merkurius on lähempänä.'],
+   ['Banaani on kasvitieteellisesti marja.', true, 'Mansikka taas ei ole!'],
+   ['Salama ei koskaan iske samaan paikkaan kahdesti.', false, 'Esimerkiksi korkeisiin torneihin se iskee usein.'],
+   ['Kultakalan muisti kestää vain kolme sekuntia.', false, 'Kultakala muistaa asioita kuukausia.'],
+   ['Vesi kiehuu merenpinnan tasolla 100 asteessa.', true, ''],
+   ['Kuu on aina yhtä kaukana Maasta.', false, 'Kuun rata on soikea.'],
+  ],
+  list: [
+   ['Nimeä Aurinkokunnan planeettoja', ['Merkurius', 'Venus', 'Maa/Tellus', 'Mars', 'Jupiter', 'Saturnus', 'Uranus', 'Neptunus']],
+   ['Nimeä Pohjoismaiden ja niiden itsehallintoalueiden pääkaupunkeja', ['Helsinki', 'Tukholma', 'Oslo', 'Kööpenhamina/Köpenhamina', 'Reykjavík', 'Maarianhamina/Mariehamn', 'Tórshavn', 'Nuuk']],
+  ]},
+ historia: {
+  order: [
+   ['Järjestä vanhimmasta uusimpaan', ['Rooman valtakunta jakautuu|395', 'Kolumbus saapuu Amerikkaan|1492', 'Ranskan vallankumous|1789', 'Suomi itsenäistyy|1917']],
+   ['Järjestä Suomen sodat vanhimmasta uusimpaan', ['Sisällissota|1918', 'Talvisota|1939–1940', 'Jatkosota|1941–1944', 'Lapin sota|1944–1945']],
+   ['Järjestä vanhimmasta uusimpaan', ['Gizan suuri pyramidi|n. 2560 eaa.', 'Julius Caesarin murha|44 eaa.', 'Lutherin teesit|1517', 'Berliinin muuri murtuu|1989']],
+  ],
+  tf: [
+   ['Talvisota alkoi marraskuussa 1939.', true, 'Neuvostoliitto hyökkäsi 30.11.1939.'],
+   ['Suomi itsenäistyi vuonna 1918.', false, 'Itsenäisyysjulistus annettiin 6.12.1917.'],
+   ['Napoleon kruunasi itsensä Ranskan keisariksi.', true, 'Vuonna 1804.'],
+   ['Berliinin muuri rakennettiin vuonna 1961.', true, ''],
+   ['Mikael Agricola käänsi Uuden testamentin suomeksi.', true, 'Käännös ilmestyi 1548.'],
+   ['Yhdysvallat ja Neuvostoliitto sotivat kylmässä sodassa suoraan toisiaan vastaan.', false, 'Ne kilpailivat varustelussa ja välillisissä sodissa.'],
+   ['Ensimmäinen maailmansota alkoi vuonna 1939.', false, 'Se alkoi 1914. Toinen maailmansota alkoi 1939.'],
+   ['Suomi oli osa Ruotsin valtakuntaa noin 600 vuotta.', true, 'Vuoteen 1809 asti.'],
+  ],
+  list: [
+   ['Nimeä Suomen presidenttejä', ['Ståhlberg/K. J. Ståhlberg', 'Relander/Lauri Kristian Relander', 'Svinhufvud/P. E. Svinhufvud', 'Kallio/Kyösti Kallio', 'Ryti/Risto Ryti', 'Mannerheim/C. G. E. Mannerheim', 'Paasikivi/J. K. Paasikivi', 'Kekkonen/Urho Kekkonen', 'Koivisto/Mauno Koivisto', 'Ahtisaari/Martti Ahtisaari', 'Halonen/Tarja Halonen', 'Niinistö/Sauli Niinistö', 'Stubb/Alexander Stubb']],
+   ['Nimeä toisen maailmansodan sotaan osallistuneita valtioita', ['Saksa', 'Neuvostoliitto', 'Yhdysvallat', 'Iso-Britannia/Britannia/Englanti', 'Ranska', 'Japani', 'Italia', 'Suomi', 'Kiina', 'Puola', 'Kanada', 'Australia', 'Unkari', 'Romania', 'Norja', 'Kreikka', 'Alankomaat/Hollanti', 'Belgia', 'Jugoslavia', 'Uusi-Seelanti', 'Bulgaria', 'Intia']],
+  ]},
+ maantieto: {
+  order: [
+   ['Järjestä pinta-alan mukaan pienimmästä suurimpaan', ['Viro|45 000 km²', 'Islanti|103 000 km²', 'Suomi|338 000 km²', 'Ukraina|604 000 km²']],
+   ['Järjestä etelästä pohjoiseen', ['Helsinki|60° P', 'Tampere|61,5° P', 'Oulu|65° P', 'Rovaniemi|66,5° P']],
+   ['Järjestä matalimmasta korkeimpaan', ['Halti|1 324 m', 'Mont Blanc|n. 4 805 m', 'Kilimanjaro|5 895 m', 'Mount Everest|8 849 m']],
+  ],
+  tf: [
+   ['Norja kuuluu Euroopan unioniin.', false, 'Norja on äänestänyt jäsenyyttä vastaan kahdesti.'],
+   ['Amazon on vesimäärältään maailman suurin joki.', true, ''],
+   ['Australia on sekä maanosa että valtio.', true, ''],
+   ['Suomessa on yli 150 000 järveä.', true, 'Yli viiden aarin järviä on noin 188 000.'],
+   ['Saharan autiomaa sijaitsee Aasiassa.', false, 'Sahara on Pohjois-Afrikassa.'],
+   ['Päiväntasaaja kulkee Brasilian halki.', true, ''],
+   ['Kanadan pääkaupunki on Toronto.', false, 'Pääkaupunki on Ottawa.'],
+   ['Grönlanti kuuluu Tanskan kuningaskuntaan.', true, 'Grönlannilla on laaja itsehallinto.'],
+   ['Pariisin halki virtaa Tonava.', false, 'Pariisin joki on Seine.'],
+  ],
+  list: [
+   ['Nimeä Euroopan unionin jäsenmaita', ['Alankomaat/Hollanti', 'Belgia', 'Bulgaria', 'Espanja', 'Irlanti', 'Italia', 'Itävalta', 'Kreikka', 'Kroatia', 'Kypros', 'Latvia', 'Liettua', 'Luxemburg', 'Malta', 'Portugali', 'Puola', 'Ranska', 'Romania', 'Ruotsi', 'Saksa', 'Slovakia', 'Slovenia', 'Suomi', 'Tanska', 'Tšekki/Tsekki', 'Unkari', 'Viro']],
+   ['Nimeä Suomen maakuntia', ['Uusimaa', 'Varsinais-Suomi', 'Satakunta', 'Kanta-Häme', 'Pirkanmaa', 'Päijät-Häme', 'Kymenlaakso', 'Etelä-Karjala', 'Etelä-Savo', 'Pohjois-Savo', 'Pohjois-Karjala', 'Keski-Suomi', 'Etelä-Pohjanmaa', 'Pohjanmaa', 'Keski-Pohjanmaa', 'Pohjois-Pohjanmaa', 'Kainuu', 'Lappi', 'Ahvenanmaa']],
+  ]},
+ urheilu: {
+  order: [
+   ['Järjestä kesäolympialaiset vanhimmasta uusimpaan', ['Helsinki|1952', 'Moskova|1980', 'Sydney|2000', 'Pariisi|2024']],
+   ['Järjestä lajit kentällä olevien pelaajien määrän mukaan (yksi joukkue, pienimmästä suurimpaan)', ['Koripallo|5', 'Jääkiekko|6', 'Jalkapallo|11', 'Rugby union|15']],
+  ],
+  tf: [
+   ['Jalkapallon miesten MM-kisat järjestetään neljän vuoden välein.', true, ''],
+   ['Jääkiekko-ottelussa on neljä erää.', false, 'Eriä on kolme.'],
+   ['Paavo Nurmi voitti yhdeksän olympiakultaa.', true, ''],
+   ['Maratonin pituus on tasan 40 kilometriä.', false, 'Matka on 42,195 km.'],
+   ['Tenniksessä tasatilannetta 40–40 kutsutaan nimellä deuce.', true, ''],
+   ['Pesäpallo on Suomen kansallispeli.', true, 'Sen kehitti Lauri "Tahko" Pihkala.'],
+   ['Lentopallossa joukkueella on kentällä seitsemän pelaajaa.', false, 'Pelaajia on kuusi.'],
+  ],
+  list: [
+   ['Nimeä palloilulajeja', ['Jalkapallo/Futis', 'Koripallo', 'Lentopallo', 'Käsipallo', 'Pesäpallo', 'Tennis', 'Golf', 'Rugby', 'Baseball', 'Salibandy', 'Pöytätennis/Pingis', 'Squash', 'Kriketti', 'Vesipallo', 'Maahockey/Maahoki', 'Padel', 'Amerikkalainen jalkapallo', 'Keilailu', 'Biljardi', 'Petanki', 'Rantalentopallo', 'Softball', 'Futsal', 'Sulkapallo']],
+  ]},
+ musiikki: {
+  order: [
+   ['Järjestä säveltäjät syntymävuoden mukaan', ['J. S. Bach|1685', 'W. A. Mozart|1756', 'Ludwig van Beethoven|1770', 'Jean Sibelius|1865']],
+   ['Järjestä vanhimmasta uusimpaan', ['Elvis Presleyn läpimurto|1956', 'The Beatles hajoaa|1970', 'Lordi voittaa Euroviisut|2006', 'Käärijän Cha Cha Cha|2023']],
+  ],
+  tf: [
+   ['Kantele on puhallinsoitin.', false, 'Kantele on kielisoitin.'],
+   ['Nuottiviivastossa on viisi viivaa.', true, ''],
+   ['Käärijä voitti Euroviisut vuonna 2023.', false, 'Käärijä oli toinen. Voittaja oli Ruotsin Loreen.'],
+   ['Beethoven sävelsi Kuutamosonaatin.', true, ''],
+   ['Sello on suurempi kuin viulu.', true, ''],
+   ['Lordi voitti Euroviisut kappaleella Hard Rock Hallelujah.', true, 'Vuonna 2006.'],
+   ['Finlandian sävelsi Oskar Merikanto.', false, 'Finlandian sävelsi Jean Sibelius.'],
+  ],
+  list: [
+   ['Nimeä soittimia', ['Kitara/Sähkökitara', 'Piano', 'Viulu', 'Sello', 'Kontrabasso', 'Rummut/Rumpu', 'Huilu', 'Klarinetti', 'Saksofoni', 'Trumpetti', 'Pasuuna', 'Tuuba', 'Käyrätorvi', 'Harppu', 'Kantele', 'Harmonikka', 'Urut', 'Basso/Bassokitara', 'Ukulele', 'Banjo', 'Mandoliini', 'Oboe', 'Fagotti', 'Ksylofoni', 'Marimba', 'Triangeli', 'Syntetisaattori/Syna', 'Nokkahuilu', 'Alttoviulu', 'Huuliharppu', 'Cembalo', 'Djembe', 'Tamburiini', 'Symbaali', 'Säkkipilli', 'Sitar']],
+  ]},
+ some: {
+  order: [
+   ['Järjestä julkaisuvuoden mukaan vanhimmasta uusimpaan', ['Facebook|2004', 'YouTube|2005', 'Instagram|2010', 'TikTok maailmalle|2017']],
+   ['Järjestä vanhimmasta uusimpaan', ['Ensimmäinen iPhone|2007', 'WhatsApp|2009', 'Snapchat|2011', 'ChatGPT|2022']],
+  ],
+  tf: [
+   ['Instagram on Metan omistama.', true, ''],
+   ['YouTube perustettiin ennen Facebookia.', false, 'Facebook 2004, YouTube 2005.'],
+   ['Minecraft on kaikkien aikojen myydyin videopeli.', true, ''],
+   ['Supercell on ruotsalainen peliyhtiö.', false, 'Supercell on suomalainen.'],
+   ['Deepfake-video voi olla kokonaan tekoälyn tekemä.', true, 'Siksi videoihinkin kannattaa suhtautua kriittisesti.'],
+   ['Snapchat-viestistä ei voi koskaan jäädä kopiota.', false, 'Vastaanottaja voi ottaa kuvakaappauksen.'],
+   ['Angry Birds on suomalainen peli.', true, 'Sen teki Rovio.'],
+   ['Tietojenkalastelu tarkoittaa huijausta, jolla urkitaan tunnuksia.', true, ''],
+   ['Twitter tunnetaan nykyään nimellä X.', true, ''],
+  ],
+  list: [
+   ['Nimeä somepalveluja tai pikaviestimiä', ['TikTok', 'Instagram/Insta', 'Snapchat/Snap', 'YouTube', 'Facebook', 'X/Twitter', 'WhatsApp', 'Discord', 'Telegram', 'Pinterest', 'Reddit', 'LinkedIn', 'Twitch', 'BeReal', 'Threads', 'Tumblr', 'Messenger', 'Signal', 'WeChat', 'Bluesky', 'Jodel', 'Mastodon', 'Kick']],
+  ]},
+};
+Object.entries(EXTRA).forEach(([k, v]) => Object.assign(PACKS[k], v));
+
+const normTxt = x => String(x || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-z0-9]/g, '');
+function lev(a, b) {
+  if (a === b) return 0; const m = a.length, n = b.length; if (!m) return n; if (!n) return m;
+  let prev = Array.from({length: n + 1}, (_, j) => j);
+  for (let i = 1; i <= m; i++) { const cur = [i]; for (let j = 1; j <= n; j++) cur[j] = Math.min(prev[j] + 1, cur[j - 1] + 1, prev[j - 1] + (a[i - 1] === b[j - 1] ? 0 : 1)); prev = cur; }
+  return prev[n];
+}
+function matchList(text, norms) {
+  const t = normTxt(text); if (!t) return -1;
+  for (let i = 0; i < norms.length; i++) if (norms[i].includes(t)) return i;
+  for (let i = 0; i < norms.length; i++) for (const a of norms[i]) { const tol = a.length >= 8 ? 2 : a.length >= 4 ? 1 : 0; if (tol && Math.abs(a.length - t.length) <= tol && lev(a, t) <= tol) return i; }
+  for (let i = 0; i < norms.length; i++) for (const a of norms[i]) if (a.length >= 5 && t.length > a.length && t.endsWith(a)) return i;
+  return -1;
+}
+const nfmt = n => Number(n).toLocaleString('fi-FI', {maximumFractionDigits: 3, useGrouping: Math.abs(Number(n)) >= 10000});
+const ROUNDS = {
+  aikajana:   {name: 'Aikajana', emoji: '⏳', desc: 'Järjestä neljä asiaa oikeaan järjestykseen. Täysin oikein = bonus. Yksi tai ei yhtään oikealla paikalla = kellari.'},
+  tottatarua: {name: 'Totta vai tarua', emoji: '⚖️', desc: 'Viisi väitettä salamavauhtia. Eniten virheitä tehnyt joutuu kellariin.'},
+  lista:      {name: 'Listakierros', emoji: '📝', desc: 'Kirjoita niin monta oikeaa kuin keksit. Vastaus, jota kukaan muu ei keksinyt, tuo tuplapisteet. Vähiten keksinyt joutuu kellariin.'},
+  lahin:  {name: 'Lähimmäs voittaa', emoji: '🎯', desc: 'Arvaa luku. Lähimmäs osunut saa eniten pisteitä. Kauimmas arvannut joutuu kellariin.'},
+  nopein: {name: 'Nopein voittaa', emoji: '⚡', desc: 'Mitä nopeammin vastaat oikein, sitä enemmän pisteitä.'},
+  pommi:  {name: 'Pistepommi', emoji: '💣', desc: 'Panosta ennen kysymystä. Oikein: +300 + panos. Väärin: panos menee.'},
+  ryosto: {name: 'Ryöstö', emoji: '🦝', desc: 'Oikein vastanneet varastavat 250 pistettä valitsemaltaan pelaajalta.'},
+};
+const CARDS = {
+  muste:    {emoji: '🖋️', name: 'Muste', desc: 'Sotkee kohteen vastausnapit', w: 3},
+  peili:    {emoji: '🪞', name: 'Peilitalo', desc: 'Kohteen ruutu peilikuvaksi', w: 3},
+  hidaste:  {emoji: '🐌', name: 'Hidaste', desc: 'Puolittaa kohteen vastausajan', w: 3},
+  pyorre:   {emoji: '🌀', name: 'Pyörremyrsky', desc: 'Kohteen napit vaihtavat paikkaa', w: 3},
+  jaa:      {emoji: '🧊', name: 'Jäädytys', desc: 'Kohde ei voi vastata 4 sekuntiin', w: 3},
+  kilpi:    {emoji: '🛡️', name: 'Kilpi', desc: 'Torjuu seuraavan kiusan ja palauttaa sen. Toimii itsestään.', w: 2, passive: true},
+};
+const MG = {
+  reaktio: {name: 'Sähkötuoli', emoji: '⚡', desc: 'Paina, kun ruutu muuttuu vihreäksi. Liian aikaisin painanut ja hitain kuolevat.', dur: 11000},
+  muisti:  {name: 'Kummitusurut', emoji: '🎹', desc: 'Urut soittavat viiden värin sarjan. Toista se. Yksikin virhe on kohtalokas.', dur: 26000},
+  matikka: {name: 'Laskukone', emoji: '🧮', desc: 'Viisi laskua 20 sekunnissa. Alle neljä oikein ja olet haamu.', dur: 22000},
+  ovet:    {name: 'Kolme ovea', emoji: '🚪', desc: 'Kahden oven takana on käytävä. Yhden takana odottaa Kellarimestari.', dur: 12000},
+  varit:   {name: 'Värisokeus', emoji: '🎨', desc: 'Paina sitä väriä, jolla sana on kirjoitettu. Älä lue sanaa! Kymmenen kierrosta, alle kahdeksan oikein ja olet haamu.', dur: 30000},
+  kirstut: {name: 'Kultakirstut', emoji: '💰', desc: 'Avaa kirstuja ja kerää kultaa. Yhdessä odottaa Kellarimestari ja vie kaiken. Alle 400 kultaa tai vähiten kerännyt kuolee.', dur: 28000},
+  uhri:    {name: 'Uhrilahja', emoji: '🕯️', desc: 'Uhraa salaa pisteitäsi Kellarimestarille. Pienimmän uhrin antanut kuolee. Uhri menee, vaikka selviäisit.', dur: 20000, min: 2},
+};
+const QUIPS = {
+  intro: ['Tervetuloa Kaaoskartanoon. Ovet on lukittu, avain on hukassa ja minulla on kysymyksiä.',
+          'Hyvää iltaa, uudet asukkaat. Vastatkaa oikein, niin pääsette ehkä kotiin. Ehkä.'],
+  prep: ['Nyt on oikea hetki olla ilkeä. Pelatkaa korttinne.', 'Muistakaa: ystävyys on yliarvostettua.',
+         'Kiusakortit pöytään. Kukaan ei näe. Paitsi kaikki.', 'Joku tässä huoneessa ansaitsee mustetta naamalleen.'],
+  allRight: ['Kaikki oikein? Epäilyttävää. Tarkistan säännöt.', 'Hmph. Kellari jää tyhjäksi. Kellarimestari itkee.'],
+  toCellar: ['{n}: kellariin. Ottakaa taskulamppu.', '{n}, portaat alas. Älkää välittäkö raapimisäänistä.',
+             '{n} vastasi väärin. Kellarimestari on jo nälkäinen.'],
+  death: ['{n} on nyt haamu. Sopii sisustukseen.', '{n} siirtyy ajasta iäisyyteen. Pisteet jäävät meille.',
+          'Hyvästi, {n}. Saat kummitella vapaasti.'],
+  survive: ['Kaikki selvisivät. Kellarimestari on pettynyt.', 'Harmi. Tai siis onneksi olkoon.'],
+  finale: ['Uloskäynti on tuolla. Ensimmäinen elävä ulos voittaa. Haamut, nyt on teidän tilaisuutenne.'],
+  orderBad: ['{n} sekoitti aikajanan. Kellarimestari vihaa sekasotkua.', '{n}, historia ei mennyt ihan noin. Kellariin.'],
+  tfBad: ['{n} uskoi tarinoita. Kellarissa niitä kerrotaan lisää.', 'Eniten virheitä: {n}. Portaat ovat tuolla.'],
+  listBad: ['{n} keksi vähiten. Kellarissa on aikaa miettiä.', '{n}, lista jäi lyhyeksi. Kellari ei.'],
+  farthest: ['{n} arvasi kauimmas. Kellari kutsuu.', '{n}, tuo ei ollut edes lähellä. Portaat ovat tuolla.', 'Kauimpana {n}. Kellarimestari kiittää.'],
+  win: ['{n} pakeni kartanosta! Muut jäävät tänne iäksi. Tai siihen asti, kun kello soi.'],
+};
+
+/* ================= sound + voice (host) ================= */
+let AC = null;
+function audio() { if (!AC) { try { AC = new (window.AudioContext || window.webkitAudioContext)(); } catch (e) {} } return AC; }
+function tone(f, d = .15, type = 'square', vol = .06, when = 0, f2) {
+  const ac = audio(); if (!ac || !G.sound) return;
+  const t = ac.currentTime + when, o = ac.createOscillator(), g = ac.createGain();
+  o.type = type; o.frequency.setValueAtTime(f, t); if (f2) o.frequency.exponentialRampToValueAtTime(f2, t + d);
+  g.gain.setValueAtTime(vol, t); g.gain.exponentialRampToValueAtTime(.0001, t + d);
+  o.connect(g); g.connect(ac.destination); o.start(t); o.stop(t + d + .02);
+}
+const SFX = {
+  start() { [262, 330, 392, 523].forEach((f, i) => tone(f, .18, 'square', .05, i * .1)); },
+  attack() { tone(880, .35, 'sawtooth', .05, 0, 120); },
+  right() { [523, 659, 784].forEach((f, i) => tone(f, .14, 'triangle', .08, i * .08)); },
+  wrong() { tone(140, .5, 'sawtooth', .07); tone(110, .5, 'square', .04, .05); },
+  death() { tone(400, 1.2, 'sawtooth', .06, 0, 40); },
+  join() { tone(660, .08, 'triangle', .06); tone(990, .1, 'triangle', .06, .08); },
+  tick() { tone(1200, .03, 'square', .03); },
+  win() { [523, 659, 784, 1046, 784, 1046].forEach((f, i) => tone(f, .2, 'square', .05, i * .14)); },
+};
+function speak(text) {
+  if (!G.settings.voice || !window.speechSynthesis) return;
+  try {
+    speechSynthesis.cancel();
+    const u = new SpeechSynthesisUtterance(text); u.lang = 'fi-FI'; u.rate = 1.05; u.pitch = .8;
+    const v = speechSynthesis.getVoices().find(v => v.lang && v.lang.toLowerCase().startsWith('fi')); if (v) u.voice = v;
+    speechSynthesis.speak(u);
+  } catch (e) {}
+}
+
+/* ================= HOST STATE ================= */
+const G = {
+  role: null, code: '', phase: 'lobby', players: {}, order: [], conns: {}, connOf: {},
+  settings: Object.assign({rounds: 10, timer: 15, packs: ['yleis'], voice: false}, store.get('kk-settings', {})),
+  sets: [], joinUrl: store.get('kk-url', ''),
+  sound: true, qi: 0, fq: 0, qList: [], cur: null, roundType: null, phaseEnd: 0, phaseDur: 0, timer: null,
+  cellar: [], mg: null, lastMg: null, finale: false, quip: '', winner: null, lastDeaths: [], netOk: false, netErr: '', bc: null, peer: null,
+};
+const phaseKey = () => [G.phase, G.qi, G.fq, G.mg ? G.mg.id : ''].join(':');
+const plist = () => G.order.map(id => G.players[id]).filter(Boolean);
+const present = () => plist().filter(p => p.bot || p.connected);
+
+function quip(kind, o = {}) { G.quip = fmt(pick(QUIPS[kind]), o); speak(G.quip); }
+function toast(text, emoji = '📢', red = false) {
+  const el = document.createElement('div'); el.className = 'toast' + (red ? ' red' : '');
+  el.innerHTML = `<span class="e">${emoji}</span><span>${esc(text)}</span>`;
+  $('#toasts').appendChild(el); setTimeout(() => el.remove(), 4800);
+  while ($('#toasts').children.length > 5) $('#toasts').firstChild.remove();
+}
+function floater(emoji, name) {
+  const el = document.createElement('div'); el.className = 'floater';
+  el.style.left = (5 + Math.random() * 88) + '%'; el.innerHTML = `${esc(emoji)}<small>${esc(name)}</small>`;
+  $('#floaters').appendChild(el); setTimeout(() => el.remove(), 3300);
+}
+
+/* ---------- host networking ---------- */
+function hostNet() {
+  try { if (G.bc) G.bc.close(); } catch (e) {}
+  (G.mqs || []).forEach(c => { c.onclose = null; c.close(); });
+  G.mqs = []; G.net = BROKERS.map(b => ({name: b.name, state: 'wait'}));
+  const code = G.code;
+  try {
+    G.bc = new BroadcastChannel('kk-' + code);
+    G.bc.onmessage = e => {
+      const m = e.data; if (!m || m.to !== 'host') return;
+      const from = 'bc:' + m.from;
+      if (m.data && m.data.t === 'ping') { G.bc.postMessage({to: m.from, data: {t: 'pong'}}); return; }
+      G.conns[from] = d => { try { G.bc.postMessage({to: m.from, data: d}); } catch (e) {} };
+      onNet(from, m.data);
+    };
+  } catch (e) {}
+  BROKERS.forEach((b, i) => connectBroker(i, code));
+}
+function connectBroker(i, code) {
+  if (G.code !== code) return;
+  const c = new MiniMqtt(BROKERS[i].url); G.mqs[i] = c;
+  c.connect(8000).then(() => {
+    c.subscribe(TOPIC(code) + '/h');
+    c.onmessage = (topic, payload) => {
+      let m; try { m = JSON.parse(payload); } catch (e) { return; }
+      if (!m || typeof m.f !== 'string' || !m.d) return;
+      const reply = d => c.publish(TOPIC(code) + '/c/' + m.f, JSON.stringify(d));
+      if (m.d.t === 'ping') { reply({t: 'pong'}); return; }
+      const cid = 'm' + i + ':' + m.f;
+      G.conns[cid] = reply; onNet(cid, m.d);
+    };
+    c.onclose = () => { G.net[i].state = 'err'; netChanged(); setTimeout(() => connectBroker(i, code), 3000); };
+    G.net[i].state = 'ok'; netChanged();
+  }).catch(() => { G.net[i].state = 'err'; netChanged(); setTimeout(() => connectBroker(i, code), 15000); });
+}
+function netChanged() {
+  G.netOk = G.net.some(n => n.state === 'ok');
+  G.netErr = !G.netOk && G.net.every(n => n.state === 'err') ? 'Ei yhteyttä pelipalvelimiin. Verkko voi estää ne. Testibotit toimivat silti.' : '';
+  if (G.phase === 'lobby') renderHost();
+}
+setInterval(() => {
+  if (G.role !== 'host') return; let changed = false;
+  for (const p of plist()) if (!p.bot && p.connected && Date.now() - (p.lastSeen || 0) > 16000) { p.connected = false; changed = true; }
+  if (changed) renderHost();
+}, 4000);
+function sendTo(p, d) { if (p.bot || !p.conn) return; const f = G.conns[p.conn]; if (f) f(d); }
+function onClose(connId) {
+  const pid = G.connOf[connId]; delete G.conns[connId];
+  if (pid && G.players[pid] && G.players[pid].conn === connId) { G.players[pid].connected = false; renderHost(); }
+}
+function onNet(connId, d) {
+  if (!d || typeof d !== 'object') return;
+  if (d.t === 'join') return onJoin(connId, d);
+  const pid = G.connOf[connId]; const p = pid && G.players[pid];
+  if (!p) { const f = G.conns[connId]; if (f) f({t: 'rejoin'}); return; }
+  p.lastSeen = Date.now();
+  if (!p.connected || p.conn !== connId) { p.connected = true; p.conn = connId; renderHost(); sync(); }
+  if (d.t === 'hb') { sendTo(p, {t: 'hb'}); return; }
+  handle(p, d);
+}
+function onJoin(connId, d) {
+  let p = d.pid && G.players[d.pid];
+  if (p) { p.conn = connId; p.connected = true; p.lastSeen = Date.now(); }
+  else {
+    if (plist().length >= 24) { G.conns[connId] && G.conns[connId]({t: 'error', msg: 'Peli on täynnä (24 pelaajaa).'}); return; }
+    let name = String(d.name || 'Nimetön').trim().slice(0, 14) || 'Nimetön';
+    const names = new Set(plist().map(x => x.name.toLowerCase()));
+    if (names.has(name.toLowerCase())) { let i = 2; while (names.has((name + i).toLowerCase())) i++; name = name + i; }
+    p = newPlayer(uid(), name, EMOJIS.includes(d.emoji) ? d.emoji : pick(EMOJIS));
+    p.conn = connId; p.connected = true; p.lastSeen = Date.now();
+    if (G.phase !== 'lobby') { p.ghost = true; toast(`${p.name} liittyi myöhässä ja on haamu`, '👻'); }
+    else SFX.join();
+  }
+  G.connOf[connId] = p.id;
+  G.conns[connId] && G.conns[connId]({t: 'joined', pid: p.id, code: G.code});
+  renderHost(); sync();
+}
+function newPlayer(id, name, emoji, bot = false) {
+  const p = {id, name, emoji, bot, score: 0, ghost: false, cards: [], effects: {}, answer: null, answerT: 0, bet: 0,
+             deadline: 0, lockUntil: 0, pos: 0, conn: null, connected: false, delta: 0, stealTarget: null, lastReact: 0};
+  G.players[id] = p; G.order.push(id); return p;
+}
+function addBot() {
+  const names = ['Botti-Bertta', 'Robo-Raimo', 'Pelti-Pekka', 'Kone-Kaisa', 'Siru-Sami', 'Data-Doris', 'Mikro-Mirja', 'Lanka-Lasse'];
+  const used = new Set(plist().map(p => p.name));
+  const name = names.find(n => !used.has(n)) || 'Botti' + rnd(99);
+  const p = newPlayer(uid(), name, pick(EMOJIS), true);
+  if (G.phase !== 'lobby') p.ghost = true;
+  SFX.join(); renderHost(); sync();
+}
+
+/* ---------- per-player views ---------- */
+function viewFor(p) {
+  const now = Date.now();
+  const v = {t: 'view', key: phaseKey(), phase: G.phase, code: G.code, qi: G.qi, rounds: G.settings.rounds, finale: G.finale, fq: G.fq,
+    remain: G.phaseEnd ? Math.max(0, G.phaseEnd - now) : 0, dur: G.phaseDur,
+    me: {id: p.id, name: p.name, emoji: p.emoji, score: p.score, ghost: p.ghost, cards: p.cards, pos: p.pos, answered: p.answer != null,
+         incoming: Object.entries(p.effects).map(([k, by]) => ({k, by}))},
+    players: plist().map(x => ({id: x.id, name: x.name, emoji: x.emoji, score: x.score, ghost: x.ghost, pos: x.pos})),
+    quip: G.quip};
+  if (G.phase === 'prep') { v.round = G.finale ? 'pako' : G.roundType; v.cat = G.cur.cat; v.bet = p.bet; }
+  if (G.phase === 'question') {
+    v.round = G.finale ? 'pako' : G.roundType;
+    v.q = G.cur.q; v.opts = G.cur.opts; v.cat = G.cur.cat; v.answer = p.answer; v.num = !!G.cur.num; v.kind = G.cur.kind || 'mc';
+    if (v.kind === 'order') v.items = G.cur.items;
+    if (v.kind === 'tf') { v.statements = G.cur.sts.map(x => x.s); v.tfDone = (p.tfAns || []).length; }
+    if (v.kind === 'list') { v.myList = (p.list || []).map(x => ({txt: x.txt, ok: x.ok, dup: x.dup})); v.listTotal = G.cur.answers.length; }
+    v.myRemain = Math.max(0, p.deadline - now); v.myDur = p.deadline - G.qStart; v.lockRemain = Math.max(0, p.lockUntil - now);
+  }
+  if (G.phase === 'reveal') {
+    v.q = G.cur.q; v.opts = G.cur.opts; v.correct = G.cur.correct; v.answer = p.answer; v.delta = p.delta;
+    v.toCellar = G.cellar.includes(p.id); v.finaleMove = p.move || 0;
+    if (G.cur.num) { v.num = true; v.ans = G.cur.ans; v.rank = p.rank; v.diff = p.diff; v.guessers = plist().filter(x => x.answer != null).length; }
+    v.kind = G.cur.kind || 'mc';
+    if (v.kind === 'order') { v.solved = G.cur.sol.map(i => ({t: G.cur.items[i], note: G.cur.notes[i]})); v.oc = p.oc; v.n = G.cur.items.length; v.answered = Array.isArray(p.answer); }
+    if (v.kind === 'tf') { v.sts = G.cur.sts.map((x, i) => ({s: x.s, v: x.v, e: x.e, mine: (p.tfAns || [])[i]})); v.oc = p.oc; }
+    if (v.kind === 'list') { v.okCount = p.okCount; v.uniq = p.uniq; const mine = new Set((p.list || []).filter(x => x.ok).map(x => x.idx)); v.missed = G.cur.answers.filter((_, i) => !mine.has(i)).slice(0, 10); v.listTotal = G.cur.answers.length; }
+  }
+  if (G.phase === 'steal') { v.canSteal = G.cur.correct === p.answer && !p.stealTarget; v.stealTarget = p.stealTarget; }
+  if (G.phase === 'cellar' || G.phase === 'minigame' || G.phase === 'mg_result') {
+    v.inCellar = G.cellar.includes(p.id); v.cellarNames = G.cellar.map(id => G.players[id] && G.players[id].name).filter(Boolean);
+    v.mgType = G.mg ? G.mg.type : null;
+  }
+  if (G.phase === 'minigame' && G.mg) {
+    v.mg = {id: G.mg.id, type: G.mg.type};
+    if (G.mg.type === 'reaktio') v.mg.delay = G.mg.delays[p.id] || 3000;
+    if (G.mg.type === 'muisti') v.mg.seq = G.mg.seq;
+    if (G.mg.type === 'matikka') v.mg.probs = G.mg.probs.map(x => x.q);
+    if (G.mg.type === 'varit') v.mg.seq = G.mg.seq;
+    if (G.mg.type === 'kirstut' && G.mg.golds[p.id]) { const r = G.mg.results[p.id] || {}; const o = r.opened || 0; v.mg.chest = {opened: o, gold: r.gold || 0, trapped: !!r.trapped, final: !!r.final, golds: G.mg.golds[p.id].slice(0, r.trapped ? o - 1 : o)}; }
+    if (G.mg.type === 'uhri') v.mg.score = p.score;
+    v.mg.submitted = !!(G.mg.results[p.id] && G.mg.results[p.id].final);
+  }
+  if (G.phase === 'mg_result') { v.died = G.lastDeaths.includes(p.id); v.deadNames = G.lastDeaths.map(id => G.players[id].name); }
+  if (G.phase === 'end') { v.winner = G.winner ? {name: G.players[G.winner].name, emoji: G.players[G.winner].emoji} : null; v.iWon = G.winner === p.id; }
+  return v;
+}
+function sync() { if (G.syncT) return; G.syncT = setTimeout(() => { G.syncT = null; for (const p of plist()) if (!p.bot && p.connected) sendTo(p, viewFor(p)); }, 50); }
+
+/* ---------- phase engine ---------- */
+function setPhase(ph, ms, next) {
+  G.phase = ph; G.phaseDur = ms || 0; G.phaseEnd = ms ? Date.now() + ms : 0;
+  clearTimeout(G.timer); if (ms && next) G.timer = setTimeout(next, ms);
+  G.next = next || null;
+  renderHost(); sync(); botsAct();
+}
+function skipPhase() { if (G.next) { clearTimeout(G.timer); const n = G.next; G.next = null; n(); } }
+
+function buildQuestions() {
+  const setOf = k => k.startsWith('c:') && G.sets.find(x => 'c:' + x.id === k);
+  let sel = (G.settings.packs || []).filter(k => setOf(k) ? setCount(setOf(k)) : PACKS[k]);
+  if (!sel.length) { sel = ['yleis']; toast('Ei valittuja aiheita, käytetään yleistietoa', '📝'); }
+  let base = [], nbase = [], obase = [], tbase = [], lbase = [];
+  for (const k of sel) {
+    const st = setOf(k), pk = st ? parseCustom(st.text) : PACKS[k], nm = st ? st.name : pk.name;
+    base = base.concat((pk.mc || []).map(q => st ? [...q.slice(0, 5), nm] : q.length >= 6 ? q : [...q, nm]));
+    nbase = nbase.concat((pk.num || []).map(q => [q[0], q[1], st ? nm : q[2] || nm]));
+    obase = obase.concat((pk.order || []).map(q => [q[0], q[1], nm]));
+    tbase = tbase.concat((pk.tf || []).map(q => [q[0], q[1], q[2] || '', nm]));
+    lbase = lbase.concat((pk.list || []).map(q => [q[0], q[1], nm]));
+  }
+  const dedupe = arr => { const seen = new Set(); return arr.filter(q => !seen.has(q[0]) && seen.add(q[0])); };
+  base = dedupe(base); nbase = dedupe(nbase);
+  G.orderList = shuffle(dedupe(obase)); G.tfList = shuffle(dedupe(tbase)); G.listList = shuffle(dedupe(lbase)); G.oi = G.ti = G.li = 0;
+  if (!base.length) base = QBANK.slice();
+  const need = G.settings.rounds + 16; let out = [];
+  while (out.length < need) out = out.concat(shuffle(base));
+  G.numList = nbase.length ? shuffle(nbase) : []; G.ni = 0;
+  return out;
+}
+function parseCustom(text) {
+  const mc = [], num = [], order = [], tf = [], list = [];
+  String(text || '').split(/\r?\n/).map(l => l.trim()).filter(l => l && !l.startsWith('#')).forEach(l => {
+    let m;
+    if ((m = l.match(/^(totta|tarua)\s*:\s*(.+)$/i))) {
+      const parts = m[2].split(/[;|\t]/).map(s => s.trim());
+      if (parts[0]) tf.push([parts[0], m[1].toLowerCase() === 'totta', parts[1] || '']);
+      return;
+    }
+    if ((m = l.match(/^([jl])\s*:\s*(.+)$/i))) {
+      const parts = m[2].split(/[;|\t]/).map(s => s.trim()).filter(Boolean);
+      if (m[1].toLowerCase() === 'j' && parts.length >= 4) order.push([parts[0], parts.slice(1, 7)]);
+      if (m[1].toLowerCase() === 'l' && parts.length >= 3) list.push([parts[0], parts.slice(1)]);
+      return;
+    }
+    const parts = l.split(/[;|\t]/).map(s => s.trim()).filter(Boolean);
+    if (parts.length === 2) {
+      const n = Number(parts[1].replace(/\s/g, '').replace(',', '.'));
+      if (isFinite(n)) num.push([parts[0], n, 'Omat']);
+      return;
+    }
+    if (parts.length < 3) return;
+    const ans = parts.slice(1, 5);
+    mc.push([parts[0], ans[0], ans[1] || '', ans[2] || '', ans[3] || '', 'Omat']);
+  });
+  return {mc, num, order, tf, list, count: mc.length + num.length + order.length + tf.length + list.length};
+}
+function makeQ(raw) {
+  const answers = raw.slice(1, 5).filter(x => x !== '' && x != null);
+  const correctText = answers[0];
+  const opts = shuffle(answers);
+  return {kind: 'mc', q: raw[0], opts, correct: opts.indexOf(correctText), cat: raw[5] || 'Sekalaiset'};
+}
+function dealCards(all) {
+  const pool = []; for (const [k, c] of Object.entries(CARDS)) for (let i = 0; i < c.w; i++) pool.push(k);
+  for (const p of plist()) {
+    const gets = p.ghost || all;
+    if (gets && p.cards.length < 2) p.cards.push(pick(pool));
+  }
+}
+function resetRoundState() {
+  for (const p of plist()) { p.answer = null; p.answerT = 0; p.bet = 0; p.effects = {}; p.delta = 0; p.stealTarget = null; p.move = 0; p.tfAns = []; p.list = []; p.oc = 0; p.okCount = 0; p.uniq = 0; }
+}
+function makeOrder(r) {
+  const parsed = r[1].map(x => { const [t, note] = String(x).split('|'); return {t: t.trim(), note: (note || '').trim()}; });
+  const disp = shuffle(parsed.map((_, i) => i));
+  return {kind: 'order', q: r[0], cat: r[2] || 'Aikajana', opts: [], items: disp.map(i => parsed[i].t), notes: disp.map(i => parsed[i].note),
+          sol: parsed.map((_, pos) => disp.indexOf(pos))};
+}
+
+function startGame() {
+  if (!plist().length) { toast('Tarvitaan vähintään yksi pelaaja', '⚠️'); return; }
+  audio(); SFX.start();
+  G.qList = buildQuestions(); G.qi = 0; G.fq = 0; G.finale = false; G.winner = null; G.lastMg = null;
+  for (const p of plist()) { p.score = 0; p.ghost = false; p.cards = []; p.pos = 0; }
+  resetRoundState(); dealCards(true);
+  quip('intro');
+  setPhase('intro', 7000, nextQuestion);
+}
+function nextQuestion() {
+  if (G.qi >= G.settings.rounds) return startFinale();
+  resetRoundState();
+  const types = ['nopein', 'nopein', 'pommi', 'ryosto'];
+  if (G.numList.length) types.push('lahin', 'lahin');
+  if (G.orderList.length) types.push('aikajana', 'aikajana');
+  if (G.tfList.length >= 5) types.push('tottatarua', 'tottatarua');
+  if (G.listList.length) types.push('lista', 'lista');
+  let rt = G.qi === 0 ? 'nopein' : pick(types);
+  if (rt === G.lastRound && rt !== 'nopein') rt = pick(types);
+  if (G.forceRound) rt = G.forceRound;
+  G.lastRound = rt; G.roundType = rt;
+  if (rt === 'lahin') { const r = G.numList[G.ni++ % G.numList.length]; G.cur = {kind: 'num', num: true, q: r[0], ans: Number(r[1]), cat: r[2] || 'Arvaus', opts: []}; }
+  else if (rt === 'aikajana') G.cur = makeOrder(G.orderList[G.oi++ % G.orderList.length]);
+  else if (rt === 'tottatarua') {
+    const sts = []; for (let i = 0; i < 5; i++) { const r = G.tfList[G.ti++ % G.tfList.length]; sts.push({s: r[0], v: !!r[1], e: r[2] || ''}); }
+    G.cur = {kind: 'tf', q: 'Totta vai tarua?', cat: G.tfList[(G.ti - 1) % G.tfList.length][3] || 'Väitteet', opts: [], sts};
+  }
+  else if (rt === 'lista') {
+    const r = G.listList[G.li++ % G.listList.length];
+    G.cur = {kind: 'list', q: r[0], cat: r[2] || 'Lista', opts: [], answers: r[1].map(a => a.split('/')[0].trim()), norms: r[1].map(a => a.split('/').map(normTxt).filter(Boolean))};
+  }
+  else G.cur = makeQ(G.qList[G.qi]);
+  dealCards(G.qi % 2 === 0);
+  quip('prep');
+  setPhase('prep', G.roundType === 'pommi' ? 11000 : 9000, startQuestion);
+}
+function startQuestion() {
+  const now = Date.now(); const k = G.cur.kind;
+  const dur = k === 'order' ? Math.max(G.settings.timer, 20) * 1000 : k === 'tf' ? 25000 : k === 'list' ? 40000 : G.settings.timer * 1000;
+  G.qStart = now; G.qDur = dur;
+  for (const p of plist()) {
+    p.deadline = now + (p.effects.hidaste ? dur / 2 : dur);
+    p.lockUntil = p.effects.jaa ? now + 4000 : 0;
+  }
+  speak(G.cur.q);
+  setPhase('question', dur, G.finale ? finaleReveal : reveal);
+}
+function allAnswered() {
+  const ps = present(); return ps.length > 0 && ps.every(p => p.answer != null || Date.now() > p.deadline);
+}
+function checkAllAnswered() {
+  if (G.phase === 'question' && G.next && allAnswered()) { clearTimeout(G.timer); const n = G.next; G.next = null; G.timer = setTimeout(n, 900); }
+}
+function revealNum() {
+  const a = G.cur.ans; G.cellar = [];
+  const guessers = plist().filter(p => p.answer != null);
+  const diffs = [...new Set(guessers.map(p => Math.abs(p.answer - a)))].sort((x, y) => x - y);
+  const PTS = [1000, 600, 350];
+  for (const p of plist()) {
+    let d = 0; p.rank = null; p.diff = null;
+    if (p.answer != null) {
+      p.diff = Math.abs(p.answer - a); p.rank = diffs.indexOf(p.diff);
+      d = (PTS[p.rank] ?? 100) + (p.diff === 0 ? 500 : 0);
+    }
+    if (p.ghost) d = Math.round(d / 2);
+    p.score = Math.max(0, p.score + d); p.delta = d;
+    if (!p.ghost && (p.bot || p.connected) && p.answer == null) G.cellar.push(p.id);
+  }
+  if (diffs.length > 1) {
+    const worst = diffs[diffs.length - 1];
+    for (const p of guessers) if (!p.ghost && p.diff === worst && !G.cellar.includes(p.id)) G.cellar.push(p.id);
+  }
+  const best = guessers.filter(p => p.rank === 0);
+  if (best.some(p => p.diff === 0)) toast(`Täysosuma! ${best.map(p => p.name).join(', ')} +500 bonus`, '🎯', true);
+  if (G.cellar.length) { SFX.wrong(); quip('farthest', {n: G.cellar.map(id => G.players[id].name).join(', ')}); }
+  else { SFX.right(); quip('allRight'); }
+  setPhase('reveal', 8000, afterReveal);
+}
+function cellarMsg() {
+  const qk = {order: 'orderBad', tf: 'tfBad', list: 'listBad'}[G.cur.kind] || 'toCellar';
+  if (G.cellar.length) { SFX.wrong(); quip(qk, {n: G.cellar.map(id => G.players[id].name).join(', ')}); }
+  else { SFX.right(); quip('allRight'); }
+}
+const alive = p => !p.ghost && (p.bot || p.connected);
+function revealOrder() {
+  const c = G.cur; G.cellar = []; const n = c.items.length;
+  for (const p of plist()) {
+    let d = 0; p.oc = 0;
+    if (Array.isArray(p.answer)) {
+      p.oc = c.sol.filter((di, pos) => p.answer[pos] === di).length;
+      d = p.oc === n ? 800 + Math.round(300 * Math.max(0, 1 - p.answerT / G.qDur)) : p.oc * 150;
+    }
+    if (p.ghost) d = Math.round(d / 2);
+    p.score = Math.max(0, p.score + d); p.delta = d;
+    if (alive(p) && (p.answer == null || p.oc <= 1)) G.cellar.push(p.id);
+  }
+  cellarMsg(); setPhase('reveal', 9000, afterReveal);
+}
+function revealTf() {
+  const sts = G.cur.sts; G.cellar = []; const n = sts.length;
+  for (const p of plist()) {
+    const a = p.tfAns || []; p.oc = sts.filter((s, i) => a[i] === s.v).length;
+    let d = p.oc * 150 + (p.oc === n ? 250 : 0); if (p.ghost) d = Math.round(d / 2);
+    p.score = Math.max(0, p.score + d); p.delta = d;
+  }
+  const live = plist().filter(alive);
+  if (live.length) {
+    const errs = live.map(p => n - p.oc), mx = Math.max(...errs), mn = Math.min(...errs);
+    for (const p of live) if ((mx > mn && n - p.oc === mx) || !(p.tfAns || []).length) G.cellar.push(p.id);
+  }
+  cellarMsg(); setPhase('reveal', 10000, afterReveal);
+}
+function revealList() {
+  const c = G.cur; G.cellar = [];
+  c.finders = c.answers.map(() => []);
+  for (const p of plist()) for (const x of p.list || []) if (x.ok) c.finders[x.idx].push(p.id);
+  for (const p of plist()) {
+    const oks = (p.list || []).filter(x => x.ok); p.okCount = oks.length; p.uniq = oks.filter(x => c.finders[x.idx].length === 1).length;
+    let d = p.okCount * 100 + p.uniq * 100; if (p.ghost) d = Math.round(d / 2);
+    p.score = Math.max(0, p.score + d); p.delta = d;
+  }
+  const live = plist().filter(alive);
+  if (live.length) {
+    const cnt = live.map(p => p.okCount), mx = Math.max(...cnt), mn = Math.min(...cnt);
+    for (const p of live) if (p.okCount === 0 || (mx > mn && p.okCount === mn)) G.cellar.push(p.id);
+  }
+  cellarMsg(); setPhase('reveal', 10000, afterReveal);
+}
+function reveal() {
+  if (G.cur.num) return revealNum();
+  if (G.cur.kind === 'order') return revealOrder();
+  if (G.cur.kind === 'tf') return revealTf();
+  if (G.cur.kind === 'list') return revealList();
+  const c = G.cur.correct, rt = G.roundType;
+  G.cellar = [];
+  for (const p of plist()) {
+    const ok = p.answer === c; let d = 0;
+    if (rt === 'nopein') d = ok ? Math.round(400 + 600 * Math.max(0, 1 - p.answerT / G.qDur)) : 0;
+    if (rt === 'pommi') d = ok ? 300 + p.bet : -p.bet;
+    if (rt === 'ryosto') d = ok ? 300 : 0;
+    if (p.ghost) d = Math.round(d / 2);
+    p.score = Math.max(0, p.score + d); p.delta = d;
+    if (!ok && !p.ghost && (p.bot || p.connected)) G.cellar.push(p.id);
+  }
+  if (G.cellar.length) { SFX.wrong(); quip('toCellar', {n: G.cellar.map(id => G.players[id].name).join(', ')}); }
+  else { SFX.right(); quip('allRight'); }
+  setPhase('reveal', 6500, afterReveal);
+}
+function afterReveal() {
+  const robbers = present().filter(p => p.answer === G.cur.correct);
+  if (G.cur.kind !== 'mc') return goCellar();
+  if (G.roundType === 'ryosto' && robbers.length && plist().length > 1) return setPhase('steal', 9000, resolveSteal);
+  goCellar();
+}
+function resolveSteal() {
+  for (const p of plist()) {
+    if (!p.stealTarget) continue; const t = G.players[p.stealTarget]; if (!t) continue;
+    const amt = Math.min(250, t.score); t.score -= amt; p.score += amt;
+    toast(`${p.name} ryösti ${amt} p. pelaajalta ${t.name}`, '🦝');
+  }
+  goCellar();
+}
+function goCellar() {
+  if (!G.cellar.length) { G.qi++; return nextQuestion(); }
+  const types = Object.keys(MG).filter(t => t !== G.lastMg && (MG[t].min || 1) <= G.cellar.length);
+  const type = G.forceMg && (MG[G.forceMg].min || 1) <= G.cellar.length ? G.forceMg : pick(types); G.lastMg = type;
+  G.mg = {id: uid(), type, results: {}};
+  if (type === 'reaktio') { G.mg.delays = {}; for (const id of G.cellar) G.mg.delays[id] = 2000 + rnd(4000); }
+  if (type === 'muisti') G.mg.seq = Array.from({length: 5}, () => rnd(4));
+  if (type === 'matikka') G.mg.probs = makeMath();
+  if (type === 'ovet') G.mg.trap = rnd(3);
+  if (type === 'varit') G.mg.seq = Array.from({length: 10}, () => { const w = rnd(4); return {w, c: Math.random() < .85 ? (w + 1 + rnd(3)) % 4 : w}; });
+  if (type === 'kirstut') { G.mg.golds = {}; G.mg.traps = {}; for (const id of G.cellar) { G.mg.golds[id] = Array.from({length: 8}, () => 60 + rnd(11) * 10); G.mg.traps[id] = 2 + rnd(6); } }
+  SFX.death();
+  setPhase('cellar', 7000, () => setPhase('minigame', MG[type].dur, endMinigame));
+}
+function makeMath() {
+  const out = [];
+  const a = (x, y) => x + rnd(y - x + 1);
+  let x, y; x = a(12, 49); y = a(11, 49); out.push({q: `${x} + ${y}`, a: x + y});
+  x = a(3, 9); y = a(4, 9); out.push({q: `${x} × ${y}`, a: x * y});
+  x = a(50, 99); y = a(11, 39); out.push({q: `${x} − ${y}`, a: x - y});
+  x = a(6, 12); y = a(3, 8); let z = a(2, 20); out.push({q: `${x} × ${y} + ${z}`, a: x * y + z});
+  y = a(3, 9); x = y * a(3, 9); out.push({q: `${x} ÷ ${y}`, a: x / y});
+  return shuffle(out);
+}
+function mgBad(type, r) {
+  r = r || {};
+  if (type === 'reaktio') return r.ms == null ? 9999 : r.ms;
+  if (type === 'muisti' || type === 'matikka') return (5 - (r.count || 0)) * 1e6 + (r.t || 99999);
+  if (type === 'varit') return (10 - (r.count || 0)) * 1e6 + (r.t || 99999);
+  if (type === 'kirstut') return 1e6 - (r.gold || 0);
+  return 0;
+}
+function mgLabel(type, r) {
+  r = r || {};
+  if (type === 'reaktio') return r.ms == null ? 'ei painanut' : r.ms >= 9999 ? 'varaslähtö!' : r.ms + ' ms';
+  if (type === 'muisti') return (r.count || 0) + '/5';
+  if (type === 'matikka') return (r.count || 0) + '/5 oikein';
+  if (type === 'ovet') return r.door == null ? 'jähmettyi' : 'ovi ' + (r.door + 1);
+  if (type === 'varit') return (r.count || 0) + '/10 oikein';
+  if (type === 'kirstut') return r.trapped ? '👹 ansa!' : (r.gold || 0) + ' kultaa';
+  if (type === 'uhri') return '🕯️ ' + (r.bid || 0) + ' p';
+  return '';
+}
+function endMinigame() {
+  const mg = G.mg, ids = G.cellar.filter(id => G.players[id]);
+  const fail = new Set();
+  for (const id of ids) {
+    const r = mg.results[id] || {};
+    if (mg.type === 'reaktio') { const ms = mgBad('reaktio', r); if (ms >= 9999 || (ids.length === 1 && ms > 450)) fail.add(id); }
+    if (mg.type === 'muisti' && (r.count || 0) < 5) fail.add(id);
+    if (mg.type === 'matikka' && (r.count || 0) < 4) fail.add(id);
+    if (mg.type === 'ovet' && (r.door == null || r.door === mg.trap)) fail.add(id);
+    if (mg.type === 'varit' && (r.count || 0) < 8) fail.add(id);
+    if (mg.type === 'kirstut' && (r.gold || 0) < 400) fail.add(id);
+  }
+  if (mg.type === 'uhri' && ids.length) {
+    const bids = ids.map(id => (mg.results[id] && mg.results[id].bid) || 0), mn = Math.min(...bids);
+    ids.forEach((id, i) => { if (bids[i] === mn) fail.add(id); const p = G.players[id]; p.score = Math.max(0, p.score - bids[i]); });
+    const tot = bids.reduce((a, b) => a + b, 0); if (tot) toast(`Kellarimestari keräsi uhreina ${tot} pistettä`, '🕯️', true);
+  }
+  if (ids.length >= 2 && fail.size === 0 && mg.type !== 'ovet' && mg.type !== 'uhri') {
+    const worst = Math.max(...ids.map(id => mgBad(mg.type, mg.results[id])));
+    ids.filter(id => mgBad(mg.type, mg.results[id]) === worst).forEach(id => fail.add(id));
+  }
+  G.lastDeaths = [...fail];
+  for (const id of fail) { const p = G.players[id]; p.ghost = true; if (p.cards.length < 2) p.cards.push('muste'); }
+  if (fail.size) { SFX.death(); quip('death', {n: G.lastDeaths.map(id => G.players[id].name).join(' ja ')}); }
+  else { SFX.right(); quip('survive'); }
+  setPhase('mg_result', 7500, () => { G.qi++; nextQuestion(); });
+}
+
+/* ---------- finale ---------- */
+function startFinale() {
+  G.finale = true; G.fq = 0; G.cellar = []; resetRoundState();
+  const living = plist().filter(p => !p.ghost).sort((a, b) => b.score - a.score);
+  for (const p of plist()) p.pos = p.ghost ? 0 : 2;
+  if (living[0]) living[0].pos = 3;
+  quip('finale');
+  setPhase('finale_intro', 9000, finaleQuestion);
+}
+function finaleQuestion() {
+  resetRoundState(); G.roundType = 'nopein';
+  G.cur = makeQ(G.qList[G.settings.rounds + G.fq] || pick(QBANK));
+  dealCards(true);
+  setPhase('prep', 6000, startQuestion);
+}
+function finaleReveal() {
+  const c = G.cur.correct;
+  const right = plist().filter(p => p.answer === c).sort((a, b) => a.answerT - b.answerT);
+  for (const p of plist()) p.move = 0;
+  right.forEach((p, i) => { p.move = i === 0 ? 2 : 1; p.pos = Math.min(TRACK, p.pos + p.move); });
+  const living = plist().filter(p => !p.ghost);
+  for (const g of plist().filter(p => p.ghost && p.move > 0)) {
+    if (living.some(l => l.pos <= g.pos)) { g.ghost = false; toast(`${g.name} ohitti elävän ja heräsi henkiin!`, '🧟', true); }
+  }
+  right.length ? SFX.right() : SFX.wrong();
+  const live2 = plist().filter(p => !p.ghost);
+  let cands = live2.filter(p => p.pos >= TRACK);
+  if (!live2.length) cands = plist().filter(p => p.pos >= TRACK);
+  const order = (a, b) => (b.pos - a.pos) || ((a.answer === c ? a.answerT : 1e9) - (b.answer === c ? b.answerT : 1e9));
+  if (!cands.length && G.fq >= 14) cands = (live2.length ? live2 : plist()).slice();
+  G.winner = cands.length ? cands.sort(order)[0].id : null;
+  G.cellar = [];
+  setPhase('reveal', 6000, () => {
+    if (G.winner) { quip('win', {n: G.players[G.winner].name}); SFX.win(); setPhase('end'); }
+    else { G.fq++; finaleQuestion(); }
+  });
+}
+
+/* ---------- player actions (host side) ---------- */
+function handle(p, d) {
+  const now = Date.now();
+  if (d.t === 'react') {
+    if (now - p.lastReact < 900) return; p.lastReact = now;
+    if (['👻','😱','😂','🔥','💀','👏'].includes(d.e)) floater(d.e, p.name); return;
+  }
+  if (d.t === 'play' && G.phase === 'prep') {
+    const i = p.cards.indexOf(d.card); const t = G.players[d.target];
+    if (i < 0 || !t || t.id === p.id || CARDS[d.card].passive) return;
+    p.cards.splice(i, 1);
+    const c = CARDS[d.card];
+    const ki = t.cards.indexOf('kilpi');
+    if (ki >= 0) {
+      t.cards.splice(ki, 1); p.effects[d.card] = t.name;
+      toast(`${t.name} torjui kilvellä ja palautti ${c.name}-kortin pelaajalle ${p.name}!`, '🛡️', true);
+    } else {
+      t.effects[d.card] = p.name;
+      toast(`${p.name} → ${t.name}: ${c.name}`, c.emoji);
+    }
+    SFX.attack(); renderHost(); sync(); return;
+  }
+  if (d.t === 'bet' && G.phase === 'prep' && G.roundType === 'pommi' && !G.finale) {
+    const amt = d.amount === 'all' ? p.score : Math.max(0, Math.min(Number(d.amount) || 0, p.score));
+    p.bet = amt; renderHost(); sync(); return;
+  }
+  if (G.phase === 'question' && G.cur.kind === 'list' && (d.t === 'listadd' || d.t === 'listdone')) {
+    if (p.answer != null || now > p.deadline + 1500 || now < p.lockUntil) return;
+    if (d.t === 'listdone') { p.answer = 'done'; p.answerT = now - G.qStart; renderHost(); sync(); checkAllAnswered(); return; }
+    const txt = String(d.text || '').trim().slice(0, 40); if (!txt || (p.list || []).length >= 40) return;
+    const idx = matchList(txt, G.cur.norms); const dup = idx >= 0 && p.list.some(x => x.idx === idx);
+    p.list.push({txt, idx: dup ? -1 : idx, ok: idx >= 0 && !dup, dup}); renderHost(); sync(); return;
+  }
+  if (d.t === 'answer' && G.phase === 'question' && G.cur.kind === 'tf') {
+    if (p.answer != null || now > p.deadline + 1500 || now < p.lockUntil || !Array.isArray(d.tf)) return;
+    const n = G.cur.sts.length, arr = d.tf.slice(0, n).map(x => !!x);
+    if (arr.length < (p.tfAns || []).length) return;
+    p.tfAns = arr; if (d.final || arr.length >= n) { p.answer = arr; p.answerT = now - G.qStart; }
+    renderHost(); sync(); checkAllAnswered(); return;
+  }
+  if (d.t === 'answer' && G.phase === 'question' && G.cur.kind === 'order') {
+    if (p.answer != null || now > p.deadline + 1500 || now < p.lockUntil || !Array.isArray(d.order)) return;
+    const n = G.cur.items.length, o = d.order.map(Number);
+    if (o.length !== n || new Set(o).size !== n || o.some(x => !(x >= 0 && x < n))) return;
+    p.answer = o; p.answerT = now - G.qStart; renderHost(); sync(); checkAllAnswered(); return;
+  }
+  if (d.t === 'answer' && G.phase === 'question') {
+    if (p.answer != null || now > p.deadline || now < p.lockUntil) return;
+    if (G.cur.num) { const g = Number(String(d.guess).replace(',', '.')); if (!isFinite(g) || String(d.guess).trim() === '') return; p.answer = g; }
+    else { const idx = Number(d.idx); if (!(idx >= 0 && idx < G.cur.opts.length)) return; p.answer = idx; } p.answerT = now - G.qStart;
+    renderHost(); sync(); checkAllAnswered(); return;
+  }
+  if (d.t === 'steal' && G.phase === 'steal') {
+    if (p.answer !== G.cur.correct || p.stealTarget) return;
+    const t = G.players[d.target]; if (!t || t.id === p.id) return;
+    p.stealTarget = t.id; renderHost(); sync();
+    const robbers = present().filter(x => x.answer === G.cur.correct);
+    if (robbers.every(x => x.stealTarget)) { clearTimeout(G.timer); G.next = null; G.timer = setTimeout(resolveSteal, 700); }
+    return;
+  }
+  if (d.t === 'mg' && G.phase === 'minigame' && G.mg && d.id === G.mg.id && G.cellar.includes(p.id)) {
+    const prev = G.mg.results[p.id]; if (prev && prev.final) return;
+    const r = d.r || {}; let clean = {final: !!r.final};
+    if (G.mg.type === 'varit') { clean.count = Math.max(0, Math.min(10, r.count | 0)); clean.t = Number(r.t) || 99999; }
+    if (G.mg.type === 'kirstut') {
+      const st = Object.assign({opened: 0, gold: 0, trapped: false}, prev || {}); clean = st;
+      if (r.open) {
+        const o = st.opened + 1, golds = G.mg.golds[p.id];
+        if (o >= G.mg.traps[p.id]) Object.assign(st, {opened: o, gold: 0, trapped: true, final: true});
+        else Object.assign(st, {opened: o, gold: golds.slice(0, o).reduce((a, b) => a + b, 0)});
+      }
+      if (r.stop) st.final = true;
+    }
+    if (G.mg.type === 'uhri') { clean.bid = Math.max(0, Math.min(p.score, Math.round(Number(r.bid) || 0))); clean.final = true; }
+    if (G.mg.type === 'reaktio') clean.ms = Math.max(0, Math.min(9999, Math.round(Number(r.ms)))), clean.final = true;
+    if (G.mg.type === 'muisti') { clean.count = Math.max(0, Math.min(5, r.count | 0)); clean.t = Number(r.t) || 99999; }
+    if (G.mg.type === 'matikka') {
+      const answers = Array.isArray(r.answers) ? r.answers.slice(0, 5) : [];
+      clean.count = answers.filter((a, i) => G.mg.probs[i] && Number(a) === G.mg.probs[i].a).length; clean.t = Number(r.t) || 99999;
+    }
+    if (G.mg.type === 'ovet') { const dd = Number(r.door); clean.door = dd >= 0 && dd < 3 ? dd : null; clean.final = true; }
+    G.mg.results[p.id] = clean; renderHost(); sync();
+    const ids = G.cellar.filter(id => G.players[id] && (G.players[id].bot || G.players[id].connected));
+    if (ids.every(id => G.mg.results[id] && G.mg.results[id].final)) { clearTimeout(G.timer); G.next = null; G.timer = setTimeout(endMinigame, 1200); }
+  }
+}
+
+/* ---------- bots ---------- */
+function botsAct() {
+  const k = phaseKey();
+  const later = (ms, fn) => setTimeout(() => { if (phaseKey() === k) fn(); }, ms);
+  for (const p of plist().filter(p => p.bot)) {
+    if (G.phase === 'prep') {
+      const playable = p.cards.filter(c => !CARDS[c].passive);
+      if (playable.length && Math.random() < .6) later(1000 + rnd(4500), () => {
+        const others = plist().filter(x => x.id !== p.id); if (!others.length) return;
+        handle(p, {t: 'play', card: pick(playable), target: pick(others).id});
+      });
+      if (G.roundType === 'pommi' && !G.finale) later(800 + rnd(3000), () => handle(p, {t: 'bet', amount: pick([0, 100, 250, 500, 'all'])}));
+    }
+    if (G.phase === 'question' && G.cur.kind === 'list') {
+      const picks = shuffle(G.cur.answers.map((_, i) => i)).slice(0, 1 + rnd(5));
+      picks.forEach((i, j) => later((p.lockUntil ? 4200 : 0) + 2000 + j * (2500 + rnd(3000)), () => handle(p, {t: 'listadd', text: G.cur.answers[i]})));
+      if (Math.random() < .4) later(5000 + rnd(9000), () => handle(p, {t: 'listadd', text: pick(['banaani', 'en tiedä', 'joku'])}));
+      later(Math.min(picks.length * 5500 + 4000, (p.deadline - Date.now()) - 1500), () => handle(p, {t: 'listdone'}));
+    }
+    else if (G.phase === 'question') later(Math.max(300, (p.lockUntil ? 4200 : 0) + 1500 + rnd(Math.max(1500, (p.deadline - Date.now()) * .7))), () => {
+      if (G.cur.kind === 'order') { handle(p, {t: 'answer', order: Math.random() < .45 ? G.cur.sol.slice() : shuffle(G.cur.items.map((_, i) => i))}); return; }
+      if (G.cur.kind === 'tf') { handle(p, {t: 'answer', tf: G.cur.sts.map(s => Math.random() < .72 ? s.v : !s.v), final: true}); return; }
+      if (G.cur.num) { const a = G.cur.ans, spread = Math.abs(a) * .12 + 4; handle(p, {t: 'answer', guess: String(Math.round((a + (Math.random() * 2 - 1) * spread) * 10) / 10)}); return; }
+      const ok = Math.random() < .55; const n = G.cur.opts.length;
+      handle(p, {t: 'answer', idx: ok ? G.cur.correct : (G.cur.correct + 1 + rnd(n - 1)) % n});
+    });
+    if (G.phase === 'steal') later(1500 + rnd(3000), () => {
+      const others = plist().filter(x => x.id !== p.id); if (others.length) handle(p, {t: 'steal', target: pick(others).id});
+    });
+    if (G.phase === 'minigame' && G.cellar.includes(p.id)) later(2500 + rnd(5000), () => {
+      const t = G.mg.type, id = G.mg.id; let r = {final: true};
+      if (t === 'reaktio') r.ms = Math.random() < .1 ? 9999 : 230 + rnd(330);
+      if (t === 'muisti') { r.count = Math.random() < .7 ? 5 : rnd(5); r.t = 4000 + rnd(6000); }
+      if (t === 'matikka') { r.answers = G.mg.probs.map(x => Math.random() < .82 ? x.a : x.a + 1); r.t = 8000 + rnd(9000); }
+      if (t === 'ovet') r.door = rnd(3);
+      if (t === 'varit') { r.count = 6 + rnd(5); r.t = 9000 + rnd(9000); }
+      if (t === 'uhri') r.bid = Math.round(p.score * pick([0, .1, .25, .5, 1]));
+      if (t === 'kirstut') {
+        const target = 3 + rnd(4); let n = 0;
+        const step = () => { if (phaseKey() !== k) return; const st = G.mg.results[p.id]; if (st && st.final) return;
+          if (n >= target) { handle(p, {t: 'mg', id, r: {stop: true}}); return; } n++; handle(p, {t: 'mg', id, r: {open: true}}); setTimeout(step, 900 + rnd(1200)); };
+        step(); return;
+      }
+      handle(p, {t: 'mg', id, r});
+    });
+    if (['reveal', 'minigame', 'mg_result'].includes(G.phase) && Math.random() < .3) later(500 + rnd(3000), () => handle(p, {t: 'react', e: pick(['👻','😱','😂','🔥','💀','👏'])}));
+  }
+}
+
+/* ================= HOST RENDER ================= */
+function bubble() {
+  return G.quip ? `<div class="host-bubble"><div class="face" aria-hidden="true">🎩</div><div class="txt"><span class="who">Tohtori Kysymys</span>${esc(G.quip)}</div></div>` : '';
+}
+function timerBar() {
+  if (!G.phaseEnd) return '';
+  return `<div class="timerbar"><i data-from="${G.phaseEnd - G.phaseDur}" data-until="${G.phaseEnd}"></i></div>`;
+}
+function chipStatus(p) {
+  if (G.phase === 'question' && G.cur.kind === 'list') return `<span class="st ${p.answer != null ? 'ok' : ''}">📝${(p.list || []).filter(x => x.ok).length}</span>`;
+  if (G.phase === 'question' && G.cur.kind === 'tf' && p.answer == null) return (p.tfAns || []).length ? `<span class="st">${p.tfAns.length}/5</span>` : '';
+  if (G.phase === 'question') return p.answer != null ? '<span class="st ok">✓</span>' : '';
+  if (G.phase === 'prep' && G.roundType === 'pommi' && !G.finale) return p.bet ? `<span class="st">💣${p.bet}</span>` : '';
+  if (G.phase === 'reveal' && !G.finale && p.delta) return `<span class="st ${p.delta > 0 ? 'ok' : 'bad'}">${p.delta > 0 ? '+' : ''}${p.delta}</span>`;
+  if (G.phase === 'steal' && p.stealTarget) return '<span class="st">🦝</span>';
+  if (G.phase === 'minigame' && G.mg && G.mg.results[p.id] && G.mg.results[p.id].final) return '<span class="st ok">✓</span>';
+  return '';
+}
+function railHTML() {
+  return plist().map(p => `<div class="chip ${p.ghost ? 'ghost' : ''} ${p.bot || p.connected ? '' : 'off'}" title="${esc(p.name)}">
+    <span class="av">${p.ghost ? '👻' : p.emoji}</span><span>${esc(p.name)}</span>
+    <span class="sc">${G.finale ? '🏃' + p.pos : p.score}</span>${chipStatus(p)}
+    <span class="cards" aria-label="${p.cards.length} korttia">${'🃏'.repeat(p.cards.length)}</span>
+    ${G.phase === 'lobby' ? `<button class="kick" data-kick="${p.id}" aria-label="Poista ${esc(p.name)}">✕</button>` : ''}</div>`).join('');
+}
+function optsHTML(showCorrect) {
+  return `<div class="opts">${G.cur.opts.map((o, i) => {
+    const pickers = showCorrect ? plist().filter(p => p.answer === i).map(p => p.ghost ? '👻' : p.emoji).join('') : '';
+    const cls = showCorrect ? (i === G.cur.correct ? 'right' : 'dimmed') : '';
+    return `<div class="opt c${i} ${cls}"><span class="dot">${i + 1}</span><span>${esc(o)}</span><span class="pickers">${pickers}</span></div>`;
+  }).join('')}</div>`;
+}
+function trackHTML() {
+  const ps = plist().slice().sort((a, b) => b.pos - a.pos);
+  return `<div class="track">${ps.map(p => `<div class="lane ${p.ghost ? 'ghost' : ''}"><span>${p.ghost ? '👻' : p.emoji} ${esc(p.name)}</span>
+    <div class="cells" style="--n:${TRACK}">${Array.from({length: TRACK}, (_, i) => `<div class="cell ${i + 1 <= p.pos ? 'me' : ''}">${i + 1 === Math.max(1, p.pos) && p.pos > 0 ? (p.ghost ? '👻' : p.emoji) : ''}</div>`).join('')}<span class="exit">🚪</span></div></div>`).join('')}</div>`;
+}
+function stageHTML() {
+  const rt = ROUNDS[G.roundType];
+  switch (G.phase) {
+    case 'lobby': return lobbyHTML();
+    case 'intro': return `<div class="center"><div class="roundcard"><div class="em">🏚️</div><h2>Kaaoskartano</h2></div>${bubble()}
+      <p class="dim" style="max-width:60ch;margin:0">Väärä vastaus vie kellariin. Kellarissa hävinnyt muuttuu haamuksi. Haamut pelaavat silti ja saavat kiusakortin joka kierros. Lopussa kaikki juoksevat kohti uloskäyntiä.</p></div>`;
+    case 'prep':
+      if (G.finale) return `<div class="center"><div class="roundcard"><h2>Pakomatka · kysymys ${G.fq + 1}</h2><span class="cat">${esc(G.cur.cat)}</span><p>Pelaa kortit nyt. Nopein oikea vastaus etenee kaksi askelta.</p></div>${trackHTML()}${timerBar()}</div>`;
+      return `<div class="center"><div class="label">Kysymys ${G.qi + 1} / ${G.settings.rounds}</div>
+        <div class="roundcard"><div class="em">${rt.emoji}</div><h2>${rt.name}</h2><p>${rt.desc}</p><span class="cat">${esc(G.cur.cat)}</span></div>
+        ${bubble()}<div style="width:100%;display:grid;gap:6px"><div class="label">Kiusavaihe: pelaa kortit Chromebookilla</div>${timerBar()}</div></div>`;
+    case 'question': return `<div class="center"><div class="row" style="justify-content:center"><span class="cat">${esc(G.cur.cat)}</span><span class="label">${G.finale ? 'Pakomatka' : rt.emoji + ' ' + rt.name}</span></div>
+        ${hostQuestionBody()}
+        <div class="row" style="width:100%;flex-wrap:nowrap"><div class="secs" data-secs="${G.phaseEnd}"></div><div style="flex:1">${timerBar()}</div></div></div>`;
+    case 'reveal': if (G.cur.num) return numRevealHTML();
+      if (G.cur.kind === 'order') return orderRevealHTML();
+      if (G.cur.kind === 'tf') return tfRevealHTML();
+      if (G.cur.kind === 'list') return listRevealHTML();
+      return `<div class="center"><div class="qtext" style="font-size:clamp(1.3rem,2.6vw,2.2rem)">${esc(G.cur.q)}</div>${optsHTML(true)}
+        ${G.finale ? trackHTML() : ''}${bubble()}</div>`;
+    case 'steal': return `<div class="center"><div class="roundcard"><div class="em">🦝</div><h2>Ryöstöhetki</h2><p>Oikein vastanneet valitsevat nyt uhrinsa.</p></div>${timerBar()}</div>`;
+    case 'cellar': {
+      const m = MG[G.mg.type];
+      return `<div class="center cellar"><h2>Kellari</h2><div class="victims">${G.cellar.map(id => { const p = G.players[id]; return `<div class="victim"><span class="av">${p.emoji}</span>${esc(p.name)}</div>`; }).join('')}</div>
+        <div class="mgname">${m.emoji} ${m.name}</div><p style="font-size:clamp(1.1rem,2vw,1.6rem);max-width:44ch;margin:0">${m.desc}</p>${bubble()}${timerBar()}</div>`;
+    }
+    case 'minigame': {
+      const m = MG[G.mg.type];
+      return `<div class="center"><div class="mgname">${m.emoji} ${m.name}</div><p class="dim" style="margin:0">Pelaajat pelaavat omilla koneillaan. Muut voivat kannustaa tai pilkata reaktioilla.</p>
+        <div class="victims">${G.cellar.map(id => { const p = G.players[id]; const r = G.mg.results[id]; return `<div class="victim"><span class="av">${p.emoji}</span>${esc(p.name)}<span class="res">${r && r.final ? 'valmis ✓' : 'pelaa…'}</span></div>`; }).join('')}</div>
+        <div class="row" style="width:100%;flex-wrap:nowrap"><div class="secs" data-secs="${G.phaseEnd}"></div><div style="flex:1">${timerBar()}</div></div></div>`;
+    }
+    case 'mg_result': {
+      const m = MG[G.mg.type];
+      return `<div class="center"><div class="mgname">${m.emoji} ${m.name}</div>
+        ${G.mg.type === 'ovet' ? `<p style="margin:0;font-size:1.3rem">Kellarimestari odotti ovella <b>${G.mg.trap + 1}</b>.</p>` : ''}
+        <div class="victims">${G.cellar.map(id => { const p = G.players[id]; const dead = G.lastDeaths.includes(id); return `<div class="victim ${dead ? 'dead' : 'alive'}"><span class="av">${dead ? '👻' : p.emoji}</span>${esc(p.name)}<span class="res">${mgLabel(G.mg.type, G.mg.results[id])}</span><span>${dead ? 'HAAMU' : 'SELVISI'}</span></div>`; }).join('')}</div>${bubble()}</div>`;
+    }
+    case 'finale_intro': return `<div class="center"><div class="roundcard"><div class="em">🚪</div><h2>Pakomatka</h2>
+        <p>Oikea vastaus = askel kohti ovea. Nopein oikea = kaksi askelta. Haamu, joka saa elävän kiinni, herää henkiin. Ensimmäinen elävä ovella voittaa.</p></div>${trackHTML()}${bubble()}</div>`;
+    case 'end': {
+      const w = G.winner && G.players[G.winner];
+      const ranking = plist().slice().sort((a, b) => (b.id === G.winner) - (a.id === G.winner) || b.pos - a.pos || b.score - a.score);
+      return `<div class="center"><div class="podium"><div class="crown">${w ? w.emoji : '🏚️'}</div><h2>${w ? esc(w.name) + ' pakeni!' : 'Kukaan ei päässyt ulos'}</h2></div>${bubble()}
+        <div class="scoreboard">${ranking.map((p, i) => `<div class="r"><span>${i + 1}.</span><span>${p.ghost ? '👻' : p.emoji}</span><span>${esc(p.name)}</span><b>${p.score} p</b></div>`).join('')}</div>
+        <div class="row" style="justify-content:center"><button class="btn primary" id="again">Uusi peli samoilla pelaajilla</button><button class="btn" id="tolobby">Takaisin aulaan</button></div></div>`;
+    }
+  }
+  return '';
+}
+function hostQuestionBody() {
+  const c = G.cur, done = plist().filter(p => p.answer != null).length, tot = present().length;
+  if (c.num) return `<div class="qtext">${esc(c.q)}</div><div class="guesshint">🎯 Kirjoita arvauksesi Chromebookilla · ${done} / ${tot} arvannut</div>`;
+  if (c.kind === 'order') return `<div class="qtext">${esc(c.q)}</div><div class="ocards">${c.items.map(t => `<div class="ocard">${esc(t)}</div>`).join('')}</div>
+    <div class="guesshint">⏳ Järjestä Chromebookilla · ${done} / ${tot} valmiina</div>`;
+  if (c.kind === 'tf') return `<div class="qtext">⚖️ Totta vai tarua?</div><div class="guesshint">Viisi väitettä omalla ruudulla. Nopeasti!</div>
+    <div class="tfprog">${plist().map(p => `<div class="tp ${p.ghost ? 'ghost' : ''}"><span>${p.ghost ? '👻' : p.emoji} ${esc(p.name)}</span><div class="bar"><i style="width:${(p.tfAns || []).length / c.sts.length * 100}%"></i></div></div>`).join('')}</div>`;
+  if (c.kind === 'list') { const found = new Set(); plist().forEach(p => (p.list || []).forEach(x => x.ok && found.add(x.idx)));
+    return `<div class="qtext">${esc(c.q)}</div><div><div class="bigcode" style="font-size:clamp(3rem,9vw,6rem);letter-spacing:.02em">${found.size} / ${c.answers.length}</div><div class="label">Luokka on löytänyt yhteensä</div></div>
+    <div class="guesshint">📝 Kirjoita Chromebookilla. Vastaus, jota kukaan muu ei keksi, tuo tuplapisteet.</div>`; }
+  return `<div class="qtext">${esc(c.q)}</div>${optsHTML(false)}`;
+}
+function resultRows(label) {
+  const rows = plist().slice().sort((a, b) => b.delta - a.delta);
+  return `<div class="reslist">${rows.map(p => `<div class="rr ${G.cellar.includes(p.id) ? 'worst' : ''}"><span>${p.ghost ? '👻' : p.emoji} ${esc(p.name)}</span><span class="dim">${label(p)}</span><b>${p.delta ? '+' + p.delta : ''}</b></div>`).join('')}</div>`;
+}
+function orderRevealHTML() {
+  const c = G.cur;
+  return `<div class="center"><div class="qtext" style="font-size:clamp(1.2rem,2.4vw,2rem)">${esc(c.q)}</div>
+    <ol class="orev">${c.sol.map((di, pos) => `<li><span class="on">${pos + 1}</span><span>${esc(c.items[di])}</span>${c.notes[di] ? `<b>${esc(c.notes[di])}</b>` : ''}
+      <span class="pickers">${plist().filter(p => Array.isArray(p.answer) && p.answer[pos] === di).map(p => p.ghost ? '👻' : p.emoji).join('')}</span></li>`).join('')}</ol>
+    ${resultRows(p => p.answer == null ? 'ei vastannut' : p.oc + '/' + c.items.length + ' oikealla paikalla')}${bubble()}</div>`;
+}
+function tfRevealHTML() {
+  const sts = G.cur.sts, live = plist();
+  return `<div class="center"><div class="qtext" style="font-size:clamp(1.3rem,2.6vw,2.2rem)">⚖️ Totta vai tarua?</div>
+    <div class="tfrev">${sts.map((x, i) => { const right = live.filter(p => (p.tfAns || [])[i] === x.v).length;
+      return `<div class="tr"><span class="badge ${x.v ? 'yes' : 'no'}">${x.v ? 'TOTTA' : 'TARUA'}</span><div><b>${esc(x.s)}</b>${x.e ? `<small>${esc(x.e)}</small>` : ''}</div><span class="dim">${right}/${live.length} ✓</span></div>`; }).join('')}</div>
+    ${resultRows(p => (sts.length - p.oc) + ' virhettä')}${bubble()}</div>`;
+}
+function listRevealHTML() {
+  const c = G.cur;
+  return `<div class="center"><div class="qtext" style="font-size:clamp(1.2rem,2.4vw,2rem)">${esc(c.q)}</div>
+    <div class="lgrid">${c.answers.map((a, i) => { const f = c.finders[i]; return `<div class="lc ${!f.length ? 'none' : f.length === 1 ? 'uniq' : ''}"><span>${esc(a)}</span><small>${f.map(id => G.players[id].ghost ? '👻' : G.players[id].emoji).join('')}</small></div>`; }).join('')}</div>
+    ${resultRows(p => p.okCount + ' oikein' + (p.uniq ? ', ' + p.uniq + ' ainoana' : ''))}${bubble()}</div>`;
+}
+function numRevealHTML() {
+  const rows = plist().slice().sort((a, b) => (a.diff ?? Infinity) - (b.diff ?? Infinity));
+  const medal = r => r == null ? '' : ['🥇', '🥈', '🥉'][r] || '';
+  return `<div class="center"><div class="qtext" style="font-size:clamp(1.3rem,2.6vw,2.2rem)">${esc(G.cur.q)}</div>
+    <div><div class="label">Oikea vastaus</div><div class="bigcode" style="font-size:clamp(3rem,9vw,6.5rem);letter-spacing:.02em">${nfmt(G.cur.ans)}</div></div>
+    <div class="guesslist">${rows.map(p => `<div class="g ${G.cellar.includes(p.id) ? 'worst' : ''} ${p.rank === 0 ? 'best' : ''}">
+      <span class="m">${medal(p.rank)}</span><span>${p.ghost ? '👻' : p.emoji} ${esc(p.name)}</span>
+      <span class="gv">${p.answer == null ? '–' : nfmt(p.answer)}</span><span class="gd">${p.diff == null ? 'ei arvausta' : p.diff === 0 ? 'TÄYSOSUMA' : 'ero ' + nfmt(p.diff)}</span>
+      <b>${p.delta ? '+' + p.delta : ''}</b></div>`).join('')}</div>${bubble()}</div>`;
+}
+function lobbyHTML() {
+  const url = G.joinUrl || (location.origin + location.pathname).replace(/index\.html$/, '');
+  const n = plist().length;
+  return `<div class="center"><div class="lobbygrid">
+    <div class="panel" style="text-align:center;justify-items:center">
+      <div class="label">Liittymiskoodi</div><div class="bigcode">${G.code}</div>
+      <div class="joinsteps" style="text-align:left">
+        <div>1. Avaa Chromebookilla <span class="url">${esc(url)}</span></div>
+        <div>2. Valitse <b>Liity peliin</b> ja kirjoita koodi <b>${G.code}</b></div>
+        <div>3. Keksi nimi ja valitse hahmo</div>
+      </div>
+      <span class="netstat ${G.netOk ? 'ok' : G.netErr ? 'err' : ''}">${G.netOk ? '● Verkko valmis: ' + G.net.filter(n => n.state === 'ok').map(n => n.name).join(', ') : G.netErr ? esc(G.netErr) : '○ Avataan verkkoyhteyttä…'}</span>
+    </div>
+    <div class="panel">
+      <div class="row"><h3 style="font-size:1.3rem">Pelaajat</h3><span class="dim">${n} / 24</span></div>
+      <div class="lobbyplayers">${n ? railHTML() : '<span class="dim">Odotetaan ensimmäistä uhria… Voit kokeilla peliä yksin lisäämällä testibotteja.</span>'}</div>
+      <div class="settings">
+        <label>Kysymyksiä ennen finaalia<select id="s-rounds">${[6, 8, 10, 12, 15].map(v => `<option ${v == G.settings.rounds ? 'selected' : ''}>${v}</option>`).join('')}</select></label>
+        <label>Vastausaika (s)<select id="s-timer">${[10, 15, 20, 30].map(v => `<option ${v == G.settings.timer ? 'selected' : ''}>${v}</option>`).join('')}</select></label>
+        <label>Juontajan ääni<select id="s-voice"><option value="0" ${!G.settings.voice ? 'selected' : ''}>Pois</option><option value="1" ${G.settings.voice ? 'selected' : ''}>Päällä</option></select></label>
+      </div>
+      <div class="packs" role="group" aria-label="Kysymysaiheet"><div class="label">Aiheet (valitse yksi tai useampi)</div><div class="packrow">
+        ${[...Object.entries(PACKS).map(([k, pk]) => [k, pk.emoji, pk.name, ['mc', 'num', 'order', 'tf', 'list'].reduce((a, f) => a + (pk[f] || []).length, 0), false]), ...G.sets.map(x => ['c:' + x.id, '✏️', x.name, setCount(x), true])].map(([k, e, nm, c, own]) =>
+          `<button class="pack ${own ? 'own' : ''} ${(G.settings.packs || []).includes(k) ? 'on' : ''}" data-pack="${k}" aria-pressed="${(G.settings.packs || []).includes(k)}" ${!c ? 'disabled' : ''}><span class="pe">${e}</span><span>${esc(nm)}</span><small>${c} tehtävää</small></button>`).join('')}
+        <button class="pack addpack" id="newset"><span class="pe">＋</span><span>Oma kategoria</span><small>lisää kysymyksiä</small></button>
+      </div></div>
+      <div class="row">
+        <button class="btn primary" id="start" ${n ? '' : 'disabled'}>Aloita peli</button>
+        <button class="btn small" id="addbot">+ Testibotti</button>
+        <button class="btn small" id="editq">Omat kysymyssarjat${G.sets.length ? ' (' + G.sets.length + ')' : ''}</button>
+        <button class="btn small" id="editurl">Muuta osoitetta</button>
+      </div>
+    </div></div>${bubble()}</div>`;
+}
+function renderHost() {
+  if (G.role !== 'host') return;
+  const focusId = document.activeElement && document.activeElement.id;
+  const top = `<div class="hbar"><div class="logo"><span class="a">KAAOS</span><span class="b">KARTANO</span></div>
+    <span class="codechip" aria-label="Liittymiskoodi">${G.code}</span>
+    <span class="dim">${G.phase === 'lobby' ? 'Aula' : G.finale ? 'Pakomatka' : `Kysymys ${Math.min(G.qi + 1, G.settings.rounds)} / ${G.settings.rounds}`}</span>
+    <span class="grow"></span>
+    <button class="btn small" id="snd">${G.sound ? '🔊' : '🔇'} Äänet</button>
+    ${G.phase !== 'lobby' && G.phase !== 'end' ? '<button class="btn small" id="skip">⏭ Seuraava</button>' : ''}</div>`;
+  app.innerHTML = `<div class="host">${top}<div class="stage">${stageHTML()}</div>${G.phase === 'lobby' ? '<div></div>' : `<div class="rail">${railHTML()}</div>`}</div>`;
+  bindHost(); tickTimers();
+  if (focusId && document.getElementById(focusId)) document.getElementById(focusId).focus();
+}
+function saveSettings() { store.set('kk-settings', G.settings); }
+function bindHost() {
+  const on = (id, ev, fn) => { const el = document.getElementById(id); if (el) el.addEventListener(ev, fn); };
+  on('snd', 'click', () => { G.sound = !G.sound; audio(); renderHost(); });
+  on('skip', 'click', skipPhase);
+  on('start', 'click', startGame);
+  on('addbot', 'click', addBot);
+  on('s-rounds', 'change', e => { G.settings.rounds = +e.target.value; saveSettings(); });
+  on('s-timer', 'change', e => { G.settings.timer = +e.target.value; saveSettings(); });
+  $$('[data-pack]').forEach(b => b.addEventListener('click', () => {
+    const k = b.dataset.pack, cur = new Set(G.settings.packs || []);
+    cur.has(k) ? cur.delete(k) : cur.add(k); G.settings.packs = [...cur]; saveSettings(); renderHost();
+  }));
+  on('s-voice', 'change', e => { G.settings.voice = e.target.value === '1'; saveSettings(); if (G.settings.voice) speak('Ääni päällä. Tervetuloa kartanoon.'); });
+  on('editq', 'click', () => openQPanel());
+  on('newset', 'click', () => openQPanel('new'));
+  on('editurl', 'click', openUrlPanel);
+  on('again', 'click', startGame);
+  on('tolobby', 'click', () => { G.quip = ''; G.finale = false; for (const p of plist()) { p.ghost = false; p.pos = 0; } setPhase('lobby'); });
+  $$('[data-kick]').forEach(b => b.addEventListener('click', () => {
+    const id = b.dataset.kick; const p = G.players[id]; if (!p) return;
+    sendTo(p, {t: 'kicked'}); delete G.players[id]; G.order = G.order.filter(x => x !== id); renderHost();
+  }));
+}
+function loadSets() {
+  let sets = store.get('kk-sets', null);
+  if (!Array.isArray(sets)) {
+    sets = []; const old = store.get('kk-custom', '');
+    if (old && old.trim()) sets.push({id: 'omat', name: 'Omat kysymykset', text: old});
+    store.set('kk-sets', sets);
+  }
+  return sets.filter(x => x && x.id && typeof x.text === 'string');
+}
+function saveSets() { store.set('kk-sets', G.sets); }
+const setCount = st => parseCustom(st.text).count;
+/* Splits text with "## Nimi" headings into [{name, text}]; text before the first heading goes to fallbackName. */
+function splitSets(text, fallbackName) {
+  const out = []; let cur = {name: fallbackName, lines: []};
+  for (const line of String(text || '').split(/\r?\n/)) {
+    const m = line.match(/^\s*##\s*(.+?)\s*$/);
+    if (m) { out.push(cur); cur = {name: m[1].slice(0, 40), lines: []}; } else cur.lines.push(line);
+  }
+  out.push(cur);
+  return out.map(x => ({name: x.name, text: x.lines.join('\n').trim()})).filter(x => x.text);
+}
+function upsertSet(name, text) {
+  name = (name || '').trim().slice(0, 40) || 'Omat kysymykset';
+  let st = G.sets.find(x => x.name.toLowerCase() === name.toLowerCase());
+  if (st) st.text = text; else { st = {id: uid(), name, text}; G.sets.push(st); }
+  const key = 'c:' + st.id; if (!(G.settings.packs || []).includes(key)) G.settings.packs = [...(G.settings.packs || []), key];
+  return st;
+}
+function openQPanel(editId) {
+  document.querySelectorAll('.qpanel').forEach(x => x.remove());
+  const wrap = document.createElement('div'); wrap.className = 'qpanel';
+  let cur = typeof editId === 'string' ? G.sets.find(x => x.id === editId) : null;
+  if (!cur && editId !== 'new' && G.sets.length) cur = G.sets[0];
+  wrap.innerHTML = `<div class="panel"><div class="row"><h3 style="font-size:1.4rem">Omat kysymyssarjat</h3><span style="flex:1"></span><button class="btn small" id="qcancel">Sulje</button></div>
+    <div class="setchips">${G.sets.map(x => `<button class="setchip ${cur && cur.id === x.id ? 'sel' : ''}" data-set="${x.id}">✏️ ${esc(x.name)} <small>${setCount(x)}</small></button>`).join('')}
+      <button class="setchip add ${!cur ? 'sel' : ''}" data-set="new">+ Uusi kategoria</button></div>
+    <label class="label" for="sname">Kategorian nimi</label>
+    <input id="sname" maxlength="40" placeholder="esim. Teollistuminen 8A" value="${esc(cur ? cur.name : '')}">
+    <details class="qhelp"><summary>Näin kirjoitat kysymykset</summary>
+      <p class="dim" style="margin:0">Yksi tehtävä per rivi, erottimena puolipiste. <b>Monivalinta:</b> kysymys, oikea vastaus ja 1–3 väärää. <b>Lähimmäs voittaa:</b> kysymys ja luku. <b>Aikajana:</b> alkuun J:, sitten ohje ja kohteet oikeassa järjestyksessä. <b>Totta vai tarua:</b> alkuun TOTTA: tai TARUA:, perään voi lisätä selityksen. <b>Listakierros:</b> alkuun L:, sitten ohje ja hyväksytyt vastaukset (vaihtoehdot kauttaviivalla).</p>
+      <code class="qcode">Minä vuonna talvisota alkoi?; 1939; 1941; 1918; 1944
+Montako päivää talvisota kesti?; 105
+J: Järjestä vanhimmasta uusimpaan; Höyrykone; Rautatie; Puhelin; Auto
+TOTTA: Teollinen vallankumous alkoi Britanniasta.
+TARUA: Watt keksi ensimmäisen höyrykoneen.; Hän paransi Newcomenin konetta.
+L: Nimeä Pohjoismaita; Suomi; Ruotsi; Norja; Tanska; Islanti</code>
+      <p class="dim" style="margin:0"><b>Monta kategoriaa kerralla:</b> aloita jokainen kategoria rivillä <b>## Nimi</b>. Tallennus jakaa tekstin omiksi kategorioikseen.</p>
+      <code class="qcode">## Teollistuminen 8A
+Missä teollinen vallankumous alkoi?; Britannia; Ranska; Saksa
+## Talvisota
+Minä vuonna talvisota alkoi?; 1939; 1941; 1918</code>
+    </details>
+    <textarea id="qtext" placeholder="Kysymys; oikea; väärä; väärä; väärä">${esc(cur ? cur.text : '')}</textarea>
+    <div class="row"><span class="dim" id="qcount"></span></div>
+    <div class="row"><button class="btn primary" id="qsave">Tallenna</button>${cur ? '<button class="btn small danger" id="qdel">Poista kategoria</button>' : ''}<span style="flex:1"></span>
+      <button class="btn small" id="qexport" ${G.sets.length ? '' : 'disabled'}>Lataa varmuuskopio</button><label class="btn small" for="qimport">Tuo tiedostosta</label><input type="file" id="qimport" accept=".txt,text/plain" hidden></div>
+    <p class="dim" id="qmsg" style="margin:0">Kategoriat tallentuvat tämän koneen selaimeen. Varmuuskopiolla saat ne siirrettyä toiselle koneelle.</p></div>`;
+  document.body.appendChild(wrap);
+  const ta = $('#qtext', wrap), cnt = $('#qcount', wrap), msg = $('#qmsg', wrap);
+  const upd = () => {
+    const parts = splitSets(ta.value, '');
+    if (parts.length > 1 || (parts[0] && parts[0].name)) { cnt.textContent = `${parts.length} kategoriaa: ` + parts.map(p => `${p.name || '(nimetön)'} ${parseCustom(p.text).count}`).join(', '); return; }
+    const c = parseCustom(ta.value); cnt.textContent = `${c.mc.length} monivalintaa, ${c.num.length} arvausta, ${c.order.length} aikajanaa, ${c.tf.length} väitettä, ${c.list.length} listaa`;
+  };
+  ta.addEventListener('input', upd); upd();
+  $('#qcancel', wrap).onclick = () => { wrap.remove(); renderHost(); };
+  $$('[data-set]', wrap).forEach(b => b.onclick = () => openQPanel(b.dataset.set));
+  $('#qsave', wrap).onclick = () => {
+    const name = $('#sname', wrap).value.trim();
+    const parts = splitSets(ta.value, name || (cur ? cur.name : ''));
+    if (!parts.length) { msg.textContent = 'Kirjoita ensin vähintään yksi kysymys.'; msg.className = 'err'; return; }
+    const bad = parts.filter(p => !parseCustom(p.text).count);
+    if (bad.length === parts.length) { msg.textContent = 'Yhtään kelvollista kysymystä ei löytynyt. Tarkista puolipisteet.'; msg.className = 'err'; return; }
+    if (cur && parts.length === 1) { cur.name = parts[0].name || cur.name; cur.text = parts[0].text; const key = 'c:' + cur.id; if (!(G.settings.packs || []).includes(key)) G.settings.packs = [...(G.settings.packs || []), key]; }
+    else parts.forEach((p, i) => { const st = upsertSet(p.name || ('Omat kysymykset ' + (G.sets.length + 1)), p.text); if (i === 0) cur = st; });
+    saveSets(); saveSettings(); openQPanel(cur.id);
+    const m2 = $('#qmsg'); if (m2) { m2.textContent = parts.length > 1 ? `Tallennettu ${parts.length} kategoriaa ja valittu peliin.` : 'Tallennettu ja valittu peliin.'; m2.className = ''; m2.style.color = 'var(--g)'; }
+  };
+  const del = $('#qdel', wrap);
+  if (del) del.onclick = () => {
+    if (!del.dataset.sure) { del.dataset.sure = '1'; del.textContent = 'Vahvista: poista ' + cur.name; return; }
+    G.sets = G.sets.filter(x => x.id !== cur.id); G.settings.packs = (G.settings.packs || []).filter(k => k !== 'c:' + cur.id);
+    saveSets(); saveSettings(); openQPanel();
+  };
+  $('#qexport', wrap).onclick = async () => {
+    const txt = G.sets.map(x => `## ${x.name}\n${x.text}`).join('\n\n') + '\n';
+    const dl = window.claude && window.claude.use ? await window.claude.use('downloads').catch(() => null) : null;
+    if (dl) {
+      try { await dl.save({filename: 'kaaoskartano-kysymykset.txt', data: txt}); msg.textContent = 'Varmuuskopio tallennettu: kaaoskartano-kysymykset.txt'; msg.style.color = 'var(--g)'; }
+      catch (e) { if (!e || e.code !== 'declined') { ta.value = txt; upd(); msg.textContent = 'Tallennus ei onnistunut. Kaikki kategoriat ovat nyt tekstikentässä, kopioi ne talteen.'; } }
+      return;
+    }
+    try {
+      const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([txt], {type: 'text/plain;charset=utf-8'}));
+      a.download = 'kaaoskartano-kysymykset.txt'; document.body.appendChild(a); a.click(); setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 1000);
+      msg.textContent = 'Varmuuskopio ladattu: kaaoskartano-kysymykset.txt'; msg.style.color = 'var(--g)';
+    } catch (e) { ta.value = txt; upd(); msg.textContent = 'Lataus ei onnistunut. Kaikki kategoriat ovat nyt tekstikentässä, kopioi ne talteen.'; }
+  };
+  $('#qimport', wrap).onchange = e => {
+    const f = e.target.files && e.target.files[0]; if (!f) return;
+    const r = new FileReader();
+    r.onload = () => {
+      const parts = splitSets(r.result, f.name.replace(/\.[^.]+$/, ''));
+      const ok = parts.filter(p => parseCustom(p.text).count);
+      if (!ok.length) { msg.textContent = 'Tiedostosta ei löytynyt kysymyksiä.'; msg.className = 'err'; return; }
+      let first = null; ok.forEach(p => { const st = upsertSet(p.name, p.text); first = first || st; });
+      saveSets(); saveSettings(); openQPanel(first.id);
+      const m2 = $('#qmsg'); if (m2) { m2.textContent = `Tuotu ${ok.length} kategoriaa.`; m2.style.color = 'var(--g)'; }
+    };
+    r.readAsText(f);
+  };
+}
+function openUrlPanel() {
+  const wrap = document.createElement('div'); wrap.className = 'qpanel';
+  wrap.innerHTML = `<div class="panel"><h3 style="font-size:1.4rem">Pelin osoite</h3>
+    <p class="dim" style="margin:0">Kirjoita osoite, jonka oppilaat avaavat Chromebookilla. Se näkyy aulassa isolla.</p>
+    <input id="urlin" value="${esc(G.joinUrl || location.href.split('#')[0])}">
+    <div class="row"><span style="flex:1"></span><button class="btn" id="ucancel">Peruuta</button><button class="btn primary" id="usave">Tallenna</button></div></div>`;
+  document.body.appendChild(wrap);
+  $('#ucancel', wrap).onclick = () => wrap.remove();
+  $('#usave', wrap).onclick = () => { G.joinUrl = $('#urlin', wrap).value.trim(); store.set('kk-url', G.joinUrl); wrap.remove(); renderHost(); };
+}
+
+/* ================= PLAYER ================= */
+const P = {send: null, pid: null, code: '', name: '', emoji: '', view: null, key: null, recv: 0, local: {}, cleanup: [], status: 'idle'};
+function pSend(d) { if (P.send) try { P.send(d); } catch (e) {} }
+async function playerConnect(code) {
+  const connId = uid();
+  let bc = null; try { bc = new BroadcastChannel('kk-' + code); } catch (e) {}
+  if (bc) {
+    const ok = await new Promise(res => {
+      const t = setTimeout(() => res(false), 700);
+      bc.onmessage = e => { const m = e.data; if (m && m.to === connId && m.data && m.data.t === 'pong') { clearTimeout(t); res(true); } };
+      bc.postMessage({from: connId, to: 'host', data: {t: 'ping'}});
+    });
+    if (ok) {
+      bc.onmessage = e => { const m = e.data; if (m && m.to === connId) onHostMsg(m.data); };
+      P.send = d => bc.postMessage({from: connId, to: 'host', data: d});
+      P.lastHost = Date.now(); clearInterval(P.hb); P.hb = setInterval(() => pSend({t: 'hb'}), 5000);
+      return;
+    }
+    bc.close();
+  }
+  const topicH = TOPIC(code) + '/h', topicC = TOPIC(code) + '/c/' + connId;
+  const attempts = BROKERS.map(b => new MiniMqtt(b.url));
+  const winner = await new Promise((res, rej) => {
+    let left = attempts.length, won = false, sawConn = false;
+    const fail = () => { if (--left === 0 && !won) rej(new Error(sawConn ? 'Peliä ei löytynyt koodilla ' + code + '. Tarkista koodi ja että juontajan aula on auki.' : 'Ei yhteyttä pelipalvelimiin. Tarkista nettiyhteys.')); };
+    attempts.forEach(c => {
+      c.connect(8000).then(() => {
+        sawConn = true; c.subscribe(topicC);
+        const ping = () => c.publish(topicH, JSON.stringify({f: connId, d: {t: 'ping'}}));
+        const t1 = setTimeout(ping, 300), t2 = setTimeout(ping, 1800);
+        const to = setTimeout(() => { if (!won || P.mq !== c) { c.close(); fail(); } }, 6000);
+        c.onmessage = (t, p) => { let d; try { d = JSON.parse(p); } catch (e) { return; } if (d && d.t === 'pong' && !won) { won = true; clearTimeout(to); clearTimeout(t1); clearTimeout(t2); res(c); } };
+      }).catch(fail);
+    });
+  });
+  attempts.forEach(c => { if (c !== winner) { c.onclose = null; c.close(); } });
+  P.mq = winner;
+  winner.onmessage = (t, p) => { let d; try { d = JSON.parse(p); } catch (e) { return; } onHostMsg(d); };
+  winner.onclose = onLost;
+  P.send = d => winner.publish(topicH, JSON.stringify({f: connId, d}));
+  P.lastHost = Date.now();
+  clearInterval(P.hb);
+  P.hb = setInterval(() => {
+    if (P.status === 'lost') return clearInterval(P.hb);
+    pSend({t: 'hb'});
+    if (Date.now() - P.lastHost > 22000) { try { winner.onclose = null; winner.close(); } catch (e) {} onLost(); }
+  }, 5000);
+}
+function onLost() {
+  if (P.status === 'lost') return; P.status = 'lost'; P.send = null; P.key = null; clearInterval(P.hb);
+  app.innerHTML = `<div class="player"><div></div><div class="pmain"><div class="big">🔌</div><h2>Yhteys katkesi</h2><p class="dim">Pelisi on tallessa. Yhdistä uudelleen.</p>
+    <button class="btn primary" id="recon">Yhdistä uudelleen</button><p class="err" id="rerr"></p></div><div></div></div>`;
+  $('#recon').onclick = async () => { $('#rerr').textContent = 'Yhdistetään…'; try { await playerConnect(P.code); P.status = 'ok'; pSend({t: 'join', pid: P.pid, name: P.name, emoji: P.emoji}); } catch (e) { $('#rerr').textContent = e.message; } };
+}
+function onHostMsg(d) {
+  if (!d) return;
+  P.lastHost = Date.now();
+  if (d.t === 'hb' || d.t === 'pong') return;
+  if (d.t === 'joined') { P.pid = d.pid; sstore.set('kk-me', {pid: P.pid, code: P.code, name: P.name, emoji: P.emoji}); return; }
+  if (d.t === 'error') { renderJoin(d.msg); return; }
+  if (d.t === 'kicked') { sstore.set('kk-me', null); P.send = null; renderJoin('Juontaja poisti sinut pelistä.'); return; }
+  if (d.t === 'rejoin') { pSend({t: 'join', pid: P.pid, name: P.name, emoji: P.emoji}); return; }
+  if (d.t === 'view') {
+    P.view = d; P.recv = Date.now();
+    document.body.classList.toggle('is-ghost', !!d.me.ghost);
+    if (d.key !== P.key) { P.key = d.key; P.local = {}; renderPlayer(true); } else renderPlayer(false);
+  }
+}
+function renderJoin(err = '') {
+  G.role = 'player';
+  const saved = sstore.get('kk-me', null) || {};
+  const hashCode = (location.hash || '').replace('#', '').toUpperCase();
+  const code = /^[A-Z]{4}$/.test(hashCode) ? hashCode : (saved.code || '');
+  let emoji = saved.emoji || pick(EMOJIS);
+  app.innerHTML = `<div class="player"><div class="logo" style="font-size:1.6rem;text-align:center"><span class="a">KAAOS</span><span class="b">KARTANO</span></div>
+    <form class="joinform" id="jf" autocomplete="off">
+      <label class="label" for="jcode">Pelikoodi</label><input class="codein" id="jcode" maxlength="4" value="${esc(code)}" placeholder="ABCD" required>
+      <label class="label" for="jname">Nimesi</label><input id="jname" maxlength="14" value="${esc(saved.name || store.get('kk-name', ''))}" placeholder="esim. Sami" required>
+      <span class="label">Hahmo</span><div class="emojis" id="jem">${EMOJIS.map(e => `<button type="button" data-e="${e}" class="${e === emoji ? 'sel' : ''}" aria-label="Hahmo ${e}">${e}</button>`).join('')}</div>
+      <button class="btn primary" id="jgo" type="submit" style="font-size:1.2rem">Liity peliin</button>
+      <p class="err" id="jerr" role="alert">${esc(err)}</p>
+      <button class="btn small" type="button" id="jback">← Takaisin</button>
+    </form><div></div></div>`;
+  $$('#jem button').forEach(b => b.onclick = () => { emoji = b.dataset.e; $$('#jem button').forEach(x => x.classList.toggle('sel', x === b)); });
+  $('#jback').onclick = renderLanding;
+  $('#jcode').addEventListener('input', e => { e.target.value = e.target.value.toUpperCase().replace(/[^A-ZÅÄÖ]/g, ''); });
+  $('#jf').addEventListener('submit', async e => {
+    e.preventDefault();
+    const c = $('#jcode').value.trim().toUpperCase(), n = $('#jname').value.trim();
+    if (c.length !== 4) { $('#jerr').textContent = 'Koodissa on neljä kirjainta.'; return; }
+    if (!n) { $('#jerr').textContent = 'Kirjoita nimi.'; return; }
+    $('#jgo').disabled = true; $('#jerr').textContent = 'Yhdistetään…';
+    P.code = c; P.name = n; P.emoji = emoji; store.set('kk-name', n);
+    if (saved.code !== c) P.pid = null; else P.pid = saved.pid || null;
+    try { await playerConnect(c); P.status = 'ok'; pSend({t: 'join', pid: P.pid, name: n, emoji}); $('#jerr').textContent = 'Odotetaan juontajaa…'; }
+    catch (err) { $('#jerr').textContent = err.message; $('#jgo').disabled = false; }
+  });
+}
+function pTimer(ms) { return `<div class="timerbar"><i data-from="${P.recv + ms - (P.view.dur || ms)}" data-until="${P.recv + ms}"></i></div>`; }
+function reactBar() { return `<div class="reacts">${['👻','😱','😂','🔥','💀','👏'].map(e => `<button data-react="${e}" aria-label="Reaktio ${e}">${e}</button>`).join('')}</div>`; }
+function renderPlayer(full) {
+  const v = P.view; if (!v) return;
+  const me = v.me;
+  const live = ['question', 'minigame'];
+  if (!full && live.includes(v.phase)) { const sc = $('#psc'); if (sc) sc.textContent = v.finale ? '🏃 ' + me.pos + '/' + TRACK : me.score + ' p'; if (P.local.onView) P.local.onView(v); return; }
+  P.cleanup.forEach(f => f()); P.cleanup = [];
+  const bar = `<div class="pbar"><span class="av">${me.ghost ? '👻' : esc(me.emoji)}</span><span class="nm">${esc(me.name)}${me.ghost ? ' <span style="color:var(--ghost)">(haamu)</span>' : ''}</span><span class="sc" id="psc">${v.finale ? '🏃 ' + me.pos + '/' + TRACK : me.score + ' p'}</span></div>`;
+  let main = '', foot = '';
+  const others = v.players.filter(x => x.id !== me.id);
+  switch (v.phase) {
+    case 'lobby': main = `<div class="big">${esc(me.emoji)}</div><h2>Olet mukana!</h2><p class="dim">Katso valkokangasta. Peli alkaa, kun juontaja painaa aloita.</p><p>Pelaajia: ${v.players.map(x => esc(x.emoji)).join(' ')}</p>`; break;
+    case 'intro': main = `<div class="big">🏚️</div><h2>Peli alkaa</h2><p class="dim">Kuuntele Tohtori Kysymystä.</p>`; break;
+    case 'prep': main = prepHTML(v, others); break;
+    case 'question': main = questionHTML(v); break;
+    case 'reveal': {
+      const ok = v.answer === v.correct;
+      if (v.kind === 'order' || v.kind === 'tf' || v.kind === 'list') { main = playerRevealHTML(v); foot = reactBar(); break; }
+      if (v.num) {
+        const medal = v.rank == null ? '😶' : ['🥇', '🥈', '🥉'][v.rank] || (v.toCellar ? '😱' : '🎯');
+        main = `<div class="big">${medal}</div><h2>${v.answer == null ? 'Et arvannut!' : v.diff === 0 ? 'TÄYSOSUMA!' : v.rank === 0 ? 'Lähimpänä!' : 'Sija ' + (v.rank + 1)}</h2>
+          <p>Oikea: <b>${nfmt(v.ans)}</b>${v.answer != null ? ` · sinun arvauksesi ${nfmt(v.answer)} (ero ${nfmt(v.diff)})` : ''}</p>
+          <p style="font-size:1.4rem;font-weight:800;color:var(--g)">+${v.delta} p</p>${v.toCellar ? '<p class="err">Kauimpana… kellari odottaa.</p>' : ''}`;
+        foot = reactBar(); break;
+      }
+      if (v.finale) main = `<div class="big">${ok ? '🏃' : '🐢'}</div><h2>${ok ? (v.finaleMove === 2 ? 'Nopein! +2 askelta' : 'Oikein! +1 askel') : v.answer == null ? 'Et ehtinyt vastata' : 'Väärin'}</h2><p>Oikea: <b>${esc(v.opts[v.correct])}</b></p>`;
+      else main = `<div class="big">${ok ? '✅' : v.toCellar ? '😱' : '❌'}</div><h2>${ok ? 'Oikein!' : v.answer == null ? 'Liian hidas!' : 'Väärin!'}</h2>
+        <p style="font-size:1.4rem;font-weight:800;color:${v.delta >= 0 ? 'var(--g)' : 'var(--blood)'}">${v.delta > 0 ? '+' : ''}${v.delta} p</p>
+        <p>Oikea vastaus: <b>${esc(v.opts[v.correct])}</b></p>${v.toCellar ? '<p class="err">Kellari odottaa sinua…</p>' : ''}`;
+      foot = reactBar(); break;
+    }
+    case 'steal':
+      if (v.canSteal) main = `<h2>🦝 Valitse uhri</h2><p class="dim">Varastat enintään 250 pistettä.</p><div class="targets">${others.map(o => `<button class="target" data-steal="${o.id}"><span>${o.ghost ? '👻' : esc(o.emoji)}</span>${esc(o.name)} <span class="dim">${o.score}</span></button>`).join('')}</div>${pTimer(v.remain)}`;
+      else if (v.stealTarget) main = `<div class="big">🦝</div><h2>Ryöstö tehty</h2><p class="dim">Saalis jaetaan pian.</p>`;
+      else main = `<div class="big">👀</div><h2>Ryöstäjät liikkeellä</h2><p class="dim">Pidä kiinni pisteistäsi.</p>`;
+      break;
+    case 'cellar':
+      main = v.inCellar ? `<div class="big">😱</div><h2>Joudut kellariin!</h2><p><b>${MG[v.mgType].emoji} ${MG[v.mgType].name}</b></p><p>${MG[v.mgType].desc}</p><p class="dim">Peli alkaa ruudullasi hetken päästä.</p>`
+        : `<div class="big">🕯️</div><h2>Kellarissa: ${esc(v.cellarNames.join(', '))}</h2><p class="dim">Seuraa valkokangasta.</p>`;
+      foot = v.inCellar ? '' : reactBar(); break;
+    case 'minigame':
+      if (v.inCellar) { main = '<div id="mg"></div>'; }
+      else { main = `<div class="big">🍿</div><h2>${esc(v.cellarNames.join(', '))} taistelee hengestään</h2><p class="dim">Kannusta tai kummittele.</p>`; foot = reactBar(); }
+      break;
+    case 'mg_result':
+      if (v.inCellar) main = v.died ? `<div class="big">👻</div><h2>Olet nyt haamu</h2><p>Pelaat edelleen. Saat kiusakortin joka kierros ja voit herätä henkiin finaalissa.</p>` : `<div class="big">😮‍💨</div><h2>Selvisit!</h2><p class="dim">Tällä kertaa.</p>`;
+      else main = v.deadNames.length ? `<div class="big">💀</div><h2>${esc(v.deadNames.join(' ja '))} kummittelee nyt</h2>` : `<div class="big">😇</div><h2>Kaikki selvisivät</h2>`;
+      foot = reactBar(); break;
+    case 'finale_intro': main = `<div class="big">🚪</div><h2>Pakomatka!</h2><p>Oikea vastaus = askel. Nopein oikea = kaksi askelta. ${me.ghost ? 'Saat elävän kiinni, niin heräät henkiin!' : 'Ensimmäinen elävä ovella voittaa.'}</p><p>Olet ruudussa <b>${me.pos}</b> / ${TRACK}</p>`; break;
+    case 'end': main = v.iWon ? `<div class="big">🏆</div><h2>Pakenit kartanosta!</h2>` : `<div class="big">${me.ghost ? '👻' : '🏚️'}</div><h2>${v.winner ? esc(v.winner.name) + ' voitti' : 'Peli päättyi'}</h2><p class="dim">Katso tulokset kankaalta.</p>`; break;
+  }
+  app.innerHTML = `<div class="player">${bar}<div class="pmain">${main}</div><div>${foot}</div></div>`;
+  bindPlayer(v);
+  tickTimers();
+}
+function incomingHTML(me) {
+  if (!me.incoming.length) return '';
+  return `<div class="effects">${me.incoming.map(x => `<span class="effect">${CARDS[x.k].emoji} ${esc(x.by)}: ${CARDS[x.k].name}</span>`).join('')}</div>`;
+}
+function prepHTML(v, others) {
+  const me = v.me, L = P.local;
+  const rt = v.round === 'pako' ? {emoji: '🚪', name: 'Pakomatka', desc: 'Nopein oikea etenee kaksi askelta.'} : ROUNDS[v.round];
+  let h = `<div><div class="label">${v.finale ? 'Finaali' : 'Kysymys ' + (v.qi + 1) + ' / ' + v.rounds} · ${esc(v.cat)}</div><h2>${rt.emoji} ${rt.name}</h2><p class="dim" style="margin:4px 0 0">${rt.desc}</p></div>`;
+  if (v.round === 'pommi') {
+    h += `<div><div class="label">Panoksesi (sinulla ${me.score} p)</div><div class="bets">${[0, 100, 250, 500].map(a => `<button class="bet ${v.bet === a || (a === 0 && !v.bet) ? 'sel' : ''}" data-bet="${a}" ${a > me.score ? 'disabled' : ''}>${a}</button>`).join('')}<button class="bet ${v.bet && v.bet === me.score && ![100, 250, 500].includes(v.bet) ? 'sel' : ''}" data-bet="all">Kaikki</button></div></div>`;
+  }
+  h += incomingHTML(me);
+  if (L.sel) {
+    const c = CARDS[L.sel];
+    h += `<div><h3 style="font-size:1.2rem">${c.emoji} ${c.name}: kenelle?</h3></div><div class="targets">${others.map(o => `<button class="target" data-target="${o.id}"><span>${o.ghost ? '👻' : esc(o.emoji)}</span>${esc(o.name)}</button>`).join('')}</div><button class="btn small" data-cancel="1">Peruuta</button>`;
+  } else if (me.cards.length) {
+    h += `<div class="label">Kiusakorttisi</div><div class="hand">${me.cards.map((k, i) => { const c = CARDS[k]; return `<button class="card ${c.passive ? 'passive' : ''}" ${c.passive ? 'disabled' : ''} data-card="${k}" data-i="${i}"><span class="e">${c.emoji}</span><b>${c.name}</b><small>${c.desc}</small></button>`; }).join('')}</div>`;
+  } else h += `<p class="dim">Ei kiusakortteja tällä kertaa.</p>`;
+  if (L.sent) h += `<p style="color:var(--g);font-weight:700">${esc(L.sent)}</p>`;
+  h += pTimer(v.remain);
+  return h;
+}
+function qSetup(v) {
+  const deadline = P.recv + v.myRemain, lockUntil = P.recv + v.lockRemain;
+  P.local.deadline = deadline; P.local.lockUntil = lockUntil;
+  return {me: v.me, eff: new Set(v.me.incoming.map(x => x.k)), deadline, lockUntil};
+}
+const overlays = (eff, lockUntil) => (eff.has('muste') ? '<div class="ink" id="ink"></div>' : '') + (eff.has('jaa') && Date.now() < lockUntil ? '<div class="ice" id="ice">🧊 JÄÄSSÄ</div>' : '');
+const timerRow = (deadline, v, eff) => `<div class="row" style="flex-wrap:nowrap"><div class="secs" data-secs="${deadline}" style="font-size:1.6rem"></div><div style="flex:1"><div class="timerbar"><i data-from="${deadline - v.myDur}" data-until="${deadline}"></i></div></div>${eff.has('hidaste') ? '🐌' : ''}</div>`;
+function sabotage(eff, sel, ms) {
+  const ink = $('#ink');
+  if (eff.has('muste') && ink) for (let i = 0; i < 8; i++) { const s = 50 + rnd(90); const el = document.createElement('i');
+    el.style.cssText = `width:${s}px;height:${s * (.7 + Math.random() * .6)}px;left:${rnd(85)}%;top:${rnd(80)}%;transform:translate(-30%,-30%) rotate(${rnd(180)}deg)`; ink.appendChild(el); }
+  if (eff.has('pyorre') && sel) { const iv = setInterval(() => { const els = $$(sel); const order = shuffle(els.map((_, i) => i)); els.forEach((b, i) => b.style.order = order[i]); }, ms || 1200); P.cleanup.push(() => clearInterval(iv)); }
+  const left = P.local.lockUntil - Date.now(), pads = $('#pads');
+  if (eff.has('jaa') && left > 0 && pads) { pads.classList.add('frozen'); const t = setTimeout(() => { $('#ice') && $('#ice').remove(); $('#pads') && $('#pads').classList.remove('frozen'); }, left); P.cleanup.push(() => clearTimeout(t)); }
+}
+function orderQuestionHTML(v) {
+  const {me, eff, deadline, lockUntil} = qSetup(v);
+  const seq = P.local.seq || (P.local.seq = []);
+  const locked = v.answer != null || P.local.sentOrder;
+  let h = `<div class="label">⏳ Aikajana · ${esc(v.cat)}</div><div class="pq">${esc(v.q)}</div>${incomingHTML(me)}`;
+  const shown = locked && Array.isArray(v.answer) ? v.answer : seq;
+  h += `<div class="olist ${eff.has('peili') ? 'mirror' : ''} ${locked ? 'locked' : ''}" id="pads">${v.items.map((t, i) => { const pos = shown.indexOf(i);
+    return `<button class="oitem ${pos >= 0 ? 'on' : ''}" data-o="${i}" ${locked ? 'disabled' : ''}><span class="onum">${pos >= 0 ? pos + 1 : ''}</span><span>${esc(t)}</span></button>`; }).join('')}${locked ? '' : overlays(eff, lockUntil)}</div>`;
+  h += locked ? '<p style="font-weight:800;margin:0">Järjestys lukittu! Odota muita…</p>'
+    : `<p class="dim" style="margin:0">Napauta kohteet järjestyksessä: ensimmäinen = 1. Napauta numeroa uudelleen, niin se poistuu.</p>
+       <div class="row" style="justify-content:center"><button class="btn small" id="oclear">Tyhjennä</button><button class="btn primary" id="osend" ${seq.length === v.items.length ? '' : 'disabled'}>Lukitse järjestys</button></div>`;
+  return h + timerRow(deadline, v, eff);
+}
+function bindOrder(v) {
+  const eff = new Set(v.me.incoming.map(x => x.k)); if (!$('#osend')) return;
+  const seq = P.local.seq;
+  const redraw = () => { $$('.oitem').forEach(b => { const pos = seq.indexOf(+b.dataset.o); b.classList.toggle('on', pos >= 0); b.querySelector('.onum').textContent = pos >= 0 ? pos + 1 : ''; }); $('#osend').disabled = seq.length !== v.items.length; };
+  $$('.oitem').forEach(b => b.onclick = () => { if (Date.now() < P.local.lockUntil) return; const i = +b.dataset.o, pos = seq.indexOf(i); if (pos < 0) seq.push(i); else seq.splice(pos); redraw(); });
+  $('#oclear').onclick = () => { seq.length = 0; redraw(); };
+  $('#osend').onclick = () => { if (seq.length !== v.items.length || Date.now() > P.local.deadline) return; P.local.sentOrder = true; pSend({t: 'answer', order: seq.slice()}); renderPlayer(true); };
+  sabotage(eff, '.oitem', 1300);
+}
+function tfQuestionHTML(v) {
+  const {me, eff, deadline, lockUntil} = qSetup(v);
+  const ans = P.local.tf || (P.local.tf = []); const n = v.statements.length;
+  const done = v.answer != null || ans.length >= n;
+  let h = `<div class="label">⚖️ Totta vai tarua · ${esc(v.cat)}</div>${incomingHTML(me)}`;
+  if (done) h += `<div class="big">⚖️</div><h2>Kaikki ${n} väitettä vastattu!</h2><p class="dim">Odota muita…</p>`;
+  else h += `<div class="label" id="tfc">Väite ${ans.length + 1} / ${n}</div><div class="tfstate" id="tfs">${esc(v.statements[ans.length])}</div>
+    <div class="tfbtns ${eff.has('peili') ? 'mirror' : ''}" id="pads"><button class="tfb yes" data-tf="1">TOTTA</button><button class="tfb no" data-tf="0">TARUA</button>${overlays(eff, lockUntil)}</div>`;
+  return h + timerRow(deadline, v, eff);
+}
+function bindTf(v) {
+  const eff = new Set(v.me.incoming.map(x => x.k)); if (!$('#tfs')) return;
+  const ans = P.local.tf, n = v.statements.length;
+  $$('.tfb').forEach(b => b.onclick = () => {
+    if (Date.now() < P.local.lockUntil || Date.now() > P.local.deadline || ans.length >= n) return;
+    ans.push(b.dataset.tf === '1'); pSend({t: 'answer', tf: ans.slice(), final: ans.length >= n});
+    if (ans.length >= n) { renderPlayer(true); return; }
+    $('#tfs').textContent = v.statements[ans.length]; $('#tfc').textContent = `Väite ${ans.length + 1} / ${n}`;
+    const st = $('#tfs'); st.classList.remove('flip'); void st.offsetWidth; st.classList.add('flip');
+  });
+  sabotage(eff, '.tfb', 1000);
+}
+const listChips = list => list.length ? list.map(x => `<span class="lchip ${x.ok ? 'ok' : x.dup ? 'dup' : 'no'}">${x.ok ? '✓' : x.dup ? '↺' : '✗'} ${esc(x.txt)}</span>`).join('') : '<span class="dim">Ei vielä vastauksia.</span>';
+function listQuestionHTML(v) {
+  const {me, eff, deadline, lockUntil} = qSetup(v);
+  const done = v.answer != null;
+  const okN = v.myList.filter(x => x.ok).length;
+  let h = `<div class="label">📝 Listakierros · ${esc(v.cat)}</div><div class="pq">${esc(v.q)}</div>${incomingHTML(me)}`;
+  if (!done) h += `<form class="listform ${eff.has('peili') ? 'mirror' : ''} ${eff.has('pyorre') ? 'wobble' : ''}" id="pads"><input id="li" autocomplete="off" maxlength="40" placeholder="Kirjoita ja paina Enter" aria-label="Vastaus"><button class="btn primary" type="submit">Lisää</button>${overlays(eff, lockUntil)}</form>`;
+  h += `<div class="label" id="lcount">${okN} oikein</div><div class="lchips" id="lchips">${listChips(v.myList)}</div>`;
+  h += done ? '<p style="font-weight:800;margin:0">Valmis! Odota muita…</p>' : '<button class="btn small" id="ldone">Olen valmis</button>';
+  return h + timerRow(deadline, v, eff);
+}
+function bindList(v) {
+  const eff = new Set(v.me.incoming.map(x => x.k));
+  P.local.onView = nv => { if (nv.kind !== 'list' || !nv.myList) return; const c = $('#lchips'); if (c) c.innerHTML = listChips(nv.myList); const lc = $('#lcount'); if (lc) lc.textContent = nv.myList.filter(x => x.ok).length + ' oikein'; };
+  const form = $('#pads'); if (!form) return; const inp = $('#li');
+  const left = P.local.lockUntil - Date.now();
+  if (left > 0) { inp.disabled = true; const t = setTimeout(() => { inp.disabled = false; inp.focus(); }, left); P.cleanup.push(() => clearTimeout(t)); } else inp.focus();
+  form.addEventListener('submit', e => { e.preventDefault(); const txt = inp.value.trim(); if (!txt || Date.now() > P.local.deadline) return; pSend({t: 'listadd', text: txt}); inp.value = ''; inp.focus(); });
+  $('#ldone').onclick = () => { pSend({t: 'listdone'}); };
+  sabotage(eff, null);
+}
+function playerRevealHTML(v) {
+  const cel = v.toCellar ? '<p class="err">Kellari odottaa sinua…</p>' : '';
+  const pts = `<p style="font-size:1.4rem;font-weight:800;color:var(--g);margin:0">+${v.delta} p</p>`;
+  if (v.kind === 'order') return `<div class="big">${!v.answered ? '😶' : v.oc === v.n ? '🏆' : v.oc >= 2 ? '👍' : '😱'}</div><h2>${!v.answered ? 'Et lukinnut järjestystä' : v.oc === v.n ? 'Täydellinen aikajana!' : v.oc + ' / ' + v.n + ' oikealla paikalla'}</h2>${pts}
+    <ol class="orev small">${v.solved.map((x, i) => `<li><span class="on">${i + 1}</span><span>${esc(x.t)}</span>${x.note ? `<b>${esc(x.note)}</b>` : ''}</li>`).join('')}</ol>${cel}`;
+  if (v.kind === 'tf') return `<div class="big">${v.oc === v.sts.length ? '🏆' : v.toCellar ? '😱' : '⚖️'}</div><h2>${v.oc} / ${v.sts.length} oikein</h2>${pts}
+    <div class="tfrev small">${v.sts.map(x => `<div class="tr"><span class="badge ${x.v ? 'yes' : 'no'}">${x.v ? 'TOTTA' : 'TARUA'}</span><div><b>${esc(x.s)}</b>${x.e ? `<small>${esc(x.e)}</small>` : ''}</div><span>${x.mine === x.v ? '✅' : '❌'}</span></div>`).join('')}</div>${cel}`;
+  return `<div class="big">${v.toCellar ? '😱' : v.uniq ? '🦄' : '📝'}</div><h2>${v.okCount} / ${v.listTotal} löydetty</h2>${pts}${v.uniq ? `<p style="margin:0">${v.uniq} vastausta, joita kukaan muu ei keksinyt!</p>` : ''}
+    ${v.missed.length ? `<p class="dim" style="margin:0">Jäi löytämättä mm.: ${v.missed.map(esc).join(', ')}</p>` : ''}${cel}`;
+}
+function questionHTML(v) {
+  if (v.kind === 'order') return orderQuestionHTML(v);
+  if (v.kind === 'tf') return tfQuestionHTML(v);
+  if (v.kind === 'list') return listQuestionHTML(v);
+  if (v.num) return numQuestionHTML(v);
+  const me = v.me, eff = new Set(me.incoming.map(x => x.k));
+  const deadline = P.recv + v.myRemain, lockUntil = P.recv + v.lockRemain;
+  P.local.deadline = deadline; P.local.lockUntil = lockUntil;
+  const answered = v.answer != null ? v.answer : P.local.picked;
+  let h = `<div class="label">${esc(v.cat)}</div><div style="font-size:clamp(1.1rem,4vw,1.5rem);font-weight:800">${esc(v.q)}</div>${incomingHTML(me)}`;
+  h += `<div class="pads ${eff.has('peili') ? 'mirror' : ''} ${answered != null ? 'locked' : ''}" id="pads">
+    ${v.opts.map((o, i) => `<button class="pad c${i} ${answered === i ? 'picked' : ''}" data-ans="${i}" ${answered != null ? 'disabled' : ''}><span>${esc(o)}</span></button>`).join('')}
+    ${eff.has('muste') ? '<div class="ink" id="ink"></div>' : ''}
+    ${eff.has('jaa') && Date.now() < lockUntil ? '<div class="ice" id="ice">🧊 JÄÄSSÄ</div>' : ''}</div>`;
+  h += `<div class="row" style="flex-wrap:nowrap"><div class="secs" data-secs="${deadline}" style="font-size:1.6rem"></div><div style="flex:1"><div class="timerbar"><i data-from="${deadline - v.myDur}" data-until="${deadline}"></i></div></div>${eff.has('hidaste') ? '🐌' : ''}</div>`;
+  h += answered != null ? `<p style="font-weight:800">Vastaus lukittu: ${BTNS[answered]}</p>` : '<p class="dim" style="margin:0">Näppäimet 1–4 toimivat myös.</p>';
+  return h;
+}
+function bindPlayer(v) {
+  $$('[data-react]').forEach(b => b.onclick = () => { pSend({t: 'react', e: b.dataset.react}); b.disabled = true; setTimeout(() => b.disabled = false, 1000); });
+  if (v.phase === 'prep') {
+    $$('[data-card]').forEach(b => b.onclick = () => { P.local.sel = b.dataset.card; renderPlayer(false); });
+    $$('[data-target]').forEach(b => b.onclick = () => {
+      const t = v.players.find(x => x.id === b.dataset.target);
+      pSend({t: 'play', card: P.local.sel, target: b.dataset.target});
+      P.local.sent = `${CARDS[P.local.sel].emoji} ${CARDS[P.local.sel].name} lähti pelaajalle ${t ? t.name : ''}!`; P.local.sel = null;
+    });
+    $$('[data-cancel]').forEach(b => b.onclick = () => { P.local.sel = null; renderPlayer(false); });
+    $$('[data-bet]').forEach(b => b.onclick = () => pSend({t: 'bet', amount: b.dataset.bet === 'all' ? 'all' : +b.dataset.bet}));
+  }
+  if (v.phase === 'steal') $$('[data-steal]').forEach(b => b.onclick = () => { pSend({t: 'steal', target: b.dataset.steal}); });
+  if (v.phase === 'question') bindQuestion(v);
+  if (v.phase === 'minigame' && v.inCellar) startMinigame(v);
+}
+const KEYS = ['1', '2', '3', '4', '5', '6', '7', '8', '9', ',', '0', '⌫'];
+function numQuestionHTML(v) {
+  const me = v.me, eff = new Set(me.incoming.map(x => x.k));
+  const deadline = P.recv + v.myRemain, lockUntil = P.recv + v.lockRemain;
+  P.local.deadline = deadline; P.local.lockUntil = lockUntil; if (P.local.guess == null) P.local.guess = '';
+  const done = v.answer != null || P.local.sentGuess != null;
+  let h = `<div class="label">🎯 Lähimmäs voittaa · ${esc(v.cat)}</div><div style="font-size:clamp(1.1rem,4vw,1.5rem);font-weight:800">${esc(v.q)}</div>${incomingHTML(me)}`;
+  if (done) h += `<div class="big">🎯</div><h2>Arvaus lukittu: ${esc(nfmt(v.answer ?? P.local.sentGuess))}</h2><p class="dim">Odota muita…</p>`;
+  else h += `<div class="guessbox" id="gbox">${esc(P.local.guess) || '<span class="dim">?</span>'}</div>
+    <div class="keypad ${eff.has('peili') ? 'mirror' : ''}" id="pads" style="position:relative">
+      ${KEYS.map(k => `<button class="key" data-k="${k}">${k}</button>`).join('')}
+      ${eff.has('muste') ? '<div class="ink" id="ink"></div>' : ''}
+      ${eff.has('jaa') && Date.now() < lockUntil ? '<div class="ice" id="ice">🧊 JÄÄSSÄ</div>' : ''}</div>
+    <button class="btn primary" id="gsend" style="font-size:1.2rem">Lukitse arvaus</button>`;
+  h += `<div class="row" style="flex-wrap:nowrap"><div class="secs" data-secs="${deadline}" style="font-size:1.6rem"></div><div style="flex:1"><div class="timerbar"><i data-from="${deadline - v.myDur}" data-until="${deadline}"></i></div></div>${eff.has('hidaste') ? '🐌' : ''}</div>`;
+  return h;
+}
+function bindNumQuestion(v) {
+  const eff = new Set(v.me.incoming.map(x => x.k));
+  if (!$('#gsend')) return;
+  const show = () => { $('#gbox').innerHTML = P.local.guess ? esc(P.local.guess) : '<span class="dim">?</span>'; };
+  const press = k => {
+    if (Date.now() < P.local.lockUntil) return;
+    let g = P.local.guess;
+    if (k === '⌫') g = g.slice(0, -1);
+    else if (k === ',') { if (!g.includes(',')) g = (g || '0') + ','; }
+    else if (g.replace(',', '').length < 9) g = g === '0' ? k : g + k;
+    P.local.guess = g; show();
+  };
+  const submit = () => {
+    if (!P.local.guess || Date.now() < P.local.lockUntil || Date.now() > P.local.deadline) return;
+    P.local.sentGuess = Number(P.local.guess.replace(',', '.'));
+    pSend({t: 'answer', guess: P.local.guess}); renderPlayer(true);
+  };
+  $$('.key').forEach(b => b.onclick = () => press(b.dataset.k));
+  $('#gsend').onclick = submit;
+  const sabotaged = eff.has('muste') || eff.has('pyorre') || eff.has('peili');
+  const key = e => {
+    if (e.key === 'Enter') { e.preventDefault(); submit(); return; }
+    if (e.key === 'Backspace') { press('⌫'); return; }
+    if (sabotaged) return;
+    if (/^[0-9]$/.test(e.key)) press(e.key); else if (e.key === ',' || e.key === '.') press(',');
+  };
+  document.addEventListener('keydown', key); P.cleanup.push(() => document.removeEventListener('keydown', key));
+  if (eff.has('muste')) {
+    const ink = $('#ink'); for (let i = 0; i < 8; i++) { const s = 50 + rnd(90); const el = document.createElement('i');
+      el.style.cssText = `width:${s}px;height:${s * (.7 + Math.random() * .6)}px;left:${rnd(85)}%;top:${rnd(80)}%;transform:translate(-30%,-30%) rotate(${rnd(180)}deg)`; ink.appendChild(el); }
+  }
+  if (eff.has('pyorre')) {
+    const iv = setInterval(() => { const order = shuffle(KEYS.map((_, i) => i)); $$('.key').forEach((b, i) => b.style.order = order[i]); }, 1300);
+    P.cleanup.push(() => clearInterval(iv));
+  }
+  if (eff.has('jaa')) {
+    const ms = P.local.lockUntil - Date.now();
+    if (ms > 0) { $('#pads').classList.add('frozen'); const t = setTimeout(() => { const ice = $('#ice'); if (ice) ice.remove(); $('#pads') && $('#pads').classList.remove('frozen'); }, ms); P.cleanup.push(() => clearTimeout(t)); }
+  }
+}
+function bindQuestion(v) {
+  if (v.kind === 'order') return bindOrder(v);
+  if (v.kind === 'tf') return bindTf(v);
+  if (v.kind === 'list') return bindList(v);
+  if (v.num) return bindNumQuestion(v);
+  const eff = new Set(v.me.incoming.map(x => x.k));
+  const answer = i => {
+    if (P.local.picked != null || v.answer != null) return;
+    if (Date.now() < P.local.lockUntil) return;
+    if (Date.now() > P.local.deadline) return;
+    P.local.picked = i; pSend({t: 'answer', idx: i});
+    $$('.pad').forEach(b => { b.disabled = true; b.classList.toggle('picked', +b.dataset.ans === i); });
+    $('#pads').classList.add('locked');
+    const p = document.createElement('p'); p.style.fontWeight = '800'; p.textContent = 'Vastaus lukittu: ' + BTNS[i];
+    const hint = $('.pmain p.dim:last-child'); if (hint) hint.replaceWith(p); else $('.pmain').appendChild(p);
+  };
+  $$('.pad').forEach(b => b.onclick = () => answer(+b.dataset.ans));
+  const key = e => { if (e.target.tagName === 'INPUT') return; const n = +e.key; if (n >= 1 && n <= v.opts.length) answer(n - 1); };
+  document.addEventListener('keydown', key); P.cleanup.push(() => document.removeEventListener('keydown', key));
+  if (eff.has('muste')) {
+    const ink = $('#ink'); for (let i = 0; i < 9; i++) { const s = 60 + rnd(110); const el = document.createElement('i');
+      el.style.cssText = `width:${s}px;height:${s * (.7 + Math.random() * .6)}px;left:${rnd(85)}%;top:${rnd(80)}%;transform:translate(-30%,-30%) rotate(${rnd(180)}deg)`; ink.appendChild(el); }
+  }
+  if (eff.has('pyorre')) {
+    const iv = setInterval(() => { const order = shuffle([0, 1, 2, 3]); $$('.pad').forEach((b, i) => b.style.order = order[i]); }, 1100);
+    P.cleanup.push(() => clearInterval(iv));
+  }
+  if (eff.has('jaa')) {
+    const ms = P.local.lockUntil - Date.now();
+    if (ms > 0) { const t = setTimeout(() => { const ice = $('#ice'); if (ice) ice.remove(); $('#pads') && $('#pads').classList.remove('frozen'); }, ms); P.cleanup.push(() => clearTimeout(t)); $('#pads').classList.add('frozen'); }
+  }
+}
+
+/* ---------- minigames (player side) ---------- */
+function startMinigame(v) {
+  const box = $('#mg'); const mg = v.mg; const id = mg.id;
+  const send = r => pSend({t: 'mg', id, r});
+  if (mg.submitted) { box.innerHTML = '<div class="big">✓</div><h2>Tulos lähetetty</h2><p class="dim">Odota tuomiota…</p>'; return; }
+  const done = (title, sub) => { box.innerHTML = `<div class="big">⏳</div><h2>${title}</h2><p class="dim">${sub || 'Odota muita…'}</p>`; };
+  const t0 = performance.now();
+  if (mg.type === 'reaktio') {
+    box.innerHTML = `<h2>⚡ Sähkötuoli</h2><button class="reactbox" id="rb">ODOTA…</button>`;
+    const rb = $('#rb'); let goAt = 0, finished = false;
+    const tm = setTimeout(() => { goAt = performance.now(); rb.classList.add('go'); rb.textContent = 'PAINA!'; }, mg.delay);
+    const press = () => {
+      if (finished) return; finished = true; clearTimeout(tm);
+      if (!goAt) { send({ms: 9999, final: true}); rb.classList.remove('go'); rb.classList.add('done'); rb.textContent = 'VARASLÄHTÖ!'; return; }
+      const ms = Math.round(performance.now() - goAt); send({ms, final: true}); rb.classList.add('done'); rb.textContent = ms + ' ms';
+    };
+    rb.addEventListener('pointerdown', press);
+    const key = e => { if (e.code === 'Space' || e.key === 'Enter') { e.preventDefault(); press(); } };
+    document.addEventListener('keydown', key);
+    P.cleanup.push(() => { clearTimeout(tm); document.removeEventListener('keydown', key); });
+  }
+  if (mg.type === 'muisti') {
+    box.innerHTML = `<h2>🎹 Kummitusurut</h2><p id="mstat" class="dim">Katso ja kuuntele…</p><div class="mpads">${[0, 1, 2, 3].map(i => `<button class="mpad c${i}" data-m="${i}" disabled aria-label="${BTNS[i]}"></button>`).join('')}</div>`;
+    const pads = $$('.mpad'); let idx = 0, over = false; const timers = [];
+    mg.seq.forEach((c, i) => {
+      timers.push(setTimeout(() => pads[c].classList.add('lit'), 700 + i * 750));
+      timers.push(setTimeout(() => pads[c].classList.remove('lit'), 700 + i * 750 + 500));
+    });
+    timers.push(setTimeout(() => { pads.forEach(p => p.disabled = false); $('#mstat').textContent = 'Sinun vuorosi! Toista sarja.'; }, 700 + mg.seq.length * 750));
+    const startT = 700 + mg.seq.length * 750;
+    pads.forEach(p => p.onclick = () => {
+      if (over) return; const c = +p.dataset.m;
+      p.classList.add('lit'); setTimeout(() => p.classList.remove('lit'), 180);
+      if (c === mg.seq[idx]) { idx++; send({count: idx, t: Math.round(performance.now() - t0 - startT), final: idx >= mg.seq.length}); if (idx >= mg.seq.length) { over = true; done('Täydellinen sarja!'); } else $('#mstat').textContent = idx + ' / 5'; }
+      else { over = true; send({count: idx, t: 99999, final: true}); done('Väärä nuotti…', 'Urut ulvovat. Odota tuomiota.'); }
+    });
+    P.cleanup.push(() => timers.forEach(clearTimeout));
+  }
+  if (mg.type === 'matikka') {
+    const answers = []; let i = 0;
+    const draw = () => {
+      box.innerHTML = `<h2>🧮 Laskukone</h2><p class="dim">Lasku ${i + 1} / ${mg.probs.length}</p><div class="mathq">${esc(mg.probs[i])} = ?</div>
+        <form class="mathrow" id="mf"><input id="mi" inputmode="numeric" autocomplete="off" aria-label="Vastaus"><button class="btn primary" type="submit">OK</button></form>`;
+      const mi = $('#mi'); mi.focus();
+      $('#mf').addEventListener('submit', e => {
+        e.preventDefault(); if (mi.value.trim() === '') return;
+        answers.push(Number(mi.value.trim().replace(',', '.'))); i++;
+        const fin = i >= mg.probs.length;
+        send({answers, t: Math.round(performance.now() - t0), final: fin});
+        if (fin) done('Laskut lähetetty!'); else draw();
+      });
+    };
+    draw();
+  }
+  if (mg.type === 'varit') {
+    const COL = [{n: 'PUNAINEN', c: '#ff3b5c'}, {n: 'SININEN', c: '#3d8bff'}, {n: 'VIHREÄ', c: '#22c46b'}, {n: 'KELTAINEN', c: '#ffd23a'}];
+    let i = 0, count = 0;
+    const draw = () => {
+      const tr = mg.seq[i]; const order = shuffle([0, 1, 2, 3]);
+      box.innerHTML = `<h2>🎨 Värisokeus</h2><p class="dim" style="margin:0">Paina tekstin <b>VÄRIÄ</b>, älä sanaa. ${i + 1} / ${mg.seq.length}</p>
+        <div class="stroop" style="color:${COL[tr.c].c}">${COL[tr.w].n}</div><div class="vbtns">${order.map(k => `<button class="vbtn" data-v="${k}">${COL[k].n}</button>`).join('')}</div>`;
+      $$('.vbtn').forEach(b => b.onclick = () => {
+        if (+b.dataset.v === tr.c) count++; else { b.classList.add('wrong'); }
+        i++; const fin = i >= mg.seq.length;
+        send({count, t: Math.round(performance.now() - t0), final: fin});
+        if (fin) done(count + ' / ' + mg.seq.length + ' oikein'); else setTimeout(draw, +b.dataset.v === tr.c ? 0 : 250);
+      });
+    };
+    draw();
+  }
+  if (mg.type === 'kirstut') {
+    const st = mg.chest || {opened: 0, gold: 0}; const clicked = []; let pending = false;
+    box.innerHTML = `<h2>💰 Kultakirstut</h2><p style="margin:0;font-size:1.2rem">Kultaa: <b id="kg" style="color:var(--y)">${st.gold}</b> / tarvitset vähintään 400</p>
+      <div class="chests">${Array.from({length: 8}, (_, i) => `<button class="chest" data-c="${i}">🧰</button>`).join('')}</div>
+      <p class="dim" id="kmsg" style="margin:0">Valitse kirstu. Yksi niistä on ansa.</p><button class="btn primary" id="kstop">Pakene kullan kanssa</button>`;
+    $$('.chest').forEach(b => b.onclick = () => {
+      if (pending || b.classList.contains('open')) return; pending = true; clicked.push(+b.dataset.c);
+      b.classList.add('opening'); send({open: true});
+    });
+    $('#kstop').onclick = () => { if (pending) return; send({stop: true}); done('Pakenit ' + $('#kg').textContent + ' kullan kanssa', 'Riittääkö se? Odota tuomiota…'); P.local.onView = null; };
+    P.local.onView = nv => {
+      const c = nv.mg && nv.mg.chest; if (!c || !$('#kg')) return;
+      clicked.forEach((ci, k) => { const b = $(`.chest[data-c="${ci}"]`); if (!b) return;
+        if (k < c.golds.length) { b.classList.remove('opening'); b.classList.add('open'); b.innerHTML = `💰<small>${c.golds[k]}</small>`; }
+        else if (c.trapped && k === clicked.length - 1) { b.classList.remove('opening'); b.classList.add('trap'); b.textContent = '👹'; } });
+      if (c.opened >= clicked.length) pending = false;
+      $('#kg').textContent = c.gold;
+      if (c.trapped) { $$('.chest').forEach(b => b.disabled = true); $('#kstop').disabled = true; $('#kmsg').textContent = 'KELLARIMESTARI! Menetit kaiken kullan.'; $('#kmsg').className = 'err'; P.local.onView = null; }
+    };
+  }
+  if (mg.type === 'uhri') {
+    const sc = mg.score || 0;
+    box.innerHTML = `<h2>🕯️ Uhrilahja</h2><p style="margin:0">Sinulla on <b style="color:var(--y)">${sc} p</b>. Uhraa salaa.</p>
+      <div class="bets">${[0, 100, 250, 500].filter(a => a <= sc).map(a => `<button class="bet" data-b="${a}">${a}</button>`).join('')}<button class="bet" data-b="${sc}">Kaikki</button></div>
+      <form class="mathrow" id="uf"><input id="ui" inputmode="numeric" autocomplete="off" value="0" aria-label="Uhri pisteinä"><button class="btn primary" type="submit">Uhraa</button></form>
+      <p class="dim" style="margin:0">Pienimmän uhrin antanut kuolee. Uhri menee joka tapauksessa.</p>`;
+    $$('[data-b]').forEach(b => b.onclick = () => { $('#ui').value = b.dataset.b; });
+    $('#uf').addEventListener('submit', e => { e.preventDefault(); const bid = Math.max(0, Math.min(sc, Math.round(Number($('#ui').value.replace(',', '.')) || 0)));
+      send({bid, final: true}); done('Uhrasit ' + bid + ' p', 'Kellarimestari laskee lahjoja…'); });
+  }
+  if (mg.type === 'ovet') {
+    box.innerHTML = `<h2>🚪 Kolme ovea</h2><p class="dim">Valitse ovi. Yhden takana odottaa Kellarimestari.</p><div class="doors">${[0, 1, 2].map(i => `<button class="door" data-d="${i}">${i + 1}</button>`).join('')}</div>`;
+    $$('.door').forEach(d => d.onclick = () => { send({door: +d.dataset.d, final: true}); done('Ovi ' + (+d.dataset.d + 1) + ' valittu', 'Kahva narahtaa…'); });
+  }
+}
+
+/* ================= timers (shared) ================= */
+let lastTickSec = null;
+function tickTimers() {
+  const now = Date.now();
+  $$('[data-until]').forEach(el => {
+    const from = +el.dataset.from, until = +el.dataset.until;
+    el.style.width = Math.max(0, Math.min(100, (until - now) / Math.max(1, until - from) * 100)) + '%';
+  });
+  $$('[data-secs]').forEach(el => {
+    const s = Math.max(0, Math.ceil((+el.dataset.secs - now) / 1000)); el.textContent = s;
+    if (G.role === 'host' && G.phase === 'question' && s <= 3 && s > 0 && lastTickSec !== s) { lastTickSec = s; SFX.tick(); }
+  });
+}
+setInterval(tickTimers, 100);
+
+/* ================= landing ================= */
+function renderLanding() {
+  G.role = null; document.body.classList.remove('is-ghost');
+  app.innerHTML = `<div class="landing"><div class="inner">
+    <div class="logo"><span class="a">KAAOS</span><br><span class="b">KARTANO</span></div>
+    <p>Kaoottinen tietovisa, jossa kiusataan kavereita ja väärin vastanneet joutuvat kellariin. Juontaja pyörittää peliä isolla näytöllä, pelaajat liittyvät Chromebookilla koodilla.</p>
+    <div class="roles">
+      <button class="role play" id="r-play"><span style="font-size:2rem">🎮</span><b>Liity peliin</b><span class="dim">Pelaajille. Tarvitset juontajan koodin.</span></button>
+      <button class="role" id="r-host"><span style="font-size:2rem">📽️</span><b>Juonna peliä</b><span class="dim">Opettajan kone, joka näytetään projektorilla.</span></button>
+    </div></div></div>`;
+  $('#r-play').onclick = () => renderJoin();
+  $('#r-host').onclick = startHost;
+}
+function startHost() {
+  G.sets = loadSets();
+  G.settings.packs = (G.settings.packs || []).map(k => k === 'omat' ? 'c:omat' : k).filter(k => PACKS[k] || G.sets.some(x => 'c:' + x.id === k));
+  if (!G.settings.packs.length) G.settings.packs = ['yleis'];
+  G.role = 'host'; G.code = newCode(); G.quip = 'Kartano on auki. Liittykää, jos uskallatte.';
+  audio(); hostNet(); setPhase('lobby');
+}
+
+/* ================= boot ================= */
+(function boot() {
+  const saved = sstore.get('kk-me', null);
+  const hashCode = (location.hash || '').replace('#', '').toUpperCase();
+  if (/^[A-Z]{4}$/.test(hashCode) || saved) renderJoin(); else renderLanding();
+  window.addEventListener('beforeunload', e => { if (G.role === 'host' && G.phase !== 'lobby' && G.phase !== 'end') { e.preventDefault(); e.returnValue = ''; } });
+})();
+</script>
+</body></html>
