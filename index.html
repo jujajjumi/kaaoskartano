@@ -290,6 +290,38 @@ body.is-ghost .pbar{border-color:var(--ghost)}
 .pack.own.on{border-style:solid}
 .addpack{border-style:dashed;color:var(--dim)}
 .addpack .pe{color:var(--y)}
+.goldc{font-family:var(--f-display);color:var(--y);font-size:.95rem;padding:2px 10px;border-radius:999px;background:#2e2512}
+.goldline{color:var(--y);font-weight:800;margin:0}
+.inv{display:flex;flex-wrap:wrap;gap:6px;justify-content:center;align-items:center}
+.invchip{padding:4px 10px;border-radius:999px;background:#122a3a;color:var(--ghost);font-weight:700;font-size:.85rem}
+.shopgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px}
+.shopitem{display:grid;gap:4px;text-align:left;padding:12px;border-radius:16px;background:var(--wall2);border:2px solid var(--line)}
+.shopitem .e{font-size:1.9rem;line-height:1}
+.shopitem b{font-family:var(--f-display);font-weight:400}
+.shopitem small{color:var(--dim);font-size:.8rem}
+.shopitem .sp,.shelfitem .sp{display:flex;justify-content:space-between;gap:6px;align-items:center;margin-top:auto;font-size:.85rem}
+.shopitem .sp{flex-direction:column;align-items:flex-start;gap:2px}
+.shopitem .price,.shelfitem .price{white-space:nowrap}
+.shopitem .price,.shelfitem .price{color:var(--y);font-weight:800}
+.shopitem .why{color:var(--dim);font-size:.75rem}
+.shopitem:not([disabled]):hover{border-color:var(--y)}
+.shopitem[disabled]{opacity:.45;cursor:not-allowed}
+.shelf{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:12px;width:100%}
+.shelfitem{display:grid;gap:4px;text-align:left;padding:14px;border-radius:18px;background:var(--wall2);border:2px solid var(--line);font-size:clamp(.9rem,1.4vw,1.1rem)}
+.shelfitem .e{font-size:clamp(2rem,3.4vw,2.8rem);line-height:1}
+.shelfitem b{font-family:var(--f-display);font-weight:400;font-size:1.1em}
+.shelfitem small{color:var(--dim)}
+.shelfitem .stock{font-weight:700}
+.shelfitem.soldout{opacity:.35}
+.shelfitem.soldout .stock{color:var(--blood)}
+.pad.gone{opacity:.15;filter:grayscale(1)}
+.lampnote{margin:0;padding:8px 12px;border-radius:12px;background:#2e2512;color:var(--y);font-weight:700}
+.door.safe{outline:4px solid var(--y);outline-offset:3px}
+.door small{display:block;font-family:var(--f-body);font-size:.8rem}
+.joinhead{display:flex;gap:18px;align-items:center;justify-content:center;flex-wrap:wrap}
+.qr{margin:0;display:grid;gap:6px;justify-items:center}
+.qr svg{width:clamp(150px,16vw,220px);height:auto;border-radius:12px;display:block}
+.qr figcaption{font-size:.8rem;color:var(--dim);max-width:24ch;text-align:center}
 @keyframes pop{0%{transform:scale(.2);opacity:0}100%{transform:scale(1);opacity:1}}
 @keyframes pulse{50%{outline-color:var(--y)}}
 @keyframes shake{0%,100%{transform:translateX(0)}20%{transform:translateX(-14px) rotate(-2deg)}40%{transform:translateX(12px) rotate(2deg)}60%{transform:translateX(-8px)}80%{transform:translateX(6px)}}
@@ -303,6 +335,1254 @@ body.is-ghost .pbar{border-color:var(--ghost)}
 <div id="toasts"></div>
 <div id="floaters"></div>
 
+<script>
+/* QRCode for JavaScript, Copyright (c) 2009 Kazuhiko Arase, MIT license (via qrcode-terminal) */
+(function(){var M={},C={};function R(n){n=n.replace('./','');if(C[n])return C[n].exports;var m=C[n]={exports:{}};M[n](m,m.exports,R);return m.exports;}
+M['QR8bitByte']=function(module,exports,require){
+var QRMode = require('./QRMode');
+
+function QR8bitByte(data) {
+	this.mode = QRMode.MODE_8BIT_BYTE;
+	this.data = data;
+}
+
+QR8bitByte.prototype = {
+
+	getLength : function() {
+		return this.data.length;
+	},
+	
+	write : function(buffer) {
+		for (var i = 0; i < this.data.length; i++) {
+			// not JIS ...
+			buffer.put(this.data.charCodeAt(i), 8);
+		}
+	}
+};
+
+module.exports = QR8bitByte;
+
+};
+M['QRBitBuffer']=function(module,exports,require){
+function QRBitBuffer() {
+	this.buffer = [];
+	this.length = 0;
+}
+
+QRBitBuffer.prototype = {
+
+	get : function(index) {
+		var bufIndex = Math.floor(index / 8);
+		return ( (this.buffer[bufIndex] >>> (7 - index % 8) ) & 1) == 1;
+	},
+	
+	put : function(num, length) {
+		for (var i = 0; i < length; i++) {
+			this.putBit( ( (num >>> (length - i - 1) ) & 1) == 1);
+		}
+	},
+	
+	getLengthInBits : function() {
+		return this.length;
+	},
+	
+	putBit : function(bit) {
+	
+		var bufIndex = Math.floor(this.length / 8);
+		if (this.buffer.length <= bufIndex) {
+			this.buffer.push(0);
+		}
+	
+		if (bit) {
+			this.buffer[bufIndex] |= (0x80 >>> (this.length % 8) );
+		}
+	
+		this.length++;
+	}
+};
+
+module.exports = QRBitBuffer;
+
+};
+M['QRErrorCorrectLevel']=function(module,exports,require){
+module.exports = {
+	L : 1,
+	M : 0,
+	Q : 3,
+	H : 2
+};
+
+
+};
+M['QRMaskPattern']=function(module,exports,require){
+module.exports = {
+	PATTERN000 : 0,
+	PATTERN001 : 1,
+	PATTERN010 : 2,
+	PATTERN011 : 3,
+	PATTERN100 : 4,
+	PATTERN101 : 5,
+	PATTERN110 : 6,
+	PATTERN111 : 7
+};
+
+};
+M['QRMath']=function(module,exports,require){
+var QRMath = {
+
+	glog : function(n) {
+	
+		if (n < 1) {
+			throw new Error("glog(" + n + ")");
+		}
+		
+		return QRMath.LOG_TABLE[n];
+	},
+	
+	gexp : function(n) {
+	
+		while (n < 0) {
+			n += 255;
+		}
+	
+		while (n >= 256) {
+			n -= 255;
+		}
+	
+		return QRMath.EXP_TABLE[n];
+	},
+	
+	EXP_TABLE : new Array(256),
+	
+	LOG_TABLE : new Array(256)
+
+};
+	
+for (var i = 0; i < 8; i++) {
+	QRMath.EXP_TABLE[i] = 1 << i;
+}
+for (var i = 8; i < 256; i++) {
+	QRMath.EXP_TABLE[i] = QRMath.EXP_TABLE[i - 4]
+		^ QRMath.EXP_TABLE[i - 5]
+		^ QRMath.EXP_TABLE[i - 6]
+		^ QRMath.EXP_TABLE[i - 8];
+}
+for (var i = 0; i < 255; i++) {
+	QRMath.LOG_TABLE[QRMath.EXP_TABLE[i] ] = i;
+}
+
+module.exports = QRMath;
+
+};
+M['QRMode']=function(module,exports,require){
+module.exports = {
+    MODE_NUMBER :       1 << 0,
+    MODE_ALPHA_NUM :    1 << 1,
+    MODE_8BIT_BYTE :    1 << 2,
+    MODE_KANJI :        1 << 3
+};
+
+};
+M['QRPolynomial']=function(module,exports,require){
+var QRMath = require('./QRMath');
+
+function QRPolynomial(num, shift) {
+	if (num.length === undefined) {
+		throw new Error(num.length + "/" + shift);
+	}
+
+	var offset = 0;
+
+	while (offset < num.length && num[offset] === 0) {
+		offset++;
+	}
+
+	this.num = new Array(num.length - offset + shift);
+	for (var i = 0; i < num.length - offset; i++) {
+		this.num[i] = num[i + offset];
+	}
+}
+
+QRPolynomial.prototype = {
+
+	get : function(index) {
+		return this.num[index];
+	},
+	
+	getLength : function() {
+		return this.num.length;
+	},
+	
+	multiply : function(e) {
+	
+		var num = new Array(this.getLength() + e.getLength() - 1);
+	
+		for (var i = 0; i < this.getLength(); i++) {
+			for (var j = 0; j < e.getLength(); j++) {
+				num[i + j] ^= QRMath.gexp(QRMath.glog(this.get(i) ) + QRMath.glog(e.get(j) ) );
+			}
+		}
+	
+		return new QRPolynomial(num, 0);
+	},
+	
+	mod : function(e) {
+	
+		if (this.getLength() - e.getLength() < 0) {
+			return this;
+		}
+	
+		var ratio = QRMath.glog(this.get(0) ) - QRMath.glog(e.get(0) );
+	
+		var num = new Array(this.getLength() );
+		
+		for (var i = 0; i < this.getLength(); i++) {
+			num[i] = this.get(i);
+		}
+		
+		for (var x = 0; x < e.getLength(); x++) {
+			num[x] ^= QRMath.gexp(QRMath.glog(e.get(x) ) + ratio);
+		}
+	
+		// recursive call
+		return new QRPolynomial(num, 0).mod(e);
+	}
+};
+
+module.exports = QRPolynomial;
+
+};
+M['QRRSBlock']=function(module,exports,require){
+var QRErrorCorrectLevel = require('./QRErrorCorrectLevel');
+
+function QRRSBlock(totalCount, dataCount) {
+	this.totalCount = totalCount;
+	this.dataCount  = dataCount;
+}
+
+QRRSBlock.RS_BLOCK_TABLE = [
+
+	// L
+	// M
+	// Q
+	// H
+
+	// 1
+	[1, 26, 19],
+	[1, 26, 16],
+	[1, 26, 13],
+	[1, 26, 9],
+	
+	// 2
+	[1, 44, 34],
+	[1, 44, 28],
+	[1, 44, 22],
+	[1, 44, 16],
+
+	// 3
+	[1, 70, 55],
+	[1, 70, 44],
+	[2, 35, 17],
+	[2, 35, 13],
+
+	// 4		
+	[1, 100, 80],
+	[2, 50, 32],
+	[2, 50, 24],
+	[4, 25, 9],
+	
+	// 5
+	[1, 134, 108],
+	[2, 67, 43],
+	[2, 33, 15, 2, 34, 16],
+	[2, 33, 11, 2, 34, 12],
+	
+	// 6
+	[2, 86, 68],
+	[4, 43, 27],
+	[4, 43, 19],
+	[4, 43, 15],
+	
+	// 7		
+	[2, 98, 78],
+	[4, 49, 31],
+	[2, 32, 14, 4, 33, 15],
+	[4, 39, 13, 1, 40, 14],
+	
+	// 8
+	[2, 121, 97],
+	[2, 60, 38, 2, 61, 39],
+	[4, 40, 18, 2, 41, 19],
+	[4, 40, 14, 2, 41, 15],
+	
+	// 9
+	[2, 146, 116],
+	[3, 58, 36, 2, 59, 37],
+	[4, 36, 16, 4, 37, 17],
+	[4, 36, 12, 4, 37, 13],
+	
+	// 10		
+	[2, 86, 68, 2, 87, 69],
+	[4, 69, 43, 1, 70, 44],
+	[6, 43, 19, 2, 44, 20],
+	[6, 43, 15, 2, 44, 16],
+
+	// 11
+	[4, 101, 81],
+	[1, 80, 50, 4, 81, 51],
+	[4, 50, 22, 4, 51, 23],
+	[3, 36, 12, 8, 37, 13],
+
+	// 12
+	[2, 116, 92, 2, 117, 93],
+	[6, 58, 36, 2, 59, 37],
+	[4, 46, 20, 6, 47, 21],
+	[7, 42, 14, 4, 43, 15],
+
+	// 13
+	[4, 133, 107],
+	[8, 59, 37, 1, 60, 38],
+	[8, 44, 20, 4, 45, 21],
+	[12, 33, 11, 4, 34, 12],
+
+	// 14
+	[3, 145, 115, 1, 146, 116],
+	[4, 64, 40, 5, 65, 41],
+	[11, 36, 16, 5, 37, 17],
+	[11, 36, 12, 5, 37, 13],
+
+	// 15
+	[5, 109, 87, 1, 110, 88],
+	[5, 65, 41, 5, 66, 42],
+	[5, 54, 24, 7, 55, 25],
+	[11, 36, 12],
+
+	// 16
+	[5, 122, 98, 1, 123, 99],
+	[7, 73, 45, 3, 74, 46],
+	[15, 43, 19, 2, 44, 20],
+	[3, 45, 15, 13, 46, 16],
+
+	// 17
+	[1, 135, 107, 5, 136, 108],
+	[10, 74, 46, 1, 75, 47],
+	[1, 50, 22, 15, 51, 23],
+	[2, 42, 14, 17, 43, 15],
+
+	// 18
+	[5, 150, 120, 1, 151, 121],
+	[9, 69, 43, 4, 70, 44],
+	[17, 50, 22, 1, 51, 23],
+	[2, 42, 14, 19, 43, 15],
+
+	// 19
+	[3, 141, 113, 4, 142, 114],
+	[3, 70, 44, 11, 71, 45],
+	[17, 47, 21, 4, 48, 22],
+	[9, 39, 13, 16, 40, 14],
+
+	// 20
+	[3, 135, 107, 5, 136, 108],
+	[3, 67, 41, 13, 68, 42],
+	[15, 54, 24, 5, 55, 25],
+	[15, 43, 15, 10, 44, 16],
+
+	// 21
+	[4, 144, 116, 4, 145, 117],
+	[17, 68, 42],
+	[17, 50, 22, 6, 51, 23],
+	[19, 46, 16, 6, 47, 17],
+
+	// 22
+	[2, 139, 111, 7, 140, 112],
+	[17, 74, 46],
+	[7, 54, 24, 16, 55, 25],
+	[34, 37, 13],
+
+	// 23
+	[4, 151, 121, 5, 152, 122],
+	[4, 75, 47, 14, 76, 48],
+	[11, 54, 24, 14, 55, 25],
+	[16, 45, 15, 14, 46, 16],
+
+	// 24
+	[6, 147, 117, 4, 148, 118],
+	[6, 73, 45, 14, 74, 46],
+	[11, 54, 24, 16, 55, 25],
+	[30, 46, 16, 2, 47, 17],
+
+	// 25
+	[8, 132, 106, 4, 133, 107],
+	[8, 75, 47, 13, 76, 48],
+	[7, 54, 24, 22, 55, 25],
+	[22, 45, 15, 13, 46, 16],
+
+	// 26
+	[10, 142, 114, 2, 143, 115],
+	[19, 74, 46, 4, 75, 47],
+	[28, 50, 22, 6, 51, 23],
+	[33, 46, 16, 4, 47, 17],
+
+	// 27
+	[8, 152, 122, 4, 153, 123],
+	[22, 73, 45, 3, 74, 46],
+	[8, 53, 23, 26, 54, 24],
+	[12, 45, 15, 28, 46, 16],
+
+	// 28
+	[3, 147, 117, 10, 148, 118],
+	[3, 73, 45, 23, 74, 46],
+	[4, 54, 24, 31, 55, 25],
+	[11, 45, 15, 31, 46, 16],
+
+	// 29
+	[7, 146, 116, 7, 147, 117],
+	[21, 73, 45, 7, 74, 46],
+	[1, 53, 23, 37, 54, 24],
+	[19, 45, 15, 26, 46, 16],
+
+	// 30
+	[5, 145, 115, 10, 146, 116],
+	[19, 75, 47, 10, 76, 48],
+	[15, 54, 24, 25, 55, 25],
+	[23, 45, 15, 25, 46, 16],
+
+	// 31
+	[13, 145, 115, 3, 146, 116],
+	[2, 74, 46, 29, 75, 47],
+	[42, 54, 24, 1, 55, 25],
+	[23, 45, 15, 28, 46, 16],
+
+	// 32
+	[17, 145, 115],
+	[10, 74, 46, 23, 75, 47],
+	[10, 54, 24, 35, 55, 25],
+	[19, 45, 15, 35, 46, 16],
+
+	// 33
+	[17, 145, 115, 1, 146, 116],
+	[14, 74, 46, 21, 75, 47],
+	[29, 54, 24, 19, 55, 25],
+	[11, 45, 15, 46, 46, 16],
+
+	// 34
+	[13, 145, 115, 6, 146, 116],
+	[14, 74, 46, 23, 75, 47],
+	[44, 54, 24, 7, 55, 25],
+	[59, 46, 16, 1, 47, 17],
+
+	// 35
+	[12, 151, 121, 7, 152, 122],
+	[12, 75, 47, 26, 76, 48],
+	[39, 54, 24, 14, 55, 25],
+	[22, 45, 15, 41, 46, 16],
+
+	// 36
+	[6, 151, 121, 14, 152, 122],
+	[6, 75, 47, 34, 76, 48],
+	[46, 54, 24, 10, 55, 25],
+	[2, 45, 15, 64, 46, 16],
+
+	// 37
+	[17, 152, 122, 4, 153, 123],
+	[29, 74, 46, 14, 75, 47],
+	[49, 54, 24, 10, 55, 25],
+	[24, 45, 15, 46, 46, 16],
+
+	// 38
+	[4, 152, 122, 18, 153, 123],
+	[13, 74, 46, 32, 75, 47],
+	[48, 54, 24, 14, 55, 25],
+	[42, 45, 15, 32, 46, 16],
+
+	// 39
+	[20, 147, 117, 4, 148, 118],
+	[40, 75, 47, 7, 76, 48],
+	[43, 54, 24, 22, 55, 25],
+	[10, 45, 15, 67, 46, 16],
+
+	// 40
+	[19, 148, 118, 6, 149, 119],
+	[18, 75, 47, 31, 76, 48],
+	[34, 54, 24, 34, 55, 25],
+	[20, 45, 15, 61, 46, 16]
+];
+
+QRRSBlock.getRSBlocks = function(typeNumber, errorCorrectLevel) {
+	
+	var rsBlock = QRRSBlock.getRsBlockTable(typeNumber, errorCorrectLevel);
+	
+	if (rsBlock === undefined) {
+		throw new Error("bad rs block @ typeNumber:" + typeNumber + "/errorCorrectLevel:" + errorCorrectLevel);
+	}
+
+	var length = rsBlock.length / 3;
+	
+	var list = [];
+	
+	for (var i = 0; i < length; i++) {
+
+		var count = rsBlock[i * 3 + 0];
+		var totalCount = rsBlock[i * 3 + 1];
+		var dataCount  = rsBlock[i * 3 + 2];
+
+		for (var j = 0; j < count; j++) {
+			list.push(new QRRSBlock(totalCount, dataCount) );	
+		}
+	}
+	
+	return list;
+};
+
+QRRSBlock.getRsBlockTable = function(typeNumber, errorCorrectLevel) {
+
+	switch(errorCorrectLevel) {
+	case QRErrorCorrectLevel.L :
+		return QRRSBlock.RS_BLOCK_TABLE[(typeNumber - 1) * 4 + 0];
+	case QRErrorCorrectLevel.M :
+		return QRRSBlock.RS_BLOCK_TABLE[(typeNumber - 1) * 4 + 1];
+	case QRErrorCorrectLevel.Q :
+		return QRRSBlock.RS_BLOCK_TABLE[(typeNumber - 1) * 4 + 2];
+	case QRErrorCorrectLevel.H :
+		return QRRSBlock.RS_BLOCK_TABLE[(typeNumber - 1) * 4 + 3];
+	default :
+		return undefined;
+	}
+};
+
+module.exports = QRRSBlock;
+
+};
+M['QRUtil']=function(module,exports,require){
+var QRMode = require('./QRMode');
+var QRPolynomial = require('./QRPolynomial');
+var QRMath = require('./QRMath');
+var QRMaskPattern = require('./QRMaskPattern');
+
+var QRUtil = {
+
+    PATTERN_POSITION_TABLE : [
+        [],
+        [6, 18],
+        [6, 22],
+        [6, 26],
+        [6, 30],
+        [6, 34],
+        [6, 22, 38],
+        [6, 24, 42],
+        [6, 26, 46],
+        [6, 28, 50],
+        [6, 30, 54],        
+        [6, 32, 58],
+        [6, 34, 62],
+        [6, 26, 46, 66],
+        [6, 26, 48, 70],
+        [6, 26, 50, 74],
+        [6, 30, 54, 78],
+        [6, 30, 56, 82],
+        [6, 30, 58, 86],
+        [6, 34, 62, 90],
+        [6, 28, 50, 72, 94],
+        [6, 26, 50, 74, 98],
+        [6, 30, 54, 78, 102],
+        [6, 28, 54, 80, 106],
+        [6, 32, 58, 84, 110],
+        [6, 30, 58, 86, 114],
+        [6, 34, 62, 90, 118],
+        [6, 26, 50, 74, 98, 122],
+        [6, 30, 54, 78, 102, 126],
+        [6, 26, 52, 78, 104, 130],
+        [6, 30, 56, 82, 108, 134],
+        [6, 34, 60, 86, 112, 138],
+        [6, 30, 58, 86, 114, 142],
+        [6, 34, 62, 90, 118, 146],
+        [6, 30, 54, 78, 102, 126, 150],
+        [6, 24, 50, 76, 102, 128, 154],
+        [6, 28, 54, 80, 106, 132, 158],
+        [6, 32, 58, 84, 110, 136, 162],
+        [6, 26, 54, 82, 110, 138, 166],
+        [6, 30, 58, 86, 114, 142, 170]
+    ],
+
+    G15 : (1 << 10) | (1 << 8) | (1 << 5) | (1 << 4) | (1 << 2) | (1 << 1) | (1 << 0),
+    G18 : (1 << 12) | (1 << 11) | (1 << 10) | (1 << 9) | (1 << 8) | (1 << 5) | (1 << 2) | (1 << 0),
+    G15_MASK : (1 << 14) | (1 << 12) | (1 << 10)    | (1 << 4) | (1 << 1),
+
+    getBCHTypeInfo : function(data) {
+        var d = data << 10;
+        while (QRUtil.getBCHDigit(d) - QRUtil.getBCHDigit(QRUtil.G15) >= 0) {
+            d ^= (QRUtil.G15 << (QRUtil.getBCHDigit(d) - QRUtil.getBCHDigit(QRUtil.G15) ) );    
+        }
+        return ( (data << 10) | d) ^ QRUtil.G15_MASK;
+    },
+
+    getBCHTypeNumber : function(data) {
+        var d = data << 12;
+        while (QRUtil.getBCHDigit(d) - QRUtil.getBCHDigit(QRUtil.G18) >= 0) {
+            d ^= (QRUtil.G18 << (QRUtil.getBCHDigit(d) - QRUtil.getBCHDigit(QRUtil.G18) ) );    
+        }
+        return (data << 12) | d;
+    },
+
+    getBCHDigit : function(data) {
+
+        var digit = 0;
+
+        while (data !== 0) {
+            digit++;
+            data >>>= 1;
+        }
+
+        return digit;
+    },
+
+    getPatternPosition : function(typeNumber) {
+        return QRUtil.PATTERN_POSITION_TABLE[typeNumber - 1];
+    },
+
+    getMask : function(maskPattern, i, j) {
+        
+        switch (maskPattern) {
+            
+        case QRMaskPattern.PATTERN000 : return (i + j) % 2 === 0;
+        case QRMaskPattern.PATTERN001 : return i % 2 === 0;
+        case QRMaskPattern.PATTERN010 : return j % 3 === 0;
+        case QRMaskPattern.PATTERN011 : return (i + j) % 3 === 0;
+        case QRMaskPattern.PATTERN100 : return (Math.floor(i / 2) + Math.floor(j / 3) ) % 2 === 0;
+        case QRMaskPattern.PATTERN101 : return (i * j) % 2 + (i * j) % 3 === 0;
+        case QRMaskPattern.PATTERN110 : return ( (i * j) % 2 + (i * j) % 3) % 2 === 0;
+        case QRMaskPattern.PATTERN111 : return ( (i * j) % 3 + (i + j) % 2) % 2 === 0;
+
+        default :
+            throw new Error("bad maskPattern:" + maskPattern);
+        }
+    },
+
+    getErrorCorrectPolynomial : function(errorCorrectLength) {
+
+        var a = new QRPolynomial([1], 0);
+
+        for (var i = 0; i < errorCorrectLength; i++) {
+            a = a.multiply(new QRPolynomial([1, QRMath.gexp(i)], 0) );
+        }
+
+        return a;
+    },
+
+    getLengthInBits : function(mode, type) {
+
+        if (1 <= type && type < 10) {
+
+            // 1 - 9
+
+            switch(mode) {
+            case QRMode.MODE_NUMBER     : return 10;
+            case QRMode.MODE_ALPHA_NUM  : return 9;
+            case QRMode.MODE_8BIT_BYTE  : return 8;
+            case QRMode.MODE_KANJI      : return 8;
+            default :
+                throw new Error("mode:" + mode);
+            }
+
+        } else if (type < 27) {
+
+            // 10 - 26
+
+            switch(mode) {
+            case QRMode.MODE_NUMBER     : return 12;
+            case QRMode.MODE_ALPHA_NUM  : return 11;
+            case QRMode.MODE_8BIT_BYTE  : return 16;
+            case QRMode.MODE_KANJI      : return 10;
+            default :
+                throw new Error("mode:" + mode);
+            }
+
+        } else if (type < 41) {
+
+            // 27 - 40
+
+            switch(mode) {
+            case QRMode.MODE_NUMBER     : return 14;
+            case QRMode.MODE_ALPHA_NUM  : return 13;
+            case QRMode.MODE_8BIT_BYTE  : return 16;
+            case QRMode.MODE_KANJI      : return 12;
+            default :
+                throw new Error("mode:" + mode);
+            }
+
+        } else {
+            throw new Error("type:" + type);
+        }
+    },
+
+    getLostPoint : function(qrCode) {
+        
+        var moduleCount = qrCode.getModuleCount();
+        var lostPoint = 0;
+        var row = 0; 
+        var col = 0;
+
+        
+        // LEVEL1
+        
+        for (row = 0; row < moduleCount; row++) {
+
+            for (col = 0; col < moduleCount; col++) {
+
+                var sameCount = 0;
+                var dark = qrCode.isDark(row, col);
+
+                for (var r = -1; r <= 1; r++) {
+
+                    if (row + r < 0 || moduleCount <= row + r) {
+                        continue;
+                    }
+
+                    for (var c = -1; c <= 1; c++) {
+
+                        if (col + c < 0 || moduleCount <= col + c) {
+                            continue;
+                        }
+
+                        if (r === 0 && c === 0) {
+                            continue;
+                        }
+
+                        if (dark === qrCode.isDark(row + r, col + c) ) {
+                            sameCount++;
+                        }
+                    }
+                }
+
+                if (sameCount > 5) {
+                    lostPoint += (3 + sameCount - 5);
+                }
+            }
+        }
+
+        // LEVEL2
+
+        for (row = 0; row < moduleCount - 1; row++) {
+            for (col = 0; col < moduleCount - 1; col++) {
+                var count = 0;
+                if (qrCode.isDark(row,     col    ) ) count++;
+                if (qrCode.isDark(row + 1, col    ) ) count++;
+                if (qrCode.isDark(row,     col + 1) ) count++;
+                if (qrCode.isDark(row + 1, col + 1) ) count++;
+                if (count === 0 || count === 4) {
+                    lostPoint += 3;
+                }
+            }
+        }
+
+        // LEVEL3
+
+        for (row = 0; row < moduleCount; row++) {
+            for (col = 0; col < moduleCount - 6; col++) {
+                if (qrCode.isDark(row, col) && 
+                        !qrCode.isDark(row, col + 1) && 
+                         qrCode.isDark(row, col + 2) && 
+                         qrCode.isDark(row, col + 3) && 
+                         qrCode.isDark(row, col + 4) && 
+                        !qrCode.isDark(row, col + 5) && 
+                         qrCode.isDark(row, col + 6) ) {
+                    lostPoint += 40;
+                }
+            }
+        }
+
+        for (col = 0; col < moduleCount; col++) {
+            for (row = 0; row < moduleCount - 6; row++) {
+                if (qrCode.isDark(row, col) &&
+                        !qrCode.isDark(row + 1, col) &&
+                         qrCode.isDark(row + 2, col) &&
+                         qrCode.isDark(row + 3, col) &&
+                         qrCode.isDark(row + 4, col) &&
+                        !qrCode.isDark(row + 5, col) &&
+                         qrCode.isDark(row + 6, col) ) {
+                    lostPoint += 40;
+                }
+            }
+        }
+
+        // LEVEL4
+        
+        var darkCount = 0;
+
+        for (col = 0; col < moduleCount; col++) {
+            for (row = 0; row < moduleCount; row++) {
+                if (qrCode.isDark(row, col) ) {
+                    darkCount++;
+                }
+            }
+        }
+        
+        var ratio = Math.abs(100 * darkCount / moduleCount / moduleCount - 50) / 5;
+        lostPoint += ratio * 10;
+
+        return lostPoint;       
+    }
+
+};
+
+module.exports = QRUtil;
+
+};
+M['index']=function(module,exports,require){
+//---------------------------------------------------------------------
+// QRCode for JavaScript
+//
+// Modified to work in node for this project (and some refactoring)
+//---------------------------------------------------------------------
+
+var QR8bitByte = require('./QR8bitByte');
+var QRUtil = require('./QRUtil');
+var QRPolynomial = require('./QRPolynomial');
+var QRRSBlock = require('./QRRSBlock');
+var QRBitBuffer = require('./QRBitBuffer');
+
+function QRCode(typeNumber, errorCorrectLevel) {
+	this.typeNumber = typeNumber;
+	this.errorCorrectLevel = errorCorrectLevel;
+	this.modules = null;
+	this.moduleCount = 0;
+	this.dataCache = null;
+	this.dataList = [];
+}
+
+QRCode.prototype = {
+	
+	addData : function(data) {
+		var newData = new QR8bitByte(data);
+		this.dataList.push(newData);
+		this.dataCache = null;
+	},
+	
+	isDark : function(row, col) {
+		if (row < 0 || this.moduleCount <= row || col < 0 || this.moduleCount <= col) {
+			throw new Error(row + "," + col);
+		}
+		return this.modules[row][col];
+	},
+
+	getModuleCount : function() {
+		return this.moduleCount;
+	},
+	
+	make : function() {
+		// Calculate automatically typeNumber if provided is < 1
+		if (this.typeNumber < 1 ){
+			var typeNumber = 1;
+			for (typeNumber = 1; typeNumber < 40; typeNumber++) {
+				var rsBlocks = QRRSBlock.getRSBlocks(typeNumber, this.errorCorrectLevel);
+
+				var buffer = new QRBitBuffer();
+				var totalDataCount = 0;
+				for (var i = 0; i < rsBlocks.length; i++) {
+					totalDataCount += rsBlocks[i].dataCount;
+				}
+
+				for (var x = 0; x < this.dataList.length; x++) {
+					var data = this.dataList[x];
+					buffer.put(data.mode, 4);
+					buffer.put(data.getLength(), QRUtil.getLengthInBits(data.mode, typeNumber) );
+					data.write(buffer);
+				}
+				if (buffer.getLengthInBits() <= totalDataCount * 8)
+					break;
+			}
+			this.typeNumber = typeNumber;
+		}
+		this.makeImpl(false, this.getBestMaskPattern() );
+	},
+	
+	makeImpl : function(test, maskPattern) {
+		
+		this.moduleCount = this.typeNumber * 4 + 17;
+		this.modules = new Array(this.moduleCount);
+		
+		for (var row = 0; row < this.moduleCount; row++) {
+			
+			this.modules[row] = new Array(this.moduleCount);
+			
+			for (var col = 0; col < this.moduleCount; col++) {
+				this.modules[row][col] = null;//(col + row) % 3;
+			}
+		}
+	
+		this.setupPositionProbePattern(0, 0);
+		this.setupPositionProbePattern(this.moduleCount - 7, 0);
+		this.setupPositionProbePattern(0, this.moduleCount - 7);
+		this.setupPositionAdjustPattern();
+		this.setupTimingPattern();
+		this.setupTypeInfo(test, maskPattern);
+		
+		if (this.typeNumber >= 7) {
+			this.setupTypeNumber(test);
+		}
+	
+		if (this.dataCache === null) {
+			this.dataCache = QRCode.createData(this.typeNumber, this.errorCorrectLevel, this.dataList);
+		}
+	
+		this.mapData(this.dataCache, maskPattern);
+	},
+
+	setupPositionProbePattern : function(row, col)  {
+		
+		for (var r = -1; r <= 7; r++) {
+			
+			if (row + r <= -1 || this.moduleCount <= row + r) continue;
+			
+			for (var c = -1; c <= 7; c++) {
+				
+				if (col + c <= -1 || this.moduleCount <= col + c) continue;
+				
+				if ( (0 <= r && r <= 6 && (c === 0 || c === 6) ) || 
+                     (0 <= c && c <= 6 && (r === 0 || r === 6) ) || 
+                     (2 <= r && r <= 4 && 2 <= c && c <= 4) ) {
+					this.modules[row + r][col + c] = true;
+				} else {
+					this.modules[row + r][col + c] = false;
+				}
+			}		
+		}		
+	},
+	
+	getBestMaskPattern : function() {
+	
+		var minLostPoint = 0;
+		var pattern = 0;
+	
+		for (var i = 0; i < 8; i++) {
+			
+			this.makeImpl(true, i);
+	
+			var lostPoint = QRUtil.getLostPoint(this);
+	
+			if (i === 0 || minLostPoint >  lostPoint) {
+				minLostPoint = lostPoint;
+				pattern = i;
+			}
+		}
+	
+		return pattern;
+	},
+	
+	createMovieClip : function(target_mc, instance_name, depth) {
+	
+		var qr_mc = target_mc.createEmptyMovieClip(instance_name, depth);
+		var cs = 1;
+	
+		this.make();
+
+		for (var row = 0; row < this.modules.length; row++) {
+			
+			var y = row * cs;
+			
+			for (var col = 0; col < this.modules[row].length; col++) {
+	
+				var x = col * cs;
+				var dark = this.modules[row][col];
+			
+				if (dark) {
+					qr_mc.beginFill(0, 100);
+					qr_mc.moveTo(x, y);
+					qr_mc.lineTo(x + cs, y);
+					qr_mc.lineTo(x + cs, y + cs);
+					qr_mc.lineTo(x, y + cs);
+					qr_mc.endFill();
+				}
+			}
+		}
+		
+		return qr_mc;
+	},
+
+	setupTimingPattern : function() {
+		
+		for (var r = 8; r < this.moduleCount - 8; r++) {
+			if (this.modules[r][6] !== null) {
+				continue;
+			}
+			this.modules[r][6] = (r % 2 === 0);
+		}
+	
+		for (var c = 8; c < this.moduleCount - 8; c++) {
+			if (this.modules[6][c] !== null) {
+				continue;
+			}
+			this.modules[6][c] = (c % 2 === 0);
+		}
+	},
+	
+	setupPositionAdjustPattern : function() {
+	
+		var pos = QRUtil.getPatternPosition(this.typeNumber);
+		
+		for (var i = 0; i < pos.length; i++) {
+		
+			for (var j = 0; j < pos.length; j++) {
+			
+				var row = pos[i];
+				var col = pos[j];
+				
+				if (this.modules[row][col] !== null) {
+					continue;
+				}
+				
+				for (var r = -2; r <= 2; r++) {
+				
+					for (var c = -2; c <= 2; c++) {
+					
+						if (Math.abs(r) === 2 || 
+                            Math.abs(c) === 2 ||
+                            (r === 0 && c === 0) ) {
+							this.modules[row + r][col + c] = true;
+						} else {
+							this.modules[row + r][col + c] = false;
+						}
+					}
+				}
+			}
+		}
+	},
+	
+	setupTypeNumber : function(test) {
+	
+		var bits = QRUtil.getBCHTypeNumber(this.typeNumber);
+        var mod;
+	
+		for (var i = 0; i < 18; i++) {
+			mod = (!test && ( (bits >> i) & 1) === 1);
+			this.modules[Math.floor(i / 3)][i % 3 + this.moduleCount - 8 - 3] = mod;
+		}
+	
+		for (var x = 0; x < 18; x++) {
+			mod = (!test && ( (bits >> x) & 1) === 1);
+			this.modules[x % 3 + this.moduleCount - 8 - 3][Math.floor(x / 3)] = mod;
+		}
+	},
+	
+	setupTypeInfo : function(test, maskPattern) {
+	
+		var data = (this.errorCorrectLevel << 3) | maskPattern;
+		var bits = QRUtil.getBCHTypeInfo(data);
+        var mod;
+	
+		// vertical		
+		for (var v = 0; v < 15; v++) {
+	
+			mod = (!test && ( (bits >> v) & 1) === 1);
+	
+			if (v < 6) {
+				this.modules[v][8] = mod;
+			} else if (v < 8) {
+				this.modules[v + 1][8] = mod;
+			} else {
+				this.modules[this.moduleCount - 15 + v][8] = mod;
+			}
+		}
+	
+		// horizontal
+		for (var h = 0; h < 15; h++) {
+	
+			mod = (!test && ( (bits >> h) & 1) === 1);
+			
+			if (h < 8) {
+				this.modules[8][this.moduleCount - h - 1] = mod;
+			} else if (h < 9) {
+				this.modules[8][15 - h - 1 + 1] = mod;
+			} else {
+				this.modules[8][15 - h - 1] = mod;
+			}
+		}
+	
+		// fixed module
+		this.modules[this.moduleCount - 8][8] = (!test);
+	
+	},
+	
+	mapData : function(data, maskPattern) {
+		
+		var inc = -1;
+		var row = this.moduleCount - 1;
+		var bitIndex = 7;
+		var byteIndex = 0;
+		
+		for (var col = this.moduleCount - 1; col > 0; col -= 2) {
+	
+			if (col === 6) col--;
+	
+			while (true) {
+	
+				for (var c = 0; c < 2; c++) {
+					
+					if (this.modules[row][col - c] === null) {
+						
+						var dark = false;
+	
+						if (byteIndex < data.length) {
+							dark = ( ( (data[byteIndex] >>> bitIndex) & 1) === 1);
+						}
+	
+						var mask = QRUtil.getMask(maskPattern, row, col - c);
+	
+						if (mask) {
+							dark = !dark;
+						}
+						
+						this.modules[row][col - c] = dark;
+						bitIndex--;
+	
+						if (bitIndex === -1) {
+							byteIndex++;
+							bitIndex = 7;
+						}
+					}
+				}
+								
+				row += inc;
+	
+				if (row < 0 || this.moduleCount <= row) {
+					row -= inc;
+					inc = -inc;
+					break;
+				}
+			}
+		}
+		
+	}
+
+};
+
+QRCode.PAD0 = 0xEC;
+QRCode.PAD1 = 0x11;
+
+QRCode.createData = function(typeNumber, errorCorrectLevel, dataList) {
+	
+	var rsBlocks = QRRSBlock.getRSBlocks(typeNumber, errorCorrectLevel);
+	
+	var buffer = new QRBitBuffer();
+	
+	for (var i = 0; i < dataList.length; i++) {
+		var data = dataList[i];
+		buffer.put(data.mode, 4);
+		buffer.put(data.getLength(), QRUtil.getLengthInBits(data.mode, typeNumber) );
+		data.write(buffer);
+	}
+
+	// calc num max data.
+	var totalDataCount = 0;
+	for (var x = 0; x < rsBlocks.length; x++) {
+		totalDataCount += rsBlocks[x].dataCount;
+	}
+
+	if (buffer.getLengthInBits() > totalDataCount * 8) {
+		throw new Error("code length overflow. (" + 
+            buffer.getLengthInBits() + 
+            ">" +  
+            totalDataCount * 8 + 
+            ")");
+	}
+
+	// end code
+	if (buffer.getLengthInBits() + 4 <= totalDataCount * 8) {
+		buffer.put(0, 4);
+	}
+
+	// padding
+	while (buffer.getLengthInBits() % 8 !== 0) {
+		buffer.putBit(false);
+	}
+
+	// padding
+	while (true) {
+		
+		if (buffer.getLengthInBits() >= totalDataCount * 8) {
+			break;
+		}
+		buffer.put(QRCode.PAD0, 8);
+		
+		if (buffer.getLengthInBits() >= totalDataCount * 8) {
+			break;
+		}
+		buffer.put(QRCode.PAD1, 8);
+	}
+
+	return QRCode.createBytes(buffer, rsBlocks);
+};
+
+QRCode.createBytes = function(buffer, rsBlocks) {
+
+	var offset = 0;
+	
+	var maxDcCount = 0;
+	var maxEcCount = 0;
+	
+	var dcdata = new Array(rsBlocks.length);
+	var ecdata = new Array(rsBlocks.length);
+	
+	for (var r = 0; r < rsBlocks.length; r++) {
+
+		var dcCount = rsBlocks[r].dataCount;
+		var ecCount = rsBlocks[r].totalCount - dcCount;
+
+		maxDcCount = Math.max(maxDcCount, dcCount);
+		maxEcCount = Math.max(maxEcCount, ecCount);
+		
+		dcdata[r] = new Array(dcCount);
+		
+		for (var i = 0; i < dcdata[r].length; i++) {
+			dcdata[r][i] = 0xff & buffer.buffer[i + offset];
+		}
+		offset += dcCount;
+		
+		var rsPoly = QRUtil.getErrorCorrectPolynomial(ecCount);
+		var rawPoly = new QRPolynomial(dcdata[r], rsPoly.getLength() - 1);
+
+		var modPoly = rawPoly.mod(rsPoly);
+		ecdata[r] = new Array(rsPoly.getLength() - 1);
+		for (var x = 0; x < ecdata[r].length; x++) {
+            var modIndex = x + modPoly.getLength() - ecdata[r].length;
+			ecdata[r][x] = (modIndex >= 0)? modPoly.get(modIndex) : 0;
+		}
+
+	}
+	
+	var totalCodeCount = 0;
+	for (var y = 0; y < rsBlocks.length; y++) {
+		totalCodeCount += rsBlocks[y].totalCount;
+	}
+
+	var data = new Array(totalCodeCount);
+	var index = 0;
+
+	for (var z = 0; z < maxDcCount; z++) {
+		for (var s = 0; s < rsBlocks.length; s++) {
+			if (z < dcdata[s].length) {
+				data[index++] = dcdata[s][z];
+			}
+		}
+	}
+
+	for (var xx = 0; xx < maxEcCount; xx++) {
+		for (var t = 0; t < rsBlocks.length; t++) {
+			if (xx < ecdata[t].length) {
+				data[index++] = ecdata[t][xx];
+			}
+		}
+	}
+
+	return data;
+
+};
+
+module.exports = QRCode;
+
+};
+window.QRCodeLib=R('index');window.QRCodeLib.ECL=R('QRErrorCorrectLevel');})();
+</script>
 <script>
 "use strict";
 /* ================= utilities ================= */
@@ -817,8 +2097,23 @@ const CARDS = {
   hidaste:  {emoji: '🐌', name: 'Hidaste', desc: 'Puolittaa kohteen vastausajan', w: 3},
   pyorre:   {emoji: '🌀', name: 'Pyörremyrsky', desc: 'Kohteen napit vaihtavat paikkaa', w: 3},
   jaa:      {emoji: '🧊', name: 'Jäädytys', desc: 'Kohde ei voi vastata 4 sekuntiin', w: 3},
-  kilpi:    {emoji: '🛡️', name: 'Kilpi', desc: 'Torjuu seuraavan kiusan ja palauttaa sen. Toimii itsestään.', w: 2, passive: true},
 };
+const ATK = ['muste', 'peili', 'pyorre', 'hidaste', 'jaa'];
+const SHOP = {
+  muste:      {g: 'atk', price: 150}, peili: {g: 'atk', price: 150}, pyorre: {g: 'atk', price: 250}, hidaste: {g: 'atk', price: 300}, jaa: {g: 'atk', price: 350},
+  mysteeri:   {g: 'atk', price: 100, emoji: '🎁', name: 'Mysteerilaatikko', desc: 'Satunnainen kiusakortti'},
+  amuletti:   {g: 'shield', price: 100, emoji: '🧿', name: 'Amuletti', desc: 'Torjuu yhden valitsemasi kiusatyypin'},
+  kilpi:      {g: 'shield', price: 250, emoji: '🛡️', name: 'Kilpi', desc: 'Torjuu minkä tahansa kiusan'},
+  peilikilpi: {g: 'shield', price: 350, emoji: '🔁', name: 'Peilikilpi', desc: 'Palauttaa kiusan lähettäjälle'},
+  ansa:       {g: 'shield', price: 150, emoji: '🪤', name: 'Ansa', desc: 'Kiusa osuu, mutta kiusaaja maksaa sinulle 200 kultaa'},
+  lyhty:      {g: 'cellar', price: 200, emoji: '🏮', name: 'Lyhty', desc: 'Helpottaa seuraavaa kellaripeliä'},
+  avain:      {g: 'cellar', price: 450, emoji: '🗝️', name: 'Kellariavain', desc: 'Pääset kerran kellarista ilman minipeliä'},
+  henki:      {g: 'cellar', price: 600, emoji: '❤️', name: 'Toinen henki', desc: 'Jos häviät kellarissa, et muutu haamuksi'},
+  murtaja:    {g: 'flag', price: 300, emoji: '🔨', name: 'Murtaja', desc: 'Seuraava kiusasi läpäisee kaikki suojat'},
+  tupla:      {g: 'flag', price: 400, emoji: '✖️', name: 'Tuplaus', desc: 'Seuraavan kysymyksen pisteet tuplana'},
+  fifty:      {g: 'flag', price: 250, emoji: '✂️', name: '50/50', desc: 'Kaksi väärää vaihtoehtoa katoaa seuraavassa monivalinnassa'},
+};
+ATK.forEach(k => Object.assign(SHOP[k], {emoji: CARDS[k].emoji, name: CARDS[k].name, desc: CARDS[k].desc}));
 const MG = {
   reaktio: {name: 'Sähkötuoli', emoji: '⚡', desc: 'Paina, kun ruutu muuttuu vihreäksi. Liian aikaisin painanut ja hitain kuolevat.', dur: 11000},
   muisti:  {name: 'Kummitusurut', emoji: '🎹', desc: 'Urut soittavat viiden värin sarjan. Toista se. Yksikin virhe on kohtalokas.', dur: 26000},
@@ -843,6 +2138,7 @@ const QUIPS = {
   orderBad: ['{n} sekoitti aikajanan. Kellarimestari vihaa sekasotkua.', '{n}, historia ei mennyt ihan noin. Kellariin.'],
   tfBad: ['{n} uskoi tarinoita. Kellarissa niitä kerrotaan lisää.', 'Eniten virheitä: {n}. Portaat ovat tuolla.'],
   listBad: ['{n} keksi vähiten. Kellarissa on aikaa miettiä.', '{n}, lista jäi lyhyeksi. Kellari ei.'],
+  shop: ['Kellarimestarin puoti on auki! Kulta vaihtaa omistajaa, omatunto ei.', 'Ostakaa, ostakaa! Hyvä kiusa on kullan arvoinen.', 'Puoti on auki. Suoja on halvempi kuin kosto. Tai sitten ei.'],
   farthest: ['{n} arvasi kauimmas. Kellari kutsuu.', '{n}, tuo ei ollut edes lähellä. Portaat ovat tuolla.', 'Kauimpana {n}. Kellarimestari kiittää.'],
   win: ['{n} pakeni kartanosta! Muut jäävät tänne iäksi. Tai siihen asti, kun kello soi.'],
 };
@@ -980,7 +2276,7 @@ function onJoin(connId, d) {
   renderHost(); sync();
 }
 function newPlayer(id, name, emoji, bot = false) {
-  const p = {id, name, emoji, bot, score: 0, ghost: false, cards: [], effects: {}, answer: null, answerT: 0, bet: 0,
+  const p = {id, name, emoji, bot, score: 0, ghost: false, cards: [], effects: {}, answer: null, answerT: 0, bet: 0, gold: 300, shield: null, cellarItem: null, flags: {},
              deadline: 0, lockUntil: 0, pos: 0, conn: null, connected: false, delta: 0, stealTarget: null, lastReact: 0};
   G.players[id] = p; G.order.push(id); return p;
 }
@@ -999,7 +2295,7 @@ function viewFor(p) {
   const v = {t: 'view', key: phaseKey(), phase: G.phase, code: G.code, qi: G.qi, rounds: G.settings.rounds, finale: G.finale, fq: G.fq,
     remain: G.phaseEnd ? Math.max(0, G.phaseEnd - now) : 0, dur: G.phaseDur,
     me: {id: p.id, name: p.name, emoji: p.emoji, score: p.score, ghost: p.ghost, cards: p.cards, pos: p.pos, answered: p.answer != null,
-         incoming: Object.entries(p.effects).map(([k, by]) => ({k, by}))},
+         incoming: Object.entries(p.effects).map(([k, by]) => ({k, by})), gold: p.gold || 0, shield: p.shield, cellarItem: p.cellarItem, flags: p.flags || {}, shopDone: !!p.shopDone},
     players: plist().map(x => ({id: x.id, name: x.name, emoji: x.emoji, score: x.score, ghost: x.ghost, pos: x.pos})),
     quip: G.quip};
   if (G.phase === 'prep') { v.round = G.finale ? 'pako' : G.roundType; v.cat = G.cur.cat; v.bet = p.bet; }
@@ -1007,6 +2303,7 @@ function viewFor(p) {
     v.round = G.finale ? 'pako' : G.roundType;
     v.q = G.cur.q; v.opts = G.cur.opts; v.cat = G.cur.cat; v.answer = p.answer; v.num = !!G.cur.num; v.kind = G.cur.kind || 'mc';
     if (v.kind === 'order') v.items = G.cur.items;
+    v.hide = p.hide || []; v.tupla = !!p.tuplaNow;
     if (v.kind === 'tf') { v.statements = G.cur.sts.map(x => x.s); v.tfDone = (p.tfAns || []).length; }
     if (v.kind === 'list') { v.myList = (p.list || []).map(x => ({txt: x.txt, ok: x.ok, dup: x.dup})); v.listTotal = G.cur.answers.length; }
     v.myRemain = Math.max(0, p.deadline - now); v.myDur = p.deadline - G.qStart; v.lockRemain = Math.max(0, p.lockUntil - now);
@@ -1015,11 +2312,12 @@ function viewFor(p) {
     v.q = G.cur.q; v.opts = G.cur.opts; v.correct = G.cur.correct; v.answer = p.answer; v.delta = p.delta;
     v.toCellar = G.cellar.includes(p.id); v.finaleMove = p.move || 0;
     if (G.cur.num) { v.num = true; v.ans = G.cur.ans; v.rank = p.rank; v.diff = p.diff; v.guessers = plist().filter(x => x.answer != null).length; }
-    v.kind = G.cur.kind || 'mc';
+    v.kind = G.cur.kind || 'mc'; v.goldGain = p.goldGain || 0; v.tupla = !!p.tuplaNow;
     if (v.kind === 'order') { v.solved = G.cur.sol.map(i => ({t: G.cur.items[i], note: G.cur.notes[i]})); v.oc = p.oc; v.n = G.cur.items.length; v.answered = Array.isArray(p.answer); }
     if (v.kind === 'tf') { v.sts = G.cur.sts.map((x, i) => ({s: x.s, v: x.v, e: x.e, mine: (p.tfAns || [])[i]})); v.oc = p.oc; }
     if (v.kind === 'list') { v.okCount = p.okCount; v.uniq = p.uniq; const mine = new Set((p.list || []).filter(x => x.ok).map(x => x.idx)); v.missed = G.cur.answers.filter((_, i) => !mine.has(i)).slice(0, 10); v.listTotal = G.cur.answers.length; }
   }
+  if (G.phase === 'shop' && G.shop) { v.tax = isLeader(p); v.shop = G.shop.items.map(it => ({k: it.k, stock: it.stock, price: priceFor(p, it.k), why: buyBlock(p, it.k, it), emoji: SHOP[it.k].emoji, name: SHOP[it.k].name, desc: SHOP[it.k].desc})); }
   if (G.phase === 'steal') { v.canSteal = G.cur.correct === p.answer && !p.stealTarget; v.stealTarget = p.stealTarget; }
   if (G.phase === 'cellar' || G.phase === 'minigame' || G.phase === 'mg_result') {
     v.inCellar = G.cellar.includes(p.id); v.cellarNames = G.cellar.map(id => G.players[id] && G.players[id].name).filter(Boolean);
@@ -1033,9 +2331,12 @@ function viewFor(p) {
     if (G.mg.type === 'varit') v.mg.seq = G.mg.seq;
     if (G.mg.type === 'kirstut' && G.mg.golds[p.id]) { const r = G.mg.results[p.id] || {}; const o = r.opened || 0; v.mg.chest = {opened: o, gold: r.gold || 0, trapped: !!r.trapped, final: !!r.final, golds: G.mg.golds[p.id].slice(0, r.trapped ? o - 1 : o)}; }
     if (G.mg.type === 'uhri') v.mg.score = p.score;
+    v.mg.lamp = !!(G.mg.lamps && G.mg.lamps[p.id]);
+    if (v.mg.lamp && G.mg.type === 'ovet') v.mg.safe = G.mg.safeHint[p.id];
+    if (v.mg.lamp && G.mg.type === 'kirstut') v.mg.trapAt = G.mg.traps[p.id];
     v.mg.submitted = !!(G.mg.results[p.id] && G.mg.results[p.id].final);
   }
-  if (G.phase === 'mg_result') { v.died = G.lastDeaths.includes(p.id); v.deadNames = G.lastDeaths.map(id => G.players[id].name); }
+  if (G.phase === 'mg_result') { v.saved = (G.saved || []).includes(p.id); v.died = G.lastDeaths.includes(p.id); v.deadNames = G.lastDeaths.map(id => G.players[id].name); }
   if (G.phase === 'end') { v.winner = G.winner ? {name: G.players[G.winner].name, emoji: G.players[G.winner].emoji} : null; v.iWon = G.winner === p.id; }
   return v;
 }
@@ -1106,14 +2407,34 @@ function makeQ(raw) {
   return {kind: 'mc', q: raw[0], opts, correct: opts.indexOf(correctText), cat: raw[5] || 'Sekalaiset'};
 }
 function dealCards(all) {
-  const pool = []; for (const [k, c] of Object.entries(CARDS)) for (let i = 0; i < c.w; i++) pool.push(k);
-  for (const p of plist()) {
-    const gets = p.ghost || all;
-    if (gets && p.cards.length < 2) p.cards.push(pick(pool));
-  }
+  for (const p of plist()) if ((p.ghost || all) && p.cards.length < 3) p.cards.push(pick(ATK));
+}
+/* ---------- shop ---------- */
+function isLeader(p) { const live = plist().filter(x => !x.ghost); const top = Math.max(0, ...live.map(x => x.score)); return !p.ghost && top > 0 && p.score === top; }
+function priceFor(p, k) { let pr = SHOP[k].price; if (p.ghost) pr = pr / 2; else if (isLeader(p)) pr = pr * 1.5; return Math.round(pr / 10) * 10; }
+function buyBlock(p, k, it) {
+  const S = SHOP[k];
+  if (it && it.stock <= 0) return 'Loppu';
+  if (p.ghost && S.g !== 'atk' && k !== 'murtaja') return 'Haamu ostaa vain kiusoja';
+  if (S.g === 'atk' && p.cards.length >= 3) return 'Kädessä on jo 3 korttia';
+  if (S.g === 'shield' && p.shield) return 'Sinulla on jo suoja';
+  if (S.g === 'cellar' && p.cellarItem) return 'Sinulla on jo kellarisuoja';
+  if (S.g === 'flag' && p.flags[k]) return 'Sinulla on jo tämä';
+  if ((p.gold || 0) < priceFor(p, k)) return 'Ei tarpeeksi kultaa';
+  return '';
+}
+function openShop() {
+  const keys = Object.keys(SHOP), byG = g => shuffle(keys.filter(k => SHOP[k].g === g));
+  const chosen = new Set([...byG('atk').slice(0, 2), byG('shield')[0], byG('cellar')[0]]);
+  for (const k of shuffle(keys)) { if (chosen.size >= 6) break; chosen.add(k); }
+  const stock = Math.max(2, Math.ceil(plist().length / 4));
+  G.shop = {items: [...chosen].map(k => ({k, stock}))};
+  for (const p of plist()) p.shopDone = false;
+  resetRoundState(); quip('shop');
+  setPhase('shop', 25000, nextQuestion);
 }
 function resetRoundState() {
-  for (const p of plist()) { p.answer = null; p.answerT = 0; p.bet = 0; p.effects = {}; p.delta = 0; p.stealTarget = null; p.move = 0; p.tfAns = []; p.list = []; p.oc = 0; p.okCount = 0; p.uniq = 0; }
+  for (const p of plist()) { p.answer = null; p.answerT = 0; p.bet = 0; p.effects = {}; p.delta = 0; p.stealTarget = null; p.move = 0; p.tfAns = []; p.list = []; p.oc = 0; p.okCount = 0; p.uniq = 0; p.goldGain = 0; p.tuplaNow = false; p.hide = []; }
 }
 function makeOrder(r) {
   const parsed = r[1].map(x => { const [t, note] = String(x).split('|'); return {t: t.trim(), note: (note || '').trim()}; });
@@ -1126,12 +2447,14 @@ function startGame() {
   if (!plist().length) { toast('Tarvitaan vähintään yksi pelaaja', '⚠️'); return; }
   audio(); SFX.start();
   G.qList = buildQuestions(); G.qi = 0; G.fq = 0; G.finale = false; G.winner = null; G.lastMg = null;
-  for (const p of plist()) { p.score = 0; p.ghost = false; p.cards = []; p.pos = 0; }
+  for (const p of plist()) { p.score = 0; p.ghost = false; p.cards = []; p.pos = 0; p.gold = 300; p.shield = null; p.cellarItem = null; p.flags = {}; }
+  G.shopAt = -1;
   resetRoundState(); dealCards(true);
   quip('intro');
   setPhase('intro', 7000, nextQuestion);
 }
 function nextQuestion() {
+  if (G.qi > 0 && (G.qi % 3 === 0 || G.qi >= G.settings.rounds) && G.shopAt !== G.qi) { G.shopAt = G.qi; return openShop(); }
   if (G.qi >= G.settings.rounds) return startFinale();
   resetRoundState();
   const types = ['nopein', 'nopein', 'pommi', 'ryosto'];
@@ -1154,7 +2477,7 @@ function nextQuestion() {
     G.cur = {kind: 'list', q: r[0], cat: r[2] || 'Lista', opts: [], answers: r[1].map(a => a.split('/')[0].trim()), norms: r[1].map(a => a.split('/').map(normTxt).filter(Boolean))};
   }
   else G.cur = makeQ(G.qList[G.qi]);
-  dealCards(G.qi % 2 === 0);
+  dealCards(false);
   quip('prep');
   setPhase('prep', G.roundType === 'pommi' ? 11000 : 9000, startQuestion);
 }
@@ -1165,6 +2488,9 @@ function startQuestion() {
   for (const p of plist()) {
     p.deadline = now + (p.effects.hidaste ? dur / 2 : dur);
     p.lockUntil = p.effects.jaa ? now + 4000 : 0;
+    p.hide = [];
+    if (p.flags && p.flags.fifty && G.cur.kind === 'mc' && G.cur.opts.length >= 4) { p.flags.fifty = false; p.hide = shuffle(G.cur.opts.map((_, i) => i).filter(i => i !== G.cur.correct)).slice(0, 2); }
+    p.tuplaNow = !!(p.flags && p.flags.tupla) && !G.finale; if (p.tuplaNow) p.flags.tupla = false;
   }
   speak(G.cur.q);
   setPhase('question', dur, G.finale ? finaleReveal : reveal);
@@ -1186,7 +2512,7 @@ function revealNum() {
       p.diff = Math.abs(p.answer - a); p.rank = diffs.indexOf(p.diff);
       d = (PTS[p.rank] ?? 100) + (p.diff === 0 ? 500 : 0);
     }
-    if (p.ghost) d = Math.round(d / 2);
+    if (p.ghost) d = Math.round(d / 2); if (p.tuplaNow && d > 0) d *= 2; p.goldGain = d > 0 ? Math.round(d / 5) : 0; p.gold = (p.gold || 0) + p.goldGain;
     p.score = Math.max(0, p.score + d); p.delta = d;
     if (!p.ghost && (p.bot || p.connected) && p.answer == null) G.cellar.push(p.id);
   }
@@ -1214,7 +2540,7 @@ function revealOrder() {
       p.oc = c.sol.filter((di, pos) => p.answer[pos] === di).length;
       d = p.oc === n ? 800 + Math.round(300 * Math.max(0, 1 - p.answerT / G.qDur)) : p.oc * 150;
     }
-    if (p.ghost) d = Math.round(d / 2);
+    if (p.ghost) d = Math.round(d / 2); if (p.tuplaNow && d > 0) d *= 2; p.goldGain = d > 0 ? Math.round(d / 5) : 0; p.gold = (p.gold || 0) + p.goldGain;
     p.score = Math.max(0, p.score + d); p.delta = d;
     if (alive(p) && (p.answer == null || p.oc <= 1)) G.cellar.push(p.id);
   }
@@ -1224,7 +2550,7 @@ function revealTf() {
   const sts = G.cur.sts; G.cellar = []; const n = sts.length;
   for (const p of plist()) {
     const a = p.tfAns || []; p.oc = sts.filter((s, i) => a[i] === s.v).length;
-    let d = p.oc * 150 + (p.oc === n ? 250 : 0); if (p.ghost) d = Math.round(d / 2);
+    let d = p.oc * 150 + (p.oc === n ? 250 : 0); if (p.ghost) d = Math.round(d / 2); if (p.tuplaNow && d > 0) d *= 2; p.goldGain = d > 0 ? Math.round(d / 5) : 0; p.gold = (p.gold || 0) + p.goldGain;
     p.score = Math.max(0, p.score + d); p.delta = d;
   }
   const live = plist().filter(alive);
@@ -1240,7 +2566,7 @@ function revealList() {
   for (const p of plist()) for (const x of p.list || []) if (x.ok) c.finders[x.idx].push(p.id);
   for (const p of plist()) {
     const oks = (p.list || []).filter(x => x.ok); p.okCount = oks.length; p.uniq = oks.filter(x => c.finders[x.idx].length === 1).length;
-    let d = p.okCount * 100 + p.uniq * 100; if (p.ghost) d = Math.round(d / 2);
+    let d = p.okCount * 100 + p.uniq * 100; if (p.ghost) d = Math.round(d / 2); if (p.tuplaNow && d > 0) d *= 2; p.goldGain = d > 0 ? Math.round(d / 5) : 0; p.gold = (p.gold || 0) + p.goldGain;
     p.score = Math.max(0, p.score + d); p.delta = d;
   }
   const live = plist().filter(alive);
@@ -1262,7 +2588,7 @@ function reveal() {
     if (rt === 'nopein') d = ok ? Math.round(400 + 600 * Math.max(0, 1 - p.answerT / G.qDur)) : 0;
     if (rt === 'pommi') d = ok ? 300 + p.bet : -p.bet;
     if (rt === 'ryosto') d = ok ? 300 : 0;
-    if (p.ghost) d = Math.round(d / 2);
+    if (p.ghost) d = Math.round(d / 2); if (p.tuplaNow && d > 0) d *= 2; p.goldGain = d > 0 ? Math.round(d / 5) : 0; p.gold = (p.gold || 0) + p.goldGain;
     p.score = Math.max(0, p.score + d); p.delta = d;
     if (!ok && !p.ghost && (p.bot || p.connected)) G.cellar.push(p.id);
   }
@@ -1285,6 +2611,9 @@ function resolveSteal() {
   goCellar();
 }
 function goCellar() {
+  const keyed = G.cellar.filter(id => G.players[id] && G.players[id].cellarItem === 'avain');
+  for (const id of keyed) { const p = G.players[id]; p.cellarItem = null; toast(`${p.name} avasi kellarin oven Kellariavaimella!`, '🗝️', true); }
+  G.cellar = G.cellar.filter(id => !keyed.includes(id));
   if (!G.cellar.length) { G.qi++; return nextQuestion(); }
   const types = Object.keys(MG).filter(t => t !== G.lastMg && (MG[t].min || 1) <= G.cellar.length);
   const type = G.forceMg && (MG[G.forceMg].min || 1) <= G.cellar.length ? G.forceMg : pick(types); G.lastMg = type;
@@ -1295,6 +2624,8 @@ function goCellar() {
   if (type === 'ovet') G.mg.trap = rnd(3);
   if (type === 'varit') G.mg.seq = Array.from({length: 10}, () => { const w = rnd(4); return {w, c: Math.random() < .85 ? (w + 1 + rnd(3)) % 4 : w}; });
   if (type === 'kirstut') { G.mg.golds = {}; G.mg.traps = {}; for (const id of G.cellar) { G.mg.golds[id] = Array.from({length: 8}, () => 60 + rnd(11) * 10); G.mg.traps[id] = 2 + rnd(6); } }
+  G.mg.lamps = {}; G.mg.safeHint = {};
+  for (const id of G.cellar) { const p = G.players[id]; if (p && p.cellarItem === 'lyhty') { p.cellarItem = null; G.mg.lamps[id] = true; if (type === 'ovet') G.mg.safeHint[id] = pick([0, 1, 2].filter(x => x !== G.mg.trap)); } }
   SFX.death();
   setPhase('cellar', 7000, () => setPhase('minigame', MG[type].dur, endMinigame));
 }
@@ -1329,9 +2660,17 @@ function mgLabel(type, r) {
 }
 function endMinigame() {
   const mg = G.mg, ids = G.cellar.filter(id => G.players[id]);
+  const adj = id => { const r = Object.assign({}, mg.results[id] || {});
+    if (mg.lamps && mg.lamps[id]) {
+      if (mg.type === 'reaktio' && r.ms != null && r.ms < 9999) r.ms = Math.max(0, r.ms - 150);
+      if (mg.type === 'matikka') r.count = Math.min(5, (r.count || 0) + 1);
+      if (mg.type === 'varit') r.count = Math.min(10, (r.count || 0) + 2);
+      if (mg.type === 'uhri') r.bidEff = (r.bid || 0) + 150;
+    }
+    return r; };
   const fail = new Set();
   for (const id of ids) {
-    const r = mg.results[id] || {};
+    const r = adj(id);
     if (mg.type === 'reaktio') { const ms = mgBad('reaktio', r); if (ms >= 9999 || (ids.length === 1 && ms > 450)) fail.add(id); }
     if (mg.type === 'muisti' && (r.count || 0) < 5) fail.add(id);
     if (mg.type === 'matikka' && (r.count || 0) < 4) fail.add(id);
@@ -1340,16 +2679,20 @@ function endMinigame() {
     if (mg.type === 'kirstut' && (r.gold || 0) < 400) fail.add(id);
   }
   if (mg.type === 'uhri' && ids.length) {
-    const bids = ids.map(id => (mg.results[id] && mg.results[id].bid) || 0), mn = Math.min(...bids);
-    ids.forEach((id, i) => { if (bids[i] === mn) fail.add(id); const p = G.players[id]; p.score = Math.max(0, p.score - bids[i]); });
-    const tot = bids.reduce((a, b) => a + b, 0); if (tot) toast(`Kellarimestari keräsi uhreina ${tot} pistettä`, '🕯️', true);
+    const eff = ids.map(id => { const r = adj(id); return r.bidEff != null ? r.bidEff : (r.bid || 0); }), mn = Math.min(...eff);
+    let tot = 0;
+    ids.forEach((id, i) => { if (eff[i] === mn) fail.add(id); const p = G.players[id], bid = (mg.results[id] && mg.results[id].bid) || 0; tot += bid; p.score = Math.max(0, p.score - bid); });
+    if (tot) toast(`Kellarimestari keräsi uhreina ${tot} pistettä`, '🕯️', true);
   }
   if (ids.length >= 2 && fail.size === 0 && mg.type !== 'ovet' && mg.type !== 'uhri') {
-    const worst = Math.max(...ids.map(id => mgBad(mg.type, mg.results[id])));
-    ids.filter(id => mgBad(mg.type, mg.results[id]) === worst).forEach(id => fail.add(id));
+    const worst = Math.max(...ids.map(id => mgBad(mg.type, adj(id))));
+    ids.filter(id => mgBad(mg.type, adj(id)) === worst).forEach(id => fail.add(id));
   }
+  G.saved = [];
+  for (const id of [...fail]) { const p = G.players[id]; if (p.cellarItem === 'henki') { p.cellarItem = null; fail.delete(id); G.saved.push(id); toast(`${p.name} käytti Toisen hengen ja selvisi!`, '❤️', true); } }
   G.lastDeaths = [...fail];
-  for (const id of fail) { const p = G.players[id]; p.ghost = true; if (p.cards.length < 2) p.cards.push('muste'); }
+  for (const id of ids) if (!fail.has(id)) G.players[id].gold = (G.players[id].gold || 0) + 100;
+  for (const id of fail) { const p = G.players[id]; p.ghost = true; p.shield = null; p.cellarItem = null; if (p.cards.length < 3) p.cards.push(pick(ATK)); }
   if (fail.size) { SFX.death(); quip('death', {n: G.lastDeaths.map(id => G.players[id].name).join(' ja ')}); }
   else { SFX.right(); quip('survive'); }
   setPhase('mg_result', 7500, () => { G.qi++; nextQuestion(); });
@@ -1360,14 +2703,15 @@ function startFinale() {
   G.finale = true; G.fq = 0; G.cellar = []; resetRoundState();
   const living = plist().filter(p => !p.ghost).sort((a, b) => b.score - a.score);
   for (const p of plist()) p.pos = p.ghost ? 0 : 2;
-  if (living[0]) living[0].pos = 3;
+  let rank = 0, prev = null;
+  living.forEach((p, i) => { if (p.score !== prev) { rank = i; prev = p.score; } p.pos = rank === 0 ? 4 : rank <= 2 ? 3 : 2; });
   quip('finale');
   setPhase('finale_intro', 9000, finaleQuestion);
 }
 function finaleQuestion() {
   resetRoundState(); G.roundType = 'nopein';
   G.cur = makeQ(G.qList[G.settings.rounds + G.fq] || pick(QBANK));
-  dealCards(true);
+  dealCards(false);
   setPhase('prep', 6000, startQuestion);
 }
 function finaleReveal() {
@@ -1404,16 +2748,31 @@ function handle(p, d) {
     const i = p.cards.indexOf(d.card); const t = G.players[d.target];
     if (i < 0 || !t || t.id === p.id || CARDS[d.card].passive) return;
     p.cards.splice(i, 1);
-    const c = CARDS[d.card];
-    const ki = t.cards.indexOf('kilpi');
-    if (ki >= 0) {
-      t.cards.splice(ki, 1); p.effects[d.card] = t.name;
-      toast(`${t.name} torjui kilvellä ja palautti ${c.name}-kortin pelaajalle ${p.name}!`, '🛡️', true);
-    } else {
-      t.effects[d.card] = p.name;
-      toast(`${p.name} → ${t.name}: ${c.name}`, c.emoji);
-    }
+    const c = CARDS[d.card], sh = t.shield;
+    const pierce = !!(p.flags && p.flags.murtaja); if (pierce) p.flags.murtaja = false;
+    const hit = () => { t.effects[d.card] = p.name; };
+    if (!sh) { hit(); toast(`${p.name} → ${t.name}: ${c.name}`, c.emoji); }
+    else if (pierce) { hit(); toast(`${p.name} murskasi suojan Murtajalla! ${c.name} osui pelaajaan ${t.name}.`, '🔨', true); }
+    else if (sh.k === 'kilpi' || (sh.k === 'amuletti' && sh.vs === d.card)) { t.shield = null; toast(`${t.name} torjui kiusan (${c.name}): ${SHOP[sh.k].name}!`, SHOP[sh.k].emoji, true); }
+    else if (sh.k === 'peilikilpi') { t.shield = null; p.effects[d.card] = t.name; toast(`${c.name} kimposi peilikilvestä takaisin! ${p.name} sai oman kiusansa.`, '🔁', true); }
+    else if (sh.k === 'ansa') { t.shield = null; hit(); const amt = Math.min(200, p.gold || 0); p.gold -= amt; t.gold = (t.gold || 0) + amt; toast(`${p.name} astui ansaan ja maksoi ${amt} kultaa pelaajalle ${t.name}! ${c.name} osui silti.`, '🪤', true); }
+    else { hit(); toast(`${p.name} → ${t.name}: ${c.name}`, c.emoji); }
     SFX.attack(); renderHost(); sync(); return;
+  }
+  if (d.t === 'buy' && G.phase === 'shop' && G.shop) {
+    const it = G.shop.items.find(x => x.k === d.k); if (!it || buyBlock(p, d.k, it)) return;
+    const S = SHOP[d.k]; p.gold -= priceFor(p, d.k); it.stock--;
+    if (d.k === 'mysteeri') p.cards.push(pick(ATK));
+    else if (S.g === 'atk') p.cards.push(d.k);
+    else if (S.g === 'shield') p.shield = {k: d.k, vs: d.k === 'amuletti' ? (ATK.includes(d.vs) ? d.vs : 'muste') : null};
+    else if (S.g === 'cellar') p.cellarItem = d.k;
+    else p.flags[d.k] = true;
+    toast(`${p.name} osti jotain… 👀`, '🛒'); SFX.join(); renderHost(); sync(); return;
+  }
+  if (d.t === 'shopdone' && G.phase === 'shop') {
+    p.shopDone = true; renderHost(); sync();
+    if (G.next && present().every(x => x.shopDone)) { clearTimeout(G.timer); const n = G.next; G.next = null; G.timer = setTimeout(n, 800); }
+    return;
   }
   if (d.t === 'bet' && G.phase === 'prep' && G.roundType === 'pommi' && !G.finale) {
     const amt = d.amount === 'all' ? p.score : Math.max(0, Math.min(Number(d.amount) || 0, p.score));
@@ -1506,6 +2865,11 @@ function botsAct() {
       const ok = Math.random() < .55; const n = G.cur.opts.length;
       handle(p, {t: 'answer', idx: ok ? G.cur.correct : (G.cur.correct + 1 + rnd(n - 1)) % n});
     });
+    if (G.phase === 'shop') {
+      const n = 1 + rnd(2);
+      for (let j = 0; j < n; j++) later(1500 + j * 3000 + rnd(3000), () => { const opts = G.shop.items.filter(it => !buyBlock(p, it.k, it)); if (opts.length) handle(p, {t: 'buy', k: pick(opts).k, vs: pick(ATK)}); });
+      later(9000 + rnd(5000), () => handle(p, {t: 'shopdone'}));
+    }
     if (G.phase === 'steal') later(1500 + rnd(3000), () => {
       const others = plist().filter(x => x.id !== p.id); if (others.length) handle(p, {t: 'steal', target: pick(others).id});
     });
@@ -1544,6 +2908,7 @@ function chipStatus(p) {
   if (G.phase === 'prep' && G.roundType === 'pommi' && !G.finale) return p.bet ? `<span class="st">💣${p.bet}</span>` : '';
   if (G.phase === 'reveal' && !G.finale && p.delta) return `<span class="st ${p.delta > 0 ? 'ok' : 'bad'}">${p.delta > 0 ? '+' : ''}${p.delta}</span>`;
   if (G.phase === 'steal' && p.stealTarget) return '<span class="st">🦝</span>';
+  if (G.phase === 'shop') return p.shopDone ? '<span class="st ok">✓</span>' : '<span class="st">🛒</span>';
   if (G.phase === 'minigame' && G.mg && G.mg.results[p.id] && G.mg.results[p.id].final) return '<span class="st ok">✓</span>';
   return '';
 }
@@ -1571,7 +2936,7 @@ function stageHTML() {
   switch (G.phase) {
     case 'lobby': return lobbyHTML();
     case 'intro': return `<div class="center"><div class="roundcard"><div class="em">🏚️</div><h2>Kaaoskartano</h2></div>${bubble()}
-      <p class="dim" style="max-width:60ch;margin:0">Väärä vastaus vie kellariin. Kellarissa hävinnyt muuttuu haamuksi. Haamut pelaavat silti ja saavat kiusakortin joka kierros. Lopussa kaikki juoksevat kohti uloskäyntiä.</p></div>`;
+      <p class="dim" style="max-width:62ch;margin:0">Väärä vastaus vie kellariin. Kellarissa hävinnyt muuttuu haamuksi, joka pelaa silti ja saa kiusakortin joka kierros. Pisteistä saa kultaa, jolla ostetaan kiusoja ja suojia Kellarimestarin puodista joka kolmannen kysymyksen jälkeen. Pisteet ratkaisevat finaalin lähtöpaikan.</p></div>`;
     case 'prep':
       if (G.finale) return `<div class="center"><div class="roundcard"><h2>Pakomatka · kysymys ${G.fq + 1}</h2><span class="cat">${esc(G.cur.cat)}</span><p>Pelaa kortit nyt. Nopein oikea vastaus etenee kaksi askelta.</p></div>${trackHTML()}${timerBar()}</div>`;
       return `<div class="center"><div class="label">Kysymys ${G.qi + 1} / ${G.settings.rounds}</div>
@@ -1586,6 +2951,9 @@ function stageHTML() {
       if (G.cur.kind === 'list') return listRevealHTML();
       return `<div class="center"><div class="qtext" style="font-size:clamp(1.3rem,2.6vw,2.2rem)">${esc(G.cur.q)}</div>${optsHTML(true)}
         ${G.finale ? trackHTML() : ''}${bubble()}</div>`;
+    case 'shop': return `<div class="center"><div class="roundcard"><div class="em">🛒</div><h2>Kellarimestarin puoti</h2><p>Osta kiusoja ja suojia kullalla omalla koneella. Ostokset ovat salaisia.</p></div>
+        <div class="shelf">${G.shop.items.map(it => { const S = SHOP[it.k]; return `<div class="shelfitem ${it.stock ? '' : 'soldout'}"><span class="e">${S.emoji}</span><b>${S.name}</b><small>${S.desc}</small><span class="sp"><span class="price">🪙 ${S.price}</span><span class="stock">${it.stock ? 'jäljellä ' + it.stock : 'LOPPU'}</span></span></div>`; }).join('')}</div>
+        <p class="dim" style="margin:0">Kärjessä oleva maksaa 50 % enemmän. Haamut ostavat kiusoja puoleen hintaan.</p>${bubble()}${timerBar()}</div>`;
     case 'steal': return `<div class="center"><div class="roundcard"><div class="em">🦝</div><h2>Ryöstöhetki</h2><p>Oikein vastanneet valitsevat nyt uhrinsa.</p></div>${timerBar()}</div>`;
     case 'cellar': {
       const m = MG[G.mg.type];
@@ -1602,10 +2970,10 @@ function stageHTML() {
       const m = MG[G.mg.type];
       return `<div class="center"><div class="mgname">${m.emoji} ${m.name}</div>
         ${G.mg.type === 'ovet' ? `<p style="margin:0;font-size:1.3rem">Kellarimestari odotti ovella <b>${G.mg.trap + 1}</b>.</p>` : ''}
-        <div class="victims">${G.cellar.map(id => { const p = G.players[id]; const dead = G.lastDeaths.includes(id); return `<div class="victim ${dead ? 'dead' : 'alive'}"><span class="av">${dead ? '👻' : p.emoji}</span>${esc(p.name)}<span class="res">${mgLabel(G.mg.type, G.mg.results[id])}</span><span>${dead ? 'HAAMU' : 'SELVISI'}</span></div>`; }).join('')}</div>${bubble()}</div>`;
+        <div class="victims">${G.cellar.map(id => { const p = G.players[id]; const dead = G.lastDeaths.includes(id); return `<div class="victim ${dead ? 'dead' : 'alive'}"><span class="av">${dead ? '👻' : p.emoji}</span>${esc(p.name)}<span class="res">${mgLabel(G.mg.type, G.mg.results[id])}${G.mg.lamps && G.mg.lamps[id] ? ' 🏮' : ''}</span><span>${dead ? 'HAAMU' : (G.saved || []).includes(id) ? 'SELVISI ❤️' : 'SELVISI'}</span></div>`; }).join('')}</div>${bubble()}</div>`;
     }
     case 'finale_intro': return `<div class="center"><div class="roundcard"><div class="em">🚪</div><h2>Pakomatka</h2>
-        <p>Oikea vastaus = askel kohti ovea. Nopein oikea = kaksi askelta. Haamu, joka saa elävän kiinni, herää henkiin. Ensimmäinen elävä ovella voittaa.</p></div>${trackHTML()}${bubble()}</div>`;
+        <p>Pisteet ratkaisivat lähtöpaikan: kärki ruudusta 4, kaksi seuraavaa ruudusta 3, muut ruudusta 2. Oikea vastaus = askel, nopein oikea = kaksi askelta. Haamu, joka saa elävän kiinni, herää henkiin. Ensimmäinen elävä ovella voittaa.</p></div>${trackHTML()}${bubble()}</div>`;
     case 'end': {
       const w = G.winner && G.players[G.winner];
       const ranking = plist().slice().sort((a, b) => (b.id === G.winner) - (a.id === G.winner) || b.pos - a.pos || b.score - a.score);
@@ -1662,12 +3030,20 @@ function numRevealHTML() {
       <span class="gv">${p.answer == null ? '–' : nfmt(p.answer)}</span><span class="gd">${p.diff == null ? 'ei arvausta' : p.diff === 0 ? 'TÄYSOSUMA' : 'ero ' + nfmt(p.diff)}</span>
       <b>${p.delta ? '+' + p.delta : ''}</b></div>`).join('')}</div>${bubble()}</div>`;
 }
+function qrSVG(text) {
+  try {
+    const q = new QRCodeLib(-1, QRCodeLib.ECL.M); q.addData(text); q.make(); const n = q.getModuleCount(); let d = '';
+    for (let r = 0; r < n; r++) for (let c = 0; c < n; c++) if (q.isDark(r, c)) d += `M${c + 4} ${r + 4}h1v1h-1z`;
+    return `<svg viewBox="0 0 ${n + 8} ${n + 8}" shape-rendering="crispEdges" role="img" aria-label="QR-koodi pelin liittymissivulle"><rect width="${n + 8}" height="${n + 8}" fill="#ffffff"/><path d="${d}" fill="#000000"/></svg>`;
+  } catch (e) { return ''; }
+}
 function lobbyHTML() {
   const url = G.joinUrl || (location.origin + location.pathname).replace(/index\.html$/, '');
   const n = plist().length;
   return `<div class="center"><div class="lobbygrid">
     <div class="panel" style="text-align:center;justify-items:center">
-      <div class="label">Liittymiskoodi</div><div class="bigcode">${G.code}</div>
+      <div class="joinhead"><div><div class="label">Liittymiskoodi</div><div class="bigcode">${G.code}</div></div>
+        <figure class="qr">${qrSVG(url + (url.includes('#') ? '' : '#' + G.code))}<figcaption>Skannaa, niin koodi täyttyy valmiiksi</figcaption></figure></div>
       <div class="joinsteps" style="text-align:left">
         <div>1. Avaa Chromebookilla <span class="url">${esc(url)}</span></div>
         <div>2. Valitse <b>Liity peliin</b> ja kirjoita koodi <b>${G.code}</b></div>
@@ -1960,30 +3336,31 @@ function renderPlayer(full) {
   const v = P.view; if (!v) return;
   const me = v.me;
   const live = ['question', 'minigame'];
-  if (!full && live.includes(v.phase)) { const sc = $('#psc'); if (sc) sc.textContent = v.finale ? '🏃 ' + me.pos + '/' + TRACK : me.score + ' p'; if (P.local.onView) P.local.onView(v); return; }
+  if (!full && live.includes(v.phase)) { const sc = $('#psc'); if (sc) sc.textContent = v.finale ? '🏃 ' + me.pos + '/' + TRACK : me.score + ' p'; const pg = $('#pgold'); if (pg) pg.textContent = '🪙 ' + me.gold; if (P.local.onView) P.local.onView(v); return; }
   P.cleanup.forEach(f => f()); P.cleanup = [];
-  const bar = `<div class="pbar"><span class="av">${me.ghost ? '👻' : esc(me.emoji)}</span><span class="nm">${esc(me.name)}${me.ghost ? ' <span style="color:var(--ghost)">(haamu)</span>' : ''}</span><span class="sc" id="psc">${v.finale ? '🏃 ' + me.pos + '/' + TRACK : me.score + ' p'}</span></div>`;
+  const bar = `<div class="pbar"><span class="av">${me.ghost ? '👻' : esc(me.emoji)}</span><span class="nm">${esc(me.name)}${me.ghost ? ' <span style="color:var(--ghost)">(haamu)</span>' : ''}</span><span class="sc" id="psc">${v.finale ? '🏃 ' + me.pos + '/' + TRACK : me.score + ' p'}</span><span class="goldc" id="pgold">🪙 ${me.gold}</span></div>`;
   let main = '', foot = '';
   const others = v.players.filter(x => x.id !== me.id);
   switch (v.phase) {
     case 'lobby': main = `<div class="big">${esc(me.emoji)}</div><h2>Olet mukana!</h2><p class="dim">Katso valkokangasta. Peli alkaa, kun juontaja painaa aloita.</p><p>Pelaajia: ${v.players.map(x => esc(x.emoji)).join(' ')}</p>`; break;
     case 'intro': main = `<div class="big">🏚️</div><h2>Peli alkaa</h2><p class="dim">Kuuntele Tohtori Kysymystä.</p>`; break;
     case 'prep': main = prepHTML(v, others); break;
+    case 'shop': main = shopHTML(v); break;
     case 'question': main = questionHTML(v); break;
     case 'reveal': {
       const ok = v.answer === v.correct;
-      if (v.kind === 'order' || v.kind === 'tf' || v.kind === 'list') { main = playerRevealHTML(v); foot = reactBar(); break; }
+      if (v.kind === 'order' || v.kind === 'tf' || v.kind === 'list') { main = playerRevealHTML(v) + goldLine(v); foot = reactBar(); break; }
       if (v.num) {
         const medal = v.rank == null ? '😶' : ['🥇', '🥈', '🥉'][v.rank] || (v.toCellar ? '😱' : '🎯');
         main = `<div class="big">${medal}</div><h2>${v.answer == null ? 'Et arvannut!' : v.diff === 0 ? 'TÄYSOSUMA!' : v.rank === 0 ? 'Lähimpänä!' : 'Sija ' + (v.rank + 1)}</h2>
           <p>Oikea: <b>${nfmt(v.ans)}</b>${v.answer != null ? ` · sinun arvauksesi ${nfmt(v.answer)} (ero ${nfmt(v.diff)})` : ''}</p>
           <p style="font-size:1.4rem;font-weight:800;color:var(--g)">+${v.delta} p</p>${v.toCellar ? '<p class="err">Kauimpana… kellari odottaa.</p>' : ''}`;
-        foot = reactBar(); break;
+        main += goldLine(v); foot = reactBar(); break;
       }
       if (v.finale) main = `<div class="big">${ok ? '🏃' : '🐢'}</div><h2>${ok ? (v.finaleMove === 2 ? 'Nopein! +2 askelta' : 'Oikein! +1 askel') : v.answer == null ? 'Et ehtinyt vastata' : 'Väärin'}</h2><p>Oikea: <b>${esc(v.opts[v.correct])}</b></p>`;
       else main = `<div class="big">${ok ? '✅' : v.toCellar ? '😱' : '❌'}</div><h2>${ok ? 'Oikein!' : v.answer == null ? 'Liian hidas!' : 'Väärin!'}</h2>
         <p style="font-size:1.4rem;font-weight:800;color:${v.delta >= 0 ? 'var(--g)' : 'var(--blood)'}">${v.delta > 0 ? '+' : ''}${v.delta} p</p>
-        <p>Oikea vastaus: <b>${esc(v.opts[v.correct])}</b></p>${v.toCellar ? '<p class="err">Kellari odottaa sinua…</p>' : ''}`;
+        <p>Oikea vastaus: <b>${esc(v.opts[v.correct])}</b></p>${v.toCellar ? '<p class="err">Kellari odottaa sinua…</p>' : ''}${goldLine(v)}`;
       foot = reactBar(); break;
     }
     case 'steal':
@@ -1996,11 +3373,12 @@ function renderPlayer(full) {
         : `<div class="big">🕯️</div><h2>Kellarissa: ${esc(v.cellarNames.join(', '))}</h2><p class="dim">Seuraa valkokangasta.</p>`;
       foot = v.inCellar ? '' : reactBar(); break;
     case 'minigame':
-      if (v.inCellar) { main = '<div id="mg"></div>'; }
+      if (v.inCellar) { main = (v.mg && v.mg.lamp ? `<p class="lampnote">🏮 Lyhty: ${lampText(v.mg)}</p>` : '') + '<div id="mg"></div>'; }
       else { main = `<div class="big">🍿</div><h2>${esc(v.cellarNames.join(', '))} taistelee hengestään</h2><p class="dim">Kannusta tai kummittele.</p>`; foot = reactBar(); }
       break;
     case 'mg_result':
-      if (v.inCellar) main = v.died ? `<div class="big">👻</div><h2>Olet nyt haamu</h2><p>Pelaat edelleen. Saat kiusakortin joka kierros ja voit herätä henkiin finaalissa.</p>` : `<div class="big">😮‍💨</div><h2>Selvisit!</h2><p class="dim">Tällä kertaa.</p>`;
+      if (v.inCellar && v.saved) main = `<div class="big">❤️</div><h2>Toinen henki pelasti sinut!</h2><p class="dim">Henki on nyt käytetty.</p>`;
+      else if (v.inCellar) main = v.died ? `<div class="big">👻</div><h2>Olet nyt haamu</h2><p>Pelaat edelleen. Saat kiusakortin joka kierros ja voit herätä henkiin finaalissa.</p>` : `<div class="big">😮‍💨</div><h2>Selvisit!</h2><p class="dim">Tällä kertaa.</p>`;
       else main = v.deadNames.length ? `<div class="big">💀</div><h2>${esc(v.deadNames.join(' ja '))} kummittelee nyt</h2>` : `<div class="big">😇</div><h2>Kaikki selvisivät</h2>`;
       foot = reactBar(); break;
     case 'finale_intro': main = `<div class="big">🚪</div><h2>Pakomatka!</h2><p>Oikea vastaus = askel. Nopein oikea = kaksi askelta. ${me.ghost ? 'Saat elävän kiinni, niin heräät henkiin!' : 'Ensimmäinen elävä ovella voittaa.'}</p><p>Olet ruudussa <b>${me.pos}</b> / ${TRACK}</p>`; break;
@@ -2009,6 +3387,29 @@ function renderPlayer(full) {
   app.innerHTML = `<div class="player">${bar}<div class="pmain">${main}</div><div>${foot}</div></div>`;
   bindPlayer(v);
   tickTimers();
+}
+function goldLine(v) { return (v.tupla ? '<p class="goldline">✖️ Tuplaus käytetty!</p>' : '') + (v.goldGain ? `<p class="goldline">+🪙 ${v.goldGain} kultaa</p>` : ''); }
+function invHTML(me) {
+  const parts = [];
+  if (me.shield) parts.push(`${SHOP[me.shield.k].emoji} ${SHOP[me.shield.k].name}${me.shield.vs ? ' (' + CARDS[me.shield.vs].name + ')' : ''}`);
+  if (me.cellarItem) parts.push(`${SHOP[me.cellarItem].emoji} ${SHOP[me.cellarItem].name}`);
+  for (const k of Object.keys(me.flags || {})) if (me.flags[k]) parts.push(`${SHOP[k].emoji} ${SHOP[k].name}`);
+  return parts.length ? `<div class="inv"><span class="label">Suojasi ja apusi</span>${parts.map(x => `<span class="invchip">${esc(x)}</span>`).join('')}</div>` : '';
+}
+function lampText(mg) {
+  return {reaktio: 'aikaasi vähennetään 150 ms.', muisti: 'yksi väärä nuotti annetaan anteeksi.', matikka: 'yksi väärä vastaus annetaan anteeksi.',
+    varit: 'kaksi virhettä annetaan anteeksi.', ovet: 'valaisee yhden turvallisen oven.', uhri: 'uhriisi lasketaan vertailussa ilmaiseksi +150 p.',
+    kirstut: `ansa odottaa ${mg.trapAt}. avaamassasi kirstussa.`}[mg.type] || 'apua tulossa.';
+}
+function shopHTML(v) {
+  const me = v.me, L = P.local;
+  let h = `<div><h2>🛒 Kellarimestarin puoti</h2><p style="margin:4px 0 0">Sinulla on <b style="color:var(--y)">🪙 ${me.gold}</b> kultaa.${v.tax ? ' <span class="err">Olet kärjessä: hinnat +50 %.</span>' : ''}${me.ghost ? ' Haamuna ostat vain kiusoja puoleen hintaan.' : ''}</p></div>`;
+  h += invHTML(me) + (me.cards.length ? `<p class="dim" style="margin:0">Kädessä: ${me.cards.map(k => CARDS[k].emoji + ' ' + CARDS[k].name).join(', ')}</p>` : '');
+  if (L.amu) h += `<div><h3 style="font-size:1.2rem">🧿 Mitä kiusaa vastaan amuletti suojaa?</h3></div><div class="targets">${ATK.map(k => `<button class="target" data-vs="${k}">${CARDS[k].emoji} ${CARDS[k].name}</button>`).join('')}</div><button class="btn small" data-cancel="1">Peruuta</button>`;
+  else h += `<div class="shopgrid">${v.shop.map(it => `<button class="shopitem" data-buy="${it.k}" ${it.why ? 'disabled' : ''}><span class="e">${it.emoji}</span><b>${esc(it.name)}</b><small>${esc(it.desc)}</small><span class="sp"><span class="price">🪙 ${it.price}</span><span class="why">${it.why ? esc(it.why) : 'jäljellä ' + it.stock}</span></span></button>`).join('')}</div>`;
+  if (L.bought) h += `<p style="color:var(--g);font-weight:700;margin:0">${esc(L.bought)}</p>`;
+  h += `<button class="btn small" id="shopdone" ${me.shopDone ? 'disabled' : ''}>${me.shopDone ? 'Odotetaan muita…' : 'Valmis, sulje puoti'}</button>` + pTimer(v.remain);
+  return h;
 }
 function incomingHTML(me) {
   if (!me.incoming.length) return '';
@@ -2027,7 +3428,9 @@ function prepHTML(v, others) {
     h += `<div><h3 style="font-size:1.2rem">${c.emoji} ${c.name}: kenelle?</h3></div><div class="targets">${others.map(o => `<button class="target" data-target="${o.id}"><span>${o.ghost ? '👻' : esc(o.emoji)}</span>${esc(o.name)}</button>`).join('')}</div><button class="btn small" data-cancel="1">Peruuta</button>`;
   } else if (me.cards.length) {
     h += `<div class="label">Kiusakorttisi</div><div class="hand">${me.cards.map((k, i) => { const c = CARDS[k]; return `<button class="card ${c.passive ? 'passive' : ''}" ${c.passive ? 'disabled' : ''} data-card="${k}" data-i="${i}"><span class="e">${c.emoji}</span><b>${c.name}</b><small>${c.desc}</small></button>`; }).join('')}</div>`;
-  } else h += `<p class="dim">Ei kiusakortteja tällä kertaa.</p>`;
+  } else h += `<p class="dim">Ei kiusakortteja. Niitä saa puodista.</p>`;
+  if (me.flags && me.flags.murtaja) h += '<p style="margin:0">🔨 Seuraava kiusasi läpäisee suojat.</p>';
+  h += invHTML(me);
   if (L.sent) h += `<p style="color:var(--g);font-weight:700">${esc(L.sent)}</p>`;
   h += pTimer(v.remain);
   return h;
@@ -2131,9 +3534,9 @@ function questionHTML(v) {
   const deadline = P.recv + v.myRemain, lockUntil = P.recv + v.lockRemain;
   P.local.deadline = deadline; P.local.lockUntil = lockUntil;
   const answered = v.answer != null ? v.answer : P.local.picked;
-  let h = `<div class="label">${esc(v.cat)}</div><div style="font-size:clamp(1.1rem,4vw,1.5rem);font-weight:800">${esc(v.q)}</div>${incomingHTML(me)}`;
+  let h = `<div class="label">${esc(v.cat)}</div><div style="font-size:clamp(1.1rem,4vw,1.5rem);font-weight:800">${esc(v.q)}</div>${incomingHTML(me)}${(v.hide || []).length ? '<p class="goldline" style="margin:0">✂️ 50/50 käytössä</p>' : ''}${v.tupla ? '<p class="goldline" style="margin:0">✖️ Tuplaus: pisteet tuplana!</p>' : ''}`;
   h += `<div class="pads ${eff.has('peili') ? 'mirror' : ''} ${answered != null ? 'locked' : ''}" id="pads">
-    ${v.opts.map((o, i) => `<button class="pad c${i} ${answered === i ? 'picked' : ''}" data-ans="${i}" ${answered != null ? 'disabled' : ''}><span>${esc(o)}</span></button>`).join('')}
+    ${v.opts.map((o, i) => `<button class="pad c${i} ${answered === i ? 'picked' : ''} ${(v.hide || []).includes(i) ? 'gone' : ''}" data-ans="${i}" ${answered != null || (v.hide || []).includes(i) ? 'disabled' : ''}><span>${(v.hide || []).includes(i) ? '✂️' : esc(o)}</span></button>`).join('')}
     ${eff.has('muste') ? '<div class="ink" id="ink"></div>' : ''}
     ${eff.has('jaa') && Date.now() < lockUntil ? '<div class="ice" id="ice">🧊 JÄÄSSÄ</div>' : ''}</div>`;
   h += `<div class="row" style="flex-wrap:nowrap"><div class="secs" data-secs="${deadline}" style="font-size:1.6rem"></div><div style="flex:1"><div class="timerbar"><i data-from="${deadline - v.myDur}" data-until="${deadline}"></i></div></div>${eff.has('hidaste') ? '🐌' : ''}</div>`;
@@ -2151,6 +3554,14 @@ function bindPlayer(v) {
     });
     $$('[data-cancel]').forEach(b => b.onclick = () => { P.local.sel = null; renderPlayer(false); });
     $$('[data-bet]').forEach(b => b.onclick = () => pSend({t: 'bet', amount: b.dataset.bet === 'all' ? 'all' : +b.dataset.bet}));
+  }
+  if (v.phase === 'shop') {
+    $$('[data-buy]').forEach(b => b.onclick = () => { const k = b.dataset.buy;
+      if (k === 'amuletti') { P.local.amu = true; renderPlayer(false); return; }
+      pSend({t: 'buy', k}); P.local.bought = SHOP[k].emoji + ' ' + SHOP[k].name + ' ostettu!'; });
+    $$('[data-vs]').forEach(b => b.onclick = () => { pSend({t: 'buy', k: 'amuletti', vs: b.dataset.vs}); P.local.amu = false; P.local.bought = '🧿 Amuletti ostettu (' + CARDS[b.dataset.vs].name + ')!'; });
+    $$('[data-cancel]').forEach(b => b.onclick = () => { P.local.amu = false; renderPlayer(false); });
+    const sd = $('#shopdone'); if (sd) sd.onclick = () => pSend({t: 'shopdone'});
   }
   if (v.phase === 'steal') $$('[data-steal]').forEach(b => b.onclick = () => { pSend({t: 'steal', target: b.dataset.steal}); });
   if (v.phase === 'question') bindQuestion(v);
@@ -2220,7 +3631,7 @@ function bindQuestion(v) {
   if (v.num) return bindNumQuestion(v);
   const eff = new Set(v.me.incoming.map(x => x.k));
   const answer = i => {
-    if (P.local.picked != null || v.answer != null) return;
+    if (P.local.picked != null || v.answer != null || (v.hide || []).includes(i)) return;
     if (Date.now() < P.local.lockUntil) return;
     if (Date.now() > P.local.deadline) return;
     P.local.picked = i; pSend({t: 'answer', idx: i});
@@ -2280,6 +3691,7 @@ function startMinigame(v) {
       if (over) return; const c = +p.dataset.m;
       p.classList.add('lit'); setTimeout(() => p.classList.remove('lit'), 180);
       if (c === mg.seq[idx]) { idx++; send({count: idx, t: Math.round(performance.now() - t0 - startT), final: idx >= mg.seq.length}); if (idx >= mg.seq.length) { over = true; done('Täydellinen sarja!'); } else $('#mstat').textContent = idx + ' / 5'; }
+      else if (mg.lamp && !P.local.lampUsed) { P.local.lampUsed = true; $('#mstat').textContent = '🏮 Lyhty pelasti! Jatka samasta kohdasta.'; }
       else { over = true; send({count: idx, t: 99999, final: true}); done('Väärä nuotti…', 'Urut ulvovat. Odota tuomiota.'); }
     });
     P.cleanup.push(() => timers.forEach(clearTimeout));
@@ -2333,6 +3745,7 @@ function startMinigame(v) {
         else if (c.trapped && k === clicked.length - 1) { b.classList.remove('opening'); b.classList.add('trap'); b.textContent = '👹'; } });
       if (c.opened >= clicked.length) pending = false;
       $('#kg').textContent = c.gold;
+      if (mg.lamp && mg.trapAt && c.opened === mg.trapAt - 1 && !c.trapped && $('#kmsg')) $('#kmsg').textContent = '🏮 Lyhty varoittaa: seuraava kirstu on ansa!';
       if (c.trapped) { $$('.chest').forEach(b => b.disabled = true); $('#kstop').disabled = true; $('#kmsg').textContent = 'KELLARIMESTARI! Menetit kaiken kullan.'; $('#kmsg').className = 'err'; P.local.onView = null; }
     };
   }
@@ -2347,7 +3760,7 @@ function startMinigame(v) {
       send({bid, final: true}); done('Uhrasit ' + bid + ' p', 'Kellarimestari laskee lahjoja…'); });
   }
   if (mg.type === 'ovet') {
-    box.innerHTML = `<h2>🚪 Kolme ovea</h2><p class="dim">Valitse ovi. Yhden takana odottaa Kellarimestari.</p><div class="doors">${[0, 1, 2].map(i => `<button class="door" data-d="${i}">${i + 1}</button>`).join('')}</div>`;
+    box.innerHTML = `<h2>🚪 Kolme ovea</h2><p class="dim">Valitse ovi. Yhden takana odottaa Kellarimestari.</p><div class="doors">${[0, 1, 2].map(i => `<button class="door ${mg.lamp && mg.safe === i ? 'safe' : ''}" data-d="${i}">${i + 1}${mg.lamp && mg.safe === i ? '<small>🏮 turvallinen</small>' : ''}</button>`).join('')}</div>`;
     $$('.door').forEach(d => d.onclick = () => { send({door: +d.dataset.d, final: true}); done('Ovi ' + (+d.dataset.d + 1) + ' valittu', 'Kahva narahtaa…'); });
   }
 }
