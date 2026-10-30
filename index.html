@@ -2,7 +2,7 @@
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bungee&family=Rubik:wght@400;600;800&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bangers&family=Bungee&family=Rubik:wght@400;600;800&display=swap">
 <style>
 /* Layout: haunted game-show marquee. Host = projector stage (header / stage / player rail). Player = one-hand controller with four buzzer pads. Single dark look on purpose (projector + spooky mansion). */
 :root{
@@ -10,7 +10,7 @@
   --bone:#f5ede0; --dim:#b3a3c6; --blood:#ff3b5c; --ghost:#a6ecff;
   --b:#2f7dff; --o:#ff8a1f; --g:#22c46b; --y:#ffd23a;
   --on-b:#ffffff; --on-o:#1a0d05; --on-g:#06200f; --on-y:#241a00;
-  --f-display:'Bungee','Impact','Arial Black',sans-serif;
+  --f-display:'Bangers','Bungee','Impact','Arial Black',sans-serif;
   --f-body:'Rubik',system-ui,'Segoe UI',Roboto,sans-serif;
   color-scheme:dark;
 }
@@ -371,6 +371,65 @@ body.is-ghost .pbar{border-color:var(--ghost)}
 .hostfull{width:clamp(160px,20vw,280px);height:auto;filter:drop-shadow(0 12px 30px rgba(255,59,92,.35));animation:fume 2.2s ease-in-out infinite;transform-origin:50% 100%}
 @keyframes fume{0%,100%{transform:rotate(0)}20%{transform:rotate(-1.5deg) scale(1.01)}40%{transform:rotate(1.5deg)}60%{transform:rotate(-1deg) scale(1.02)}}
 .host-bubble .face.img img{object-fit:contain}
+/* ===== Sarjakuvatyyli: paksut ääriviivat, kovat varjot, rasteripisteet ===== */
+:root{--line:#07040b;--sh:5px 5px 0 var(--line);--sh-sm:3px 3px 0 var(--line)}
+body{background:#1a0f24}
+#app{background-color:#1a0f24;background-image:radial-gradient(rgba(255,255,255,.065) 1.3px,transparent 1.8px),radial-gradient(circle at 18% 8%,rgba(255,59,92,.16),transparent 45%),radial-gradient(circle at 85% 92%,rgba(47,125,255,.16),transparent 50%);background-size:14px 14px,auto,auto}
+.stage{border:4px solid var(--line);box-shadow:8px 8px 0 var(--line);background:radial-gradient(rgba(255,210,58,.055) 1.4px,transparent 1.9px) 0 0/12px 12px,linear-gradient(180deg,#2b1a3d,#150b1f)}
+.panel{border:3px solid var(--line);box-shadow:var(--sh);background:#25173a}
+.lobbygrid>.panel:first-child{transform:rotate(-.5deg)}
+.lobbygrid>.panel:last-child{transform:rotate(.4deg)}
+.btn{border:3px solid var(--line);box-shadow:var(--sh-sm)}
+.btn.primary{border-color:var(--line);box-shadow:4px 4px 0 var(--line)}
+.btn:active,.btn.primary:active{transform:translate(2px,2px);box-shadow:1px 1px 0 var(--line)}
+.chip{border:3px solid var(--line);box-shadow:var(--sh-sm);background:#2d1d3e}
+.chip.ghost{border-color:var(--line);background:#14303c}
+.codechip{border:3px solid var(--line);box-shadow:var(--sh-sm);transform:rotate(-2deg)}
+.opt,.pad,.tfb,.mpad{border:3px solid var(--line);box-shadow:6px 6px 0 var(--line)}
+.opt:nth-child(odd){transform:rotate(-.6deg)}
+.opt:nth-child(even){transform:rotate(.6deg)}
+.opt.right{outline-color:#fff;transform:rotate(0) scale(1.03)}
+.card,.shopitem,.shelfitem,.oitem,.ocard,.target,.pack,.key,.vbtn,.chest,.lc,.rr,.scoreboard .r,.orev li,.tfrev .tr,.tfstate,.guessbox,.door,.setchip,.role,.bet,.lane .cell,.dsz,.segb.sel,.tp .bar{border:3px solid var(--line);box-shadow:var(--sh-sm)}
+.shelfitem:nth-child(odd){transform:rotate(-1deg)}
+.shelfitem:nth-child(even){transform:rotate(1deg)}
+.ocard:nth-child(odd){transform:rotate(-1.2deg)}
+.ocard:nth-child(even){transform:rotate(1deg)}
+.pack.on,.card.sel,.oitem.on,.setchip.sel,.door.sel{outline:3px solid var(--y);outline-offset:2px}
+.pbar{border:3px solid var(--line);box-shadow:var(--sh)}
+.avimg{border:2px solid var(--line)}
+.lobbyav .avimg{border:4px solid var(--line);box-shadow:var(--sh)}
+.logo{-webkit-text-stroke:2px var(--line);paint-order:stroke fill;text-shadow:3px 3px 0 var(--line);letter-spacing:.04em}
+.bigcode{font-family:var(--f-display);-webkit-text-stroke:4px var(--line);paint-order:stroke fill;text-shadow:8px 8px 0 var(--line);letter-spacing:.14em}
+.roundcard h2,.mgname,.podium h2,.introhero h2,.cellar h2{-webkit-text-stroke:3px var(--line);paint-order:stroke fill;text-shadow:6px 6px 0 var(--line);letter-spacing:.04em}
+.roundcard h2{font-size:clamp(2.6rem,6vw,5rem)}
+.mgname{font-size:clamp(2.2rem,4.6vw,4rem);font-family:var(--f-display)}
+.cellar h2{text-shadow:6px 6px 0 var(--line),0 0 50px rgba(255,59,92,.5)}
+.qtext{text-shadow:3px 3px 0 var(--line)}
+.pmain h2,.pbar .sc,.goldc{text-shadow:2px 2px 0 var(--line)}
+.secs{-webkit-text-stroke:2px var(--line);paint-order:stroke fill;text-shadow:3px 3px 0 var(--line)}
+.label{letter-spacing:.16em}
+.cat{border:3px solid var(--line);background:var(--ghost);color:#120b1a;box-shadow:var(--sh-sm);transform:rotate(-2deg)}
+.timerbar{border:3px solid var(--line);height:18px;box-shadow:var(--sh-sm)}
+.roundcard .em{position:relative;isolation:isolate;display:grid;place-items:center;width:1.9em;height:1.9em;font-size:clamp(2.8rem,5.6vw,4.6rem);filter:drop-shadow(3px 0 0 #07040b) drop-shadow(-3px 0 0 #07040b) drop-shadow(0 3px 0 #07040b) drop-shadow(0 -3px 0 #07040b) drop-shadow(6px 6px 0 #07040b)}
+.roundcard .em::before{content:"";position:absolute;inset:0;background:#fff;z-index:-1}
+.host-bubble{align-items:center}
+.host-bubble .txt{position:relative;background:#fff;color:#120b1a;border:3px solid var(--line);border-radius:26px;box-shadow:var(--sh);padding:14px 22px}
+.host-bubble .txt::before{content:"";position:absolute;left:-24px;top:50%;margin-top:-13px;border-style:solid;border-width:13px 24px 13px 0;border-color:transparent var(--line) transparent transparent}
+.host-bubble .txt::after{content:"";position:absolute;left:-17px;top:50%;margin-top:-9px;border-style:solid;border-width:9px 18px 9px 0;border-color:transparent #fff transparent transparent}
+.host-bubble .who{font-family:var(--f-display);font-size:1.05rem;letter-spacing:.06em}
+.toast{background:var(--y);color:#120b1a;border:3px solid var(--line);border-radius:4px;box-shadow:var(--sh);transform:rotate(-1deg)}
+.toast:nth-child(even){transform:rotate(1deg)}
+.toast.red{background:var(--blood);color:#fff}
+.role b,.card b,.shopitem b,.shelfitem b,.host-bubble .who{letter-spacing:.05em}
+.fxword{position:fixed;z-index:45;transform:translate(-50%,-50%) rotate(var(--rot));pointer-events:none;display:grid;place-items:center;filter:drop-shadow(3px 0 0 #07040b) drop-shadow(-3px 0 0 #07040b) drop-shadow(0 3px 0 #07040b) drop-shadow(0 -3px 0 #07040b) drop-shadow(7px 7px 0 #07040b);animation:wordpop 1.3s cubic-bezier(.2,1.6,.4,1) forwards}
+.fxword i{position:absolute;inset:-18%}
+.fxword span{position:relative;font-family:var(--f-display);font-size:clamp(2rem,4vw,3.4rem);color:var(--wc);-webkit-text-stroke:3px #07040b;paint-order:stroke fill;letter-spacing:.04em;padding:.35em .6em;white-space:nowrap}
+.fxword.big span{font-size:clamp(3.4rem,8vw,7rem)}
+@keyframes wordpop{0%{transform:translate(-50%,-50%) rotate(var(--rot)) scale(.2);opacity:0}18%{transform:translate(-50%,-50%) rotate(var(--rot)) scale(1.15);opacity:1}30%{transform:translate(-50%,-50%) rotate(var(--rot)) scale(1)}80%{opacity:1}100%{transform:translate(-50%,-50%) rotate(var(--rot)) scale(1.08);opacity:0}}
+.hfword{font-family:var(--f-display);font-style:normal;font-size:4.2rem;color:var(--y);-webkit-text-stroke:3px #07040b;paint-order:stroke fill;text-shadow:6px 6px 0 #07040b;transform:rotate(-8deg)}
+@media (prefers-reduced-motion:reduce){.opt,.shelfitem,.ocard,.toast,.codechip,.lobbygrid>.panel{transform:none!important}}
+.cellarhead{display:flex;align-items:center;justify-content:center;gap:clamp(14px,2.5vw,32px);flex-wrap:wrap}
+.cellar .victims .av{font-size:clamp(2.2rem,4vw,3.4rem)}
 @keyframes pop{0%{transform:scale(.2);opacity:0}100%{transform:scale(1);opacity:1}}
 @keyframes pulse{50%{outline-color:var(--y)}}
 @keyframes shake{0%,100%{transform:translateX(0)}20%{transform:translateX(-14px) rotate(-2deg)}40%{transform:translateX(12px) rotate(2deg)}60%{transform:translateX(-8px)}80%{transform:translateX(6px)}}
@@ -2259,10 +2318,11 @@ function fxBurst(id, html, cls = '') {
 async function fxAttack(fromId, toId, emoji, outcome, shEmoji) {
   if (outcome === 'pierce') emoji = '🔨' + emoji;
   await fxFly(fromId, toId, emoji);
-  if (outcome === 'block') { fxBurst(toId, shEmoji || '🛡️', 'block'); return; }
-  if (outcome === 'reflect') { fxBurst(toId, '🔁', 'block'); await fxFly(toId, fromId, emoji, 700); fxBurst(fromId, emoji, 'hit'); return; }
-  if (outcome === 'trap') { fxBurst(toId, '🪤', 'block'); for (let i = 0; i < 3; i++) setTimeout(() => fxFly(fromId, toId, '🪙', 700), i * 160); fxBurst(toId, emoji, 'hit'); return; }
+  if (outcome === 'block') { fxBurst(toId, shEmoji || '🛡️', 'block'); fxWord('KLONK!', {id: toId, color: '#a6ecff', bg: '#2f7dff'}); return; }
+  if (outcome === 'reflect') { fxBurst(toId, '🔁', 'block'); fxWord('BOING!', {id: toId, color: '#a6ecff', bg: '#8a4dff'}); await fxFly(toId, fromId, emoji, 700); fxBurst(fromId, emoji, 'hit'); fxWord('AUTS!', {id: fromId, color: '#ffd23a', bg: '#ff3b5c'}); return; }
+  if (outcome === 'trap') { fxBurst(toId, '🪤', 'block'); fxWord('NAPS!', {id: toId, color: '#ffd23a', bg: '#8b5a2b'}); for (let i = 0; i < 3; i++) setTimeout(() => fxFly(fromId, toId, '🪙', 700), i * 160); fxBurst(toId, emoji, 'hit'); return; }
   fxBurst(toId, outcome === 'pierce' ? '💥' + emoji : emoji, 'hit');
+  fxWord(outcome === 'pierce' ? 'RYSKIS!' : pick(['PAM!', 'ZÄP!', 'KRÄK!', 'POKS!', 'TÄRS!']), {id: toId, color: '#ffd23a', bg: '#ff3b5c'});
 }
 function fxConfetti(n = 70) {
   if (reducedMotion() || !document.body.animate) return;
@@ -2274,6 +2334,19 @@ function fxConfetti(n = 70) {
     el.animate([{transform: 'translate(0,-5vh) rotate(0deg)', opacity: 1}, {transform: `translate(${dx}px,105vh) rotate(${rot}deg)`, opacity: .9}],
       {duration: 1800 + rnd(1600), delay: rnd(500), easing: 'cubic-bezier(.2,.6,.4,1)'}).finished.then(() => el.remove(), () => el.remove());
   }
+}
+const STAR = (() => { const pts = []; for (let i = 0; i < 24; i++) { const r = i % 2 ? 36 : 50, a = i / 24 * 2 * Math.PI; pts.push(`${(50 + r * Math.cos(a)).toFixed(1)}% ${(50 + r * Math.sin(a)).toFixed(1)}%`); } return `polygon(${pts.join(',')})`; })();
+(function () { const st = document.createElement('style'); st.textContent = `.roundcard .em::before,.fxword i{clip-path:${STAR}}`; document.head.appendChild(st); })();
+const WORD_COLORS = ['#ffd23a', '#ff3b5c', '#a6ecff', '#22c46b', '#ff8a1f'];
+function fxWord(text, opts = {}) {
+  if (reducedMotion()) return;
+  let x = opts.x, y = opts.y;
+  if (opts.id) { const c = chipEl(opts.id); if (c) { const r = c.getBoundingClientRect(); x = r.left + r.width / 2; y = r.top - 40; } }
+  const el = document.createElement('div'); el.className = 'fxword' + (opts.big ? ' big' : '');
+  el.innerHTML = `<i style="background:${opts.bg || '#fff'}"></i><span>${esc(text)}</span>`;
+  el.style.left = Math.max(90, Math.min(innerWidth - 90, x ?? innerWidth / 2)) + 'px'; el.style.top = Math.max(70, y ?? innerHeight * .42) + 'px';
+  el.style.setProperty('--wc', opts.color || pick(WORD_COLORS)); el.style.setProperty('--rot', (rnd(17) - 8) + 'deg');
+  document.body.appendChild(el); setTimeout(() => el.remove(), 1400);
 }
 function quip(kind, o = {}) { G.quip = fmt(pick(QUIPS[kind]), o); speak(G.quip); }
 function toast(text, emoji = '📢', red = false) {
@@ -2440,6 +2513,11 @@ function setPhase(ph, ms, next) {
   G.next = next || null;
   renderHost(); sync(); botsAct();
   if (ph === 'reveal' && plist().some(p => p.delta > 0)) setTimeout(() => fxConfetti(plist().some(p => p.delta >= 800) ? 90 : 45), 150);
+  if (ph === 'reveal' && !G.finale) setTimeout(() => G.cellar.length ? fxWord(pick(['AIJAI!', 'HUPS!', 'VOI EI!']), {big: true, color: '#ff3b5c', bg: '#ffd23a', y: innerHeight * .16}) : fxWord(pick(['JES!', 'MAHTAVAA!', 'TÄYS KYMPPI!']), {big: true, color: '#22c46b', bg: '#ffd23a', y: innerHeight * .16}), 200);
+  if (ph === 'cellar') setTimeout(() => fxWord('NIIIRK!', {big: true, color: '#ff3b5c', bg: '#1b1b1f', y: innerHeight * .3}), 350);
+  if (ph === 'mg_result' && G.lastDeaths.length) setTimeout(() => fxWord('PUFF!', {big: true, color: '#a6ecff', bg: '#fff'}), 250);
+  if (ph === 'shop') setTimeout(() => fxWord('KILING!', {big: true, color: '#ffd23a', bg: '#22c46b'}), 250);
+  if (ph === 'end' && G.winner) setTimeout(() => fxWord('VOITTO!', {big: true, color: '#ffd23a', bg: '#ff3b5c'}), 400);
   if (ph === 'end' && G.winner) setTimeout(() => fxConfetti(160), 300);
 }
 function skipPhase() { if (G.next) { clearTimeout(G.timer); const n = G.next; G.next = null; n(); } }
@@ -3066,7 +3144,7 @@ function stageHTML() {
     case 'steal': return `<div class="center"><div class="roundcard"><div class="em">🦝</div><h2>Ryöstöhetki</h2><p>Oikein vastanneet valitsevat nyt uhrinsa.</p></div>${timerBar()}</div>`;
     case 'cellar': {
       const m = MG[G.mg.type];
-      return `<div class="center cellar"><div class="cdoor" aria-hidden="true"><span class="eyes">👁️👁️</span><i class="l"></i><i class="r"></i></div><h2>Kellari</h2><div class="victims">${G.cellar.map(id => { const p = G.players[id]; return `<div class="victim"><span class="av">${avH(p)}</span>${esc(p.name)}</div>`; }).join('')}</div>
+      return `<div class="center cellar"><div class="cellarhead"><div class="cdoor" aria-hidden="true"><span class="eyes">👁️👁️</span><i class="l"></i><i class="r"></i></div><h2>Kellari</h2></div><div class="victims">${G.cellar.map(id => { const p = G.players[id]; return `<div class="victim"><span class="av">${avH(p)}</span>${esc(p.name)}</div>`; }).join('')}</div>
         <div class="mgname">${m.emoji} ${m.name}</div><p style="font-size:clamp(1.1rem,2vw,1.6rem);max-width:44ch;margin:0">${m.desc}</p>${bubble()}${timerBar()}</div>`;
     }
     case 'minigame': {
@@ -3541,7 +3619,7 @@ function renderPlayer(full) {
     case 'end': main = v.iWon ? `<div class="big">🏆</div><h2>Pakenit kartanosta!</h2>` : `<div class="big">${me.ghost ? '👻' : '🏚️'}</div><h2>${v.winner ? esc(v.winner.name) + ' voitti' : 'Peli päättyi'}</h2><p class="dim">Katso tulokset kankaalta.</p>`; break;
   }
   app.innerHTML = `<div class="player">${bar}<div class="pmain">${main}</div><div>${foot}</div></div>`;
-  if (v.phase === 'prep') { const inc = me.incoming.length; if (inc > (P.local.inc || 0)) { const last = me.incoming[inc - 1]; const fl = document.createElement('div'); fl.className = 'hitflash'; fl.innerHTML = `<span>${CARDS[last.k].emoji}</span><b>${esc(last.by)} kiusasi sinua!</b>`; document.body.appendChild(fl); setTimeout(() => fl.remove(), 1600); } P.local.inc = inc; }
+  if (v.phase === 'prep') { const inc = me.incoming.length; if (inc > (P.local.inc || 0)) { const last = me.incoming[inc - 1]; const fl = document.createElement('div'); fl.className = 'hitflash'; fl.innerHTML = `<em class="hfword">PAM!</em><span>${CARDS[last.k].emoji}</span><b>${esc(last.by)} kiusasi sinua!</b>`; document.body.appendChild(fl); setTimeout(() => fl.remove(), 1600); } P.local.inc = inc; }
   bindPlayer(v);
   tickTimers();
 }
