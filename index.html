@@ -443,6 +443,15 @@ body{background:#1a0f24}
 .hostmini{width:clamp(90px,9vw,140px);height:auto;animation:fume 2.2s ease-in-out infinite;transform-origin:50% 100%}
 .host-bubble .face.moodnew img{animation:moodpop .35s cubic-bezier(.2,1.6,.4,1)}
 @keyframes moodpop{from{transform:scale(.6) rotate(-6deg)}to{transform:none}}
+.throwfx{position:fixed;inset:0;z-index:55;pointer-events:none;background:radial-gradient(ellipse at 62% 82%,rgba(0,0,0,.2),rgba(8,3,14,.9) 60%);overflow:hidden}
+.throwfx .hole{position:absolute;left:62%;bottom:6vh;width:min(46vw,560px);height:min(16vw,170px);transform-origin:center}
+.throwfx .hole i{position:absolute;inset:0;border-radius:50%;background:radial-gradient(ellipse at 50% 40%,#000 55%,#1b0b14 70%,#3a1a10 100%);border:6px solid #07040b;box-shadow:0 0 0 10px #5a3a24,0 0 0 14px #07040b,0 0 60px 20px rgba(255,59,92,.35)}
+.throwfx .hole b{position:absolute;left:50%;top:-56px;transform:translateX(-50%) rotate(-3deg);font-family:var(--f-display);font-weight:400;font-size:2rem;color:#ff3b5c;-webkit-text-stroke:2px #07040b;paint-order:stroke fill;text-shadow:4px 4px 0 #07040b;letter-spacing:.08em}
+.throwfx .thrower{position:absolute;left:4vw;bottom:0;height:min(68vh,560px);width:auto;transform-origin:50% 100%;filter:drop-shadow(0 12px 30px rgba(0,0,0,.6))}
+.thrown{position:absolute;left:0;top:0;display:grid;justify-items:center;gap:2px}
+.thrown .tav{font-size:clamp(3rem,6vw,5rem);line-height:1;filter:drop-shadow(4px 4px 0 #07040b)}
+.thrown .tav .avimg{width:1.1em;height:1.1em;border:3px solid #07040b}
+.thrown small{font-family:var(--f-display);font-size:1.3rem;color:#fff;-webkit-text-stroke:1.5px #07040b;paint-order:stroke fill;text-shadow:2px 2px 0 #07040b;white-space:nowrap}
 @keyframes pop{0%{transform:scale(.2);opacity:0}100%{transform:scale(1);opacity:1}}
 @keyframes pulse{50%{outline-color:var(--y)}}
 @keyframes shake{0%,100%{transform:translateX(0)}20%{transform:translateX(-14px) rotate(-2deg)}40%{transform:translateX(12px) rotate(2deg)}60%{transform:translateX(-8px)}80%{transform:translateX(6px)}}
@@ -2361,6 +2370,44 @@ function fxWord(text, opts = {}) {
   el.style.setProperty('--wc', opts.color || pick(WORD_COLORS)); el.style.setProperty('--rot', (rnd(17) - 8) + 'deg');
   document.body.appendChild(el); setTimeout(() => el.remove(), 1400);
 }
+function fxThrow(ids) {
+  ids = ids.filter(id => G.players[id]);
+  if (!ids.length || reducedMotion() || !document.body.animate) return 0;
+  document.querySelectorAll('.throwfx').forEach(x => x.remove());
+  const W = innerWidth, H = innerHeight, n = ids.length, gap = Math.min(520, 2600 / n);
+  const fx = document.createElement('div'); fx.className = 'throwfx';
+  fx.innerHTML = `<div class="hole"><i></i><b>KELLARI</b></div><img class="thrower" src="${FULLS.evil}" alt="">`;
+  document.body.appendChild(fx);
+  const hole = fx.querySelector('.hole'), thr = fx.querySelector('.thrower');
+  const t0 = 900, total = t0 + n * gap + 1500;
+  fx.animate([{opacity: 0}, {opacity: 1, offset: .08}, {opacity: 1, offset: .93}, {opacity: 0}], {duration: total, fill: 'forwards'});
+  hole.animate([{transform: 'translateX(-50%) scale(0,.4)'}, {transform: 'translateX(-50%) scale(1,1)'}], {duration: 500, delay: 200, fill: 'both', easing: 'cubic-bezier(.3,1.4,.5,1)'});
+  setTimeout(() => { if (fx.isConnected) hole.animate([{transform: 'translateX(-50%) scale(1,1)'}, {transform: 'translateX(-50%) scale(0,.4)'}], {duration: 280, fill: 'forwards', easing: 'ease-in'}); }, t0 + n * gap + 600);
+  thr.animate([{transform: 'translateX(-70vw) rotate(-10deg)'}, {transform: 'translateX(0) rotate(0)'}], {duration: 600, delay: 250, fill: 'both', easing: 'cubic-bezier(.2,1.3,.4,1)'});
+  setTimeout(() => fxWord('HEI HOPS!', {big: true, color: '#ffd23a', bg: '#ff3b5c', x: W * .3, y: H * .2}), 500);
+  ids.forEach((id, i) => {
+    const p = G.players[id], start = t0 + i * gap;
+    setTimeout(() => {
+      if (!fx.isConnected) return;
+      thr.animate([{transform: 'rotate(0)'}, {transform: 'rotate(-9deg) translateY(-8px)'}, {transform: 'rotate(7deg)'}, {transform: 'rotate(0)'}], {duration: 380, easing: 'ease-out'});
+      const r = thr.getBoundingClientRect(), hx = r.left + r.width * .78, hy = r.top + r.height * .42;
+      const hr = hole.getBoundingClientRect(), ex = hr.left + hr.width / 2, ey = hr.top + hr.height * .45;
+      const v = document.createElement('div'); v.className = 'thrown'; v.innerHTML = `<span class="tav">${avH(p)}</span><small>${esc(p.name)}</small>`; fx.appendChild(v);
+      const px = (hx + ex) / 2 + (Math.random() * 80 - 40), py = Math.max(40, Math.min(hy, ey) - H * .32);
+      v.animate([
+        {transform: `translate(${hx}px,${hy}px) translate(-50%,-50%) scale(1) rotate(0deg)`},
+        {transform: `translate(${px}px,${py}px) translate(-50%,-50%) scale(1.25) rotate(${200 + rnd(200)}deg)`, offset: .45},
+        {transform: `translate(${ex}px,${ey - 20}px) translate(-50%,-50%) scale(.75) rotate(560deg)`, offset: .85, opacity: 1},
+        {transform: `translate(${ex}px,${ey + 30}px) translate(-50%,-50%) scale(.1) rotate(720deg)`, opacity: 0}], {duration: 950, easing: 'cubic-bezier(.35,.1,.5,1)', fill: 'forwards'});
+      tone(700, .5, 'sawtooth', .04, 0, 160);
+      if (i === 0 || n <= 4) setTimeout(() => fxWord(pick(['HUIII!', 'VIUH!', 'HYPS!', 'AAAA!']), {color: '#a6ecff', bg: '#2f7dff', x: px, y: py - 30}), 250);
+      setTimeout(() => { tone(90, .25, 'square', .06); }, 900);
+    }, start);
+  });
+  setTimeout(() => { if (!fx.isConnected) return; fxWord('KOLKS!', {big: true, color: '#ffd23a', bg: '#1b1b1f', x: W * .62, y: H * .62}); tone(70, .4, 'square', .08); }, t0 + n * gap + 700);
+  setTimeout(() => fx.remove(), total + 50);
+  return total;
+}
 function quip(kind, o = {}) { G.quip = fmt(pick(QUIPS[kind]), o); G.mood = MOOD_OF[kind] || 'angry'; speak(G.quip); }
 function toast(text, emoji = '📢', red = false) {
   const el = document.createElement('div'); el.className = 'toast' + (red ? ' red' : '');
@@ -2527,7 +2574,8 @@ function setPhase(ph, ms, next) {
   renderHost(); sync(); botsAct();
   if (ph === 'reveal' && plist().some(p => p.delta > 0)) setTimeout(() => fxConfetti(plist().some(p => p.delta >= 800) ? 90 : 45), 150);
   if (ph === 'reveal' && !G.finale) setTimeout(() => G.cellar.length ? fxWord(pick(['AIJAI!', 'HUPS!', 'VOI EI!']), {big: true, color: '#ff3b5c', bg: '#ffd23a', y: innerHeight * .16}) : fxWord(pick(['JES!', 'MAHTAVAA!', 'TÄYS KYMPPI!']), {big: true, color: '#22c46b', bg: '#ffd23a', y: innerHeight * .16}), 200);
-  if (ph === 'cellar') setTimeout(() => fxWord('NIIIRK!', {big: true, color: '#ff3b5c', bg: '#1b1b1f', y: innerHeight * .3}), 350);
+  if (ph !== 'cellar') document.querySelectorAll('.throwfx').forEach(x => x.remove());
+  if (ph === 'cellar') setTimeout(() => fxWord('NIIIRK!', {big: true, color: '#ff3b5c', bg: '#1b1b1f', y: innerHeight * .3}), G.mg && G.mg.riseDelay ? G.mg.riseDelay * 1000 + 300 : 350);
   if (ph === 'mg_result' && G.lastDeaths.length) setTimeout(() => fxWord('PUFF!', {big: true, color: '#a6ecff', bg: '#fff'}), 250);
   if (ph === 'shop') setTimeout(() => fxWord('KILING!', {big: true, color: '#ffd23a', bg: '#22c46b'}), 250);
   if (ph === 'end' && G.winner) setTimeout(() => fxWord('VOITTO!', {big: true, color: '#ffd23a', bg: '#ff3b5c'}), 400);
@@ -2811,7 +2859,8 @@ function goCellar() {
   G.mg.lamps = {}; G.mg.safeHint = {};
   for (const id of G.cellar) { const p = G.players[id]; if (p && p.cellarItem === 'lyhty') { p.cellarItem = null; G.mg.lamps[id] = true; if (type === 'ovet') G.mg.safeHint[id] = pick([0, 1, 2].filter(x => x !== G.mg.trap)); } }
   SFX.death();
-  setPhase('cellar', 7000, () => setPhase('minigame', MG[type].dur, endMinigame));
+  const td = fxThrow(G.cellar); G.mg.riseDelay = td / 1000 + .25;
+  setPhase('cellar', 7000 + td, () => setPhase('minigame', MG[type].dur, endMinigame));
 }
 function makeMath() {
   const out = [];
@@ -3162,7 +3211,7 @@ function stageHTML() {
     case 'steal': return `<div class="center"><div class="roundcard"><div class="em">🦝</div><h2>Ryöstöhetki</h2><p>Oikein vastanneet valitsevat nyt uhrinsa.</p></div>${timerBar()}</div>`;
     case 'cellar': {
       const m = MG[G.mg.type];
-      return `<div class="center cellar"><div class="cellarhead"><div class="kpit"><img class="kmaster rise" src="${KMASTER}" alt="Kellarimestari"></div><h2>Kellari</h2></div><div class="victims">${G.cellar.map(id => { const p = G.players[id]; return `<div class="victim"><span class="av">${avH(p)}</span>${esc(p.name)}</div>`; }).join('')}</div>
+      return `<div class="center cellar"><div class="cellarhead"><div class="kpit"><img class="kmaster rise" src="${KMASTER}" alt="Kellarimestari" style="animation-delay:${(G.mg.riseDelay || .25).toFixed(2)}s,${((G.mg.riseDelay || .25) + 1.2).toFixed(2)}s"></div><h2>Kellari</h2></div><div class="victims">${G.cellar.map(id => { const p = G.players[id]; return `<div class="victim"><span class="av">${avH(p)}</span>${esc(p.name)}</div>`; }).join('')}</div>
         <div class="mgname">${m.emoji} ${m.name}</div><p style="font-size:clamp(1.1rem,2vw,1.6rem);max-width:44ch;margin:0">${m.desc}</p>${bubble()}${timerBar()}</div>`;
     }
     case 'minigame': {
