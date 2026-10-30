@@ -2384,7 +2384,7 @@ function fxThrow(ids) {
   hole.animate([{transform: 'translateX(-50%) scale(0,.4)'}, {transform: 'translateX(-50%) scale(1,1)'}], {duration: 500, delay: 200, fill: 'both', easing: 'cubic-bezier(.3,1.4,.5,1)'});
   setTimeout(() => { if (fx.isConnected) hole.animate([{transform: 'translateX(-50%) scale(1,1)'}, {transform: 'translateX(-50%) scale(0,.4)'}], {duration: 280, fill: 'forwards', easing: 'ease-in'}); }, t0 + n * gap + 600);
   thr.animate([{transform: 'translateX(-70vw) rotate(-10deg)'}, {transform: 'translateX(0) rotate(0)'}], {duration: 600, delay: 250, fill: 'both', easing: 'cubic-bezier(.2,1.3,.4,1)'});
-  setTimeout(() => fxWord('HEI HOPS!', {big: true, color: '#ffd23a', bg: '#ff3b5c', x: W * .3, y: H * .2}), 500);
+  setTimeout(() => { fxWord('HEI HOPS!', {big: true, color: '#ffd23a', bg: '#ff3b5c', x: W * .3, y: H * .2}); playVoice('throw'); }, 500);
   ids.forEach((id, i) => {
     const p = G.players[id], start = t0 + i * gap;
     setTimeout(() => {
@@ -2408,7 +2408,15 @@ function fxThrow(ids) {
   setTimeout(() => fx.remove(), total + 50);
   return total;
 }
-function quip(kind, o = {}) { G.quip = fmt(pick(QUIPS[kind]), o); G.mood = MOOD_OF[kind] || 'angry'; speak(G.quip); }
+/* Lehtori Jumiskon omat äänitykset: VOICE[tilanne] = [data-URI, ...]. Tyhjä lista = ei ääntä. */
+const VOICE = {intro: [], prep: [], cellar: [], throw: [], allRight: [], death: [], survive: [], shop: [], finale: [], win: []};
+const VOICE_OF = {intro: 'intro', prep: 'prep', toCellar: 'cellar', orderBad: 'cellar', tfBad: 'cellar', listBad: 'cellar', farthest: 'cellar', allRight: 'allRight', death: 'death', survive: 'survive', shop: 'shop', finale: 'finale', win: 'win'};
+let voiceNow = null;
+function playVoice(key) {
+  const arr = VOICE[key]; if (!arr || !arr.length || !G.sound) return false;
+  try { if (voiceNow) voiceNow.pause(); voiceNow = new Audio(pick(arr)); voiceNow.volume = 1; voiceNow.play().catch(() => {}); return true; } catch (e) { return false; }
+}
+function quip(kind, o = {}) { G.quip = fmt(pick(QUIPS[kind]), o); G.mood = MOOD_OF[kind] || 'angry'; if (!playVoice(VOICE_OF[kind])) speak(G.quip); }
 function toast(text, emoji = '📢', red = false) {
   const el = document.createElement('div'); el.className = 'toast' + (red ? ' red' : '');
   el.innerHTML = `<span class="e">${emoji}</span><span>${esc(text)}</span>`;
