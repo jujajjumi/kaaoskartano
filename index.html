@@ -505,6 +505,15 @@ body{background:#1a0f24}
 .buzzbtn[disabled]{filter:grayscale(.5)}
 .lockedans{font-size:1.4rem;font-weight:800;color:var(--y);margin:0}
 .pnote{position:fixed;left:50%;top:20%;transform:translateX(-50%);z-index:60;background:var(--blood);color:#fff;padding:12px 18px;border-radius:14px;border:3px solid var(--line);box-shadow:var(--sh);font-weight:800;max-width:90vw;text-align:center}
+.kgrid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;width:min(340px,86vw);margin:0 auto}
+.kcell{aspect-ratio:1;border-radius:12px;background:var(--wall2);border:3px solid var(--line);box-shadow:3px 3px 0 var(--line);transition:background .15s}
+.kcell.lit{background:#b46bff;box-shadow:0 0 24px #b46bff}
+.kcell.ok{background:var(--g)} .kcell.bad{background:var(--blood)} .kcell.miss{background:#b46bff;opacity:.55}
+.gfield{position:relative;width:min(380px,88vw);height:min(300px,45vh);margin:0 auto;border-radius:16px;background:#120d1c;border:3px solid var(--line);overflow:hidden}
+.gfield span{position:absolute;font-size:2.2rem;line-height:1}
+.millbtn{width:min(200px,55vw);aspect-ratio:1;border-radius:50%;margin:0 auto;font-size:5.5rem;background:var(--wall2);border:5px solid var(--line);box-shadow:0 8px 0 var(--line);transition:transform .05s;touch-action:manipulation;user-select:none}
+.bombclock{font-family:var(--f-display);font-size:clamp(3.5rem,16vw,6rem);color:var(--blood);-webkit-text-stroke:2px var(--line);paint-order:stroke fill;line-height:1}
+.bombclock.hidden{color:var(--dim)}
 @keyframes pop{0%{transform:scale(.2);opacity:0}100%{transform:scale(1);opacity:1}}
 @keyframes pulse{50%{outline-color:var(--y)}}
 @keyframes shake{0%,100%{transform:translateX(0)}20%{transform:translateX(-14px) rotate(-2deg)}40%{transform:translateX(12px) rotate(2deg)}60%{transform:translateX(-8px)}80%{transform:translateX(6px)}}
@@ -2371,6 +2380,10 @@ const MG = {
   ovet:    {name: 'Kolme ovea', emoji: '🚪', desc: 'Kahden oven takana on käytävä. Yhden takana odottaa Kellarimestari.', dur: 12000},
   varit:   {name: 'Värisokeus', emoji: '🎨', desc: 'Paina sitä väriä, jolla sana on kirjoitettu. Älä lue sanaa! Kymmenen kierrosta, alle kahdeksan oikein ja olet haamu.', dur: 30000},
   kirstut: {name: 'Kultakirstut', emoji: '💰', desc: 'Avaa kirstuja ja kerää kultaa. Yhdessä odottaa Kellarimestari ja vie kaiken. Alle 400 kultaa tai vähiten kerännyt kuolee.', dur: 28000},
+  kuvio:   {name: 'Kirottu kuvio', emoji: '🔮', desc: 'Kuvio välähtää ruudukossa. Toista se ulkomuistista. Kolme kuviota, alle kaksi oikein ja olet haamu.', dur: 32000},
+  laske:   {name: 'Kummituslaskenta', emoji: '👻', desc: 'Kummituksia vilahtaa ruudulla seassa kurpitsoja. Laske vain kummitukset. Kolme kierrosta, alle kaksi oikein ja olet haamu.', dur: 34000},
+  mylly:   {name: 'Kidutusmylly', emoji: '⚙️', desc: 'Pyöritä myllyä klikkaamalla niin nopeasti kuin pystyt 8 sekunnin ajan. Alle 35 klikkausta tai hitain tulos ja olet haamu.', dur: 16000},
+  ajastin: {name: 'Pommin ajastin', emoji: '⏱️', desc: 'Pysäytä kello tasan 5,00 sekunnin kohdalla. Kello katoaa näkyvistä kesken! Yli 0,4 s heitto tai huonoin tulos räjäyttää pommin.', dur: 18000},
   uhri:    {name: 'Uhrilahja', emoji: '🕯️', desc: 'Uhraa salaa pisteitäsi Kellarimestarille. Pienimmän uhrin antanut kuolee. Uhri menee, vaikka selviäisit.', dur: 20000, min: 2},
 };
 const QUIPS = {
@@ -2713,6 +2726,8 @@ function viewFor(p) {
     if (G.mg.type === 'varit') v.mg.seq = G.mg.seq;
     if (G.mg.type === 'kirstut' && G.mg.golds[p.id]) { const r = G.mg.results[p.id] || {}; const o = r.opened || 0; v.mg.chest = {opened: o, gold: r.gold || 0, trapped: !!r.trapped, final: !!r.final, golds: G.mg.golds[p.id].slice(0, r.trapped ? o - 1 : o)}; }
     if (G.mg.type === 'uhri') v.mg.score = p.score;
+    if (G.mg.type === 'kuvio') v.mg.grids = G.mg.grids;
+    if (G.mg.type === 'laske') v.mg.ghosts = G.mg.ghosts;
     v.mg.lamp = !!(G.mg.lamps && G.mg.lamps[p.id]);
     if (v.mg.lamp && G.mg.type === 'ovet') v.mg.safe = G.mg.safeHint[p.id];
     if (v.mg.lamp && G.mg.type === 'kirstut') v.mg.trapAt = G.mg.traps[p.id];
@@ -3125,6 +3140,8 @@ function goCellar() {
   if (type === 'ovet') G.mg.trap = rnd(3);
   if (type === 'varit') G.mg.seq = Array.from({length: 10}, () => { const w = rnd(4); return {w, c: Math.random() < .85 ? (w + 1 + rnd(3)) % 4 : w}; });
   if (type === 'kirstut') { G.mg.golds = {}; G.mg.traps = {}; for (const id of G.cellar) { G.mg.golds[id] = Array.from({length: 8}, () => 60 + rnd(11) * 10); G.mg.traps[id] = 2 + rnd(6); } }
+  if (type === 'kuvio') G.mg.grids = [5, 6, 7].map(n => shuffle([...Array(16).keys()]).slice(0, n));
+  if (type === 'laske') G.mg.ghosts = [0, 1, 2].map(i => ({n: 5 + rnd(6) + i * 2, d: 3 + rnd(4) + i}));
   G.mg.lamps = {}; G.mg.safeHint = {};
   for (const id of G.cellar) { const p = G.players[id]; if (p && p.cellarItem === 'lyhty') { p.cellarItem = null; G.mg.lamps[id] = true; if (type === 'ovet') G.mg.safeHint[id] = pick([0, 1, 2].filter(x => x !== G.mg.trap)); } }
   SFX.death();
@@ -3147,6 +3164,9 @@ function mgBad(type, r) {
   if (type === 'muisti' || type === 'matikka') return (5 - (r.count || 0)) * 1e6 + (r.t || 99999);
   if (type === 'varit') return (10 - (r.count || 0)) * 1e6 + (r.t || 99999);
   if (type === 'kirstut') return 1e6 - (r.gold || 0);
+  if (type === 'kuvio' || type === 'laske') return (3 - (r.count || 0)) * 1e6 + (r.t || 99999);
+  if (type === 'mylly') return 1000 - (r.taps || 0);
+  if (type === 'ajastin') return r.err == null ? 99999 : r.err;
   return 0;
 }
 function mgLabel(type, r) {
@@ -3158,6 +3178,10 @@ function mgLabel(type, r) {
   if (type === 'varit') return (r.count || 0) + '/10 oikein';
   if (type === 'kirstut') return r.trapped ? '👹 ansa!' : (r.gold || 0) + ' kultaa';
   if (type === 'uhri') return '🕯️ ' + (r.bid || 0) + ' p';
+  if (type === 'kuvio') return (r.count || 0) + '/3 kuviota';
+  if (type === 'laske') return (r.count || 0) + '/3 oikein';
+  if (type === 'mylly') return '⚙️ ' + (r.taps || 0) + ' klikkausta';
+  if (type === 'ajastin') return r.ms == null ? 'ei pysäyttänyt' : '⏱️ ' + (r.ms / 1000).toFixed(2).replace('.', ',') + ' s';
   return '';
 }
 function endMinigame() {
@@ -3168,6 +3192,7 @@ function endMinigame() {
       if (mg.type === 'matikka') r.count = Math.min(5, (r.count || 0) + 1);
       if (mg.type === 'varit') r.count = Math.min(10, (r.count || 0) + 2);
       if (mg.type === 'uhri') r.bidEff = (r.bid || 0) + 150;
+      if (mg.type === 'mylly') r.taps = (r.taps || 0) + 8;
     }
     return r; };
   const fail = new Set();
@@ -3179,6 +3204,9 @@ function endMinigame() {
     if (mg.type === 'ovet' && (r.door == null || r.door === mg.trap)) fail.add(id);
     if (mg.type === 'varit' && (r.count || 0) < 8) fail.add(id);
     if (mg.type === 'kirstut' && (r.gold || 0) < 400) fail.add(id);
+    if ((mg.type === 'kuvio' || mg.type === 'laske') && (r.count || 0) < 2) fail.add(id);
+    if (mg.type === 'mylly' && (r.taps || 0) < 35) fail.add(id);
+    if (mg.type === 'ajastin' && (r.err == null || r.err > 400)) fail.add(id);
   }
   if (mg.type === 'uhri' && ids.length) {
     const eff = ids.map(id => { const r = adj(id); return r.bidEff != null ? r.bidEff : (r.bid || 0); }), mn = Math.min(...eff);
@@ -3382,6 +3410,9 @@ function handle(p, d) {
       const answers = Array.isArray(r.answers) ? r.answers.slice(0, 5) : [];
       clean.count = answers.filter((a, i) => G.mg.probs[i] && Number(a) === G.mg.probs[i].a).length; clean.t = Number(r.t) || 99999;
     }
+    if (G.mg.type === 'kuvio' || G.mg.type === 'laske') { clean.count = Math.max(0, Math.min(3, r.count | 0)); clean.t = Number(r.t) || 99999; }
+    if (G.mg.type === 'mylly') { clean.taps = Math.max(0, Math.min(150, r.taps | 0)); clean.final = true; }
+    if (G.mg.type === 'ajastin') { const ms = Math.max(0, Math.min(60000, Math.round(Number(r.ms) || 0))); clean.ms = ms; clean.err = Math.abs(ms - 5000); clean.final = true; }
     if (G.mg.type === 'ovet') { const dd = Number(r.door); clean.door = dd >= 0 && dd < 3 ? dd : null; clean.final = true; }
     G.mg.results[p.id] = clean; renderHost(); sync();
     const ids = G.cellar.filter(id => G.players[id] && (G.players[id].bot || G.players[id].connected));
@@ -3435,6 +3466,9 @@ function botsAct() {
       if (t === 'matikka') { r.answers = G.mg.probs.map(x => Math.random() < .82 ? x.a : x.a + 1); r.t = 8000 + rnd(9000); }
       if (t === 'ovet') r.door = rnd(3);
       if (t === 'varit') { r.count = 6 + rnd(5); r.t = 9000 + rnd(9000); }
+      if (t === 'kuvio' || t === 'laske') { r.count = Math.random() < .6 ? 3 : 1 + rnd(2); r.t = 10000 + rnd(10000); }
+      if (t === 'mylly') r.taps = 28 + rnd(25);
+      if (t === 'ajastin') r.ms = 5000 + rnd(900) - 450;
       if (t === 'uhri') r.bid = Math.round(p.score * pick([0, .1, .25, .5, 1]));
       if (t === 'kirstut') {
         const target = 3 + rnd(4); let n = 0;
@@ -4062,6 +4096,7 @@ function invHTML(me) {
 function lampText(mg) {
   return {reaktio: 'aikaasi vähennetään 150 ms.', muisti: 'yksi väärä nuotti annetaan anteeksi.', matikka: 'yksi väärä vastaus annetaan anteeksi.',
     varit: 'kaksi virhettä annetaan anteeksi.', ovet: 'valaisee yhden turvallisen oven.', uhri: 'uhriisi lasketaan vertailussa ilmaiseksi +150 p.',
+    kuvio: 'kuvio näkyy pidempään.', laske: 'kummitukset näkyvät pidempään.', mylly: 'saat 8 ilmaista klikkausta.', ajastin: 'kello näkyy 3,5 sekuntiin asti.',
     kirstut: `ansa odottaa ${mg.trapAt}. avaamassasi kirstussa.`}[mg.type] || 'apua tulossa.';
 }
 function shopHTML(v) {
@@ -4490,6 +4525,76 @@ function startMinigame(v) {
       });
     };
     draw();
+  }
+  if (mg.type === 'kuvio') {
+    let round = 0, count = 0; const show = mg.lamp ? 3500 : 2200;
+    const next = ok => { round++; const fin = round >= mg.grids.length; send({count, t: Math.round(performance.now() - t0), final: fin}); setTimeout(() => fin ? done(count + ' / 3 kuviota oikein') : play(), ok ? 600 : 1300); };
+    const play = () => {
+      const pat = new Set(mg.grids[round]);
+      box.innerHTML = `<h2>🔮 Kirottu kuvio</h2><p class="dim" id="kst" style="margin:0">Kuvio ${round + 1} / 3 · paina mieleen!</p><div class="kgrid">${Array.from({length: 16}, (_, i) => `<button class="kcell ${pat.has(i) ? 'lit' : ''}" data-k="${i}" disabled aria-label="Ruutu ${i + 1}"></button>`).join('')}</div>`;
+      const cells = $$('.kcell'), got = new Set(); let over = false;
+      const tm = setTimeout(() => { cells.forEach(c => { c.classList.remove('lit'); c.disabled = false; }); const ks = $('#kst'); if (ks) ks.textContent = `Toista kuvio! ${pat.size} ruutua`; }, show); P.cleanup.push(() => clearTimeout(tm));
+      cells.forEach(c => c.onclick = () => {
+        if (over) return; const k = +c.dataset.k; if (got.has(k)) return;
+        if (pat.has(k)) { got.add(k); c.classList.add('ok'); if (got.size === pat.size) { over = true; count++; next(true); } }
+        else { over = true; c.classList.add('bad'); cells.forEach(x => { const xk = +x.dataset.k; if (pat.has(xk) && !got.has(xk)) x.classList.add('miss'); }); next(false); }
+      });
+    };
+    play();
+  }
+  if (mg.type === 'laske') {
+    let round = 0, count = 0;
+    const play = () => {
+      const g = mg.ghosts[round], decoy = pick(['🎃', '🦇', '🕷️', '💀']);
+      const items = shuffle([...Array(g.n).fill('👻'), ...Array(g.d).fill(decoy)]);
+      box.innerHTML = `<h2>👻 Kummituslaskenta</h2><p class="dim" style="margin:0">Kierros ${round + 1} / 3 · laske vain 👻</p><div class="gfield">${items.map(e => `<span style="left:${3 + rnd(82)}%;top:${3 + rnd(78)}%">${e}</span>`).join('')}</div>`;
+      const tm = setTimeout(() => {
+        box.innerHTML = `<h2>👻 Kummituslaskenta</h2><p class="dim" style="margin:0">Kierros ${round + 1} / 3</p><div class="mathq">Montako 👻?</div><form class="mathrow" id="gf"><input id="gi" inputmode="numeric" autocomplete="off" aria-label="Kummitusten määrä"><button class="btn primary" type="submit">OK</button></form>`;
+        const gi = $('#gi'); gi.focus();
+        $('#gf').addEventListener('submit', e => {
+          e.preventDefault(); if (gi.value.trim() === '') return;
+          const ok = Number(gi.value.trim()) === g.n; if (ok) count++; round++; const fin = round >= mg.ghosts.length;
+          send({count, t: Math.round(performance.now() - t0), final: fin});
+          box.innerHTML = `<div class="big">${ok ? '✅' : '❌'}</div><h2>${ok ? 'Oikein!' : 'Kummituksia oli ' + g.n}</h2>`;
+          setTimeout(() => fin ? done(count + ' / 3 oikein') : play(), 1100);
+        });
+      }, mg.lamp ? 4200 : 2600);
+      P.cleanup.push(() => clearTimeout(tm));
+    };
+    play();
+  }
+  if (mg.type === 'mylly') {
+    let taps = 0, startAt = 0, over = false, iv = null;
+    box.innerHTML = `<h2>⚙️ Kidutusmylly</h2><p class="dim" style="margin:0">Klikkaa myllyä niin nopeasti kuin pystyt! Aika (8 s) alkaa ensimmäisestä klikkauksesta. Välilyöntikin käy.</p>
+      <div class="mathq" id="myc">0</div><button class="millbtn" id="myb" aria-label="Pyöritä myllyä">⚙️</button><div class="timerbar"><i id="myt" style="width:100%"></i></div>`;
+    const b = $('#myb'), c = $('#myc'), bar = $('#myt');
+    const finish = () => { if (over) return; over = true; clearInterval(iv); send({taps, final: true}); done(taps + ' klikkausta', taps >= 35 ? 'Mylly pyörii! Odota muita…' : 'Liian hidasta… Odota tuomiota.'); };
+    const tap = () => {
+      if (over) return;
+      if (!startAt) { startAt = performance.now(); iv = setInterval(() => { const left = 8000 - (performance.now() - startAt); bar.style.width = Math.max(0, left / 80) + '%'; if (left <= 0) finish(); }, 50); }
+      taps++; c.textContent = taps; b.style.transform = `rotate(${taps * 30}deg)`;
+    };
+    b.addEventListener('pointerdown', tap);
+    const key = e => { if (e.code === 'Space') { e.preventDefault(); if (!e.repeat) tap(); } };
+    document.addEventListener('keydown', key);
+    P.cleanup.push(() => { clearInterval(iv); document.removeEventListener('keydown', key); });
+  }
+  if (mg.type === 'ajastin') {
+    const hideAt = mg.lamp ? 3500 : 2000, f2 = ms => (ms / 1000).toFixed(2).replace('.', ',');
+    box.innerHTML = `<h2>⏱️ Pommin ajastin</h2><p class="dim" style="margin:0">Pysäytä kello tasan <b>5,00 s</b> kohdalla. Kello katoaa ${mg.lamp ? '3,5' : '2'} sekunnin jälkeen!</p>
+      <div class="bombclock" id="bc">0,00</div><button class="btn primary" id="bst" style="font-size:1.5rem;padding:16px 28px">💣 Käynnistä</button><p class="dim" style="margin:0">Välilyöntikin käy.</p>`;
+    const bc = $('#bc'), bt = $('#bst'); let st = 0, raf = 0, over = false;
+    const tick = () => { const e = performance.now() - st; if (e < hideAt) bc.textContent = f2(e); else { bc.textContent = '?,??'; bc.classList.add('hidden'); } raf = requestAnimationFrame(tick); };
+    const press = () => {
+      if (over) return;
+      if (!st) { st = performance.now(); bt.textContent = '✋ PYSÄYTÄ!'; tick(); return; }
+      over = true; cancelAnimationFrame(raf); const ms = Math.round(performance.now() - st), err = Math.abs(ms - 5000);
+      send({ms, final: true}); done(f2(ms) + ' s', `Heitto ${f2(err)} s. ${err <= 400 ? 'Pommi purettu!' : 'Tik tak… BUUM?'} Odota tuomiota.`);
+    };
+    bt.onclick = press;
+    const key = e => { if (e.code === 'Space') { e.preventDefault(); if (!e.repeat) press(); } };
+    document.addEventListener('keydown', key);
+    P.cleanup.push(() => { cancelAnimationFrame(raf); document.removeEventListener('keydown', key); });
   }
   if (mg.type === 'kirstut') {
     const st = mg.chest || {opened: 0, gold: 0}; const clicked = []; let pending = false;
