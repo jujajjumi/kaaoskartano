@@ -3535,7 +3535,7 @@ function startClass() {
     for (let i = 0; i < n; i++) { let avail = CG[r].map((_, k) => k).filter(k => !used.has(k)); if (!avail.length) { used.clear(); avail = CG[r].map((_, k) => k); } const roomE = G.cplan.filter(x => x.rno === ri).map(x => CG[r][x.gi].e), fresh = avail.filter(k => !roomE.includes(CG[r][k].e)); const gi = pick(fresh.length ? fresh : avail); used.add(gi); G.cplan.push({room: r, gi, i, n, rno: ri, rooms: seq.length}); } });
   G.mode = 'luokat'; G.qi = 0; G.fq = 0; G.finale = false; G.winner = null; G.cgIntroAt = -1; G.cg = null; G.step = null; G.cstep = null; G.roundType = 'luokka'; G.supportTo = null;
   for (const p of plist()) { p.score = 0; p.ghost = false; p.cards = []; p.pos = 0; p.gold = 300; p.shield = null; p.cellarItem = null; p.flags = {}; p.delta = 0; }
-  resetRoundState(); dealCards(true);
+  resetRoundState();
   quip('classIntro');
   setPhase('intro', 7000, classNext);
 }
@@ -3544,15 +3544,14 @@ function classNext() {
   if (q >= PL.length) return classEnd();
   const st = PL[q]; G.cstep = st; G.roundType = 'luokka';
   if (st.i === 0 && G.cgIntroAt !== q) {
-    G.cgIntroAt = q; if (st.room !== 'erityis' && q > 0) dealCards(true);
+    G.cgIntroAt = q;
     G.tline = pick(TEACHERS[st.room].lines.intro); G.quip = '';
     return setPhase('room_intro', 8000, classNext);
   }
   resetRoundState(); G.supportTo = null;
   G.cg = cgBuild(st.room, CG[st.room][st.gi]); G.cur = {kind: 'cg', cat: TEACHERS[st.room].subject, q: '', opts: []};
   G.tline = pick(TEACHERS[st.room].lines.tip);
-  if (st.room === 'erityis') return cgStart();
-  setPhase('prep', 9000, cgStart);
+  setPhase('cg_intro', st.room === 'erityis' ? 6000 : 7000, cgStart);
 }
 function cgStart() { G.cg.results = {}; G.cg.started = Date.now(); setPhase('cgame', G.cg.dur, cgEnd); }
 function cgEnd() {
@@ -3561,7 +3560,7 @@ function cgEnd() {
   if (cg.engine === 'hengitys') {
     for (const p of ps) { const s = sc(p); p.delta = s >= 300 ? 200 : s > 0 ? 50 : 0; p.score += p.delta; }
     const last = ps.slice().sort((a, b) => a.score - b.score)[0];
-    if (last && ps.length > 1) { last.shield = {k: 'kilpi', vs: null}; G.supportTo = last.id; setTimeout(() => toast(`Erityisopettaja antoi pelaajalle ${last.name} tukikortin: 🛡️ Kilpi suojaa seuraavalta jekulta`, '🫧', true), 900); }
+    if (last && ps.length > 1) { last.score += 150; last.delta = (last.delta || 0) + 150; G.supportTo = last.id; setTimeout(() => toast(`Erityisopettaja antoi pelaajalle ${last.name} +150 tukipistettä. Jokainen ansaitsee kannustusta!`, '🫧', true), 900); }
     G.tline = pick(TEACHERS.erityis.lines.good);
   } else {
     const n = ps.length;
@@ -3650,11 +3649,11 @@ function classStageHTML() {
         <div class="tgames">${games.map(gd => `<span class="tg">${CG_ENGINES[gd.e].emoji} ${esc(gd.t)}</span>`).join('')}</div></div></div>
         ${teacherBubble(st.room, G.tline)}${roomPlanHTML()}</div>`;
     }
-    case 'prep': {
+    case 'cg_intro': {
       const g = G.cg;
       return `<div class="center"><div class="label">${esc(T.subject)} · minipeli ${st.i + 1} / ${st.n}</div>
         <div class="roundcard"><div class="em">${g.emoji}</div><h2>${esc(g.title)}</h2><p>${esc(g.desc)}</p></div>
-        ${teacherBubble(st.room, G.tline)}<div style="width:100%;display:grid;gap:6px"><div class="label">Jekkuvaihe: pelaa kortit Chromebookilla</div>${timerBar()}</div></div>`;
+        ${teacherBubble(st.room, G.tline)}<div style="width:100%;display:grid;gap:6px"><div class="label">Valmistautukaa, peli alkaa pian!</div>${timerBar()}</div></div>`;
     }
     case 'cgame': {
       const g = G.cg, rows = plist().map(p => ({p, r: g.results[p.id] || {}})).sort((a, b) => (b.r.score || 0) - (a.r.score || 0)), mx = Math.max(1, ...rows.map(x => x.r.score || 0));
@@ -3674,7 +3673,7 @@ function classStageHTML() {
         ${teacherBubble(st.room, G.tline)}</div>`;
       return `<div class="center"><div class="mgname">${g.emoji} ${esc(g.title)}</div>
         ${g.engine === 'hengitys' ? '<p style="margin:0;font-size:1.2rem">Vähintään 60 % rauhallisuus: <b>+200 p</b> kaikille, jotka siihen pystyivät.</p>' : ''}
-        <div class="reslist">${G.cgRank.map((id, i) => { const p = G.players[id]; if (!p) return ''; return `<div class="rr ${i === 0 && sc(id) > 0 ? 'best' : ''}"><span>${i + 1}. ${avH(p)} ${esc(p.name)}${G.supportTo === id ? ' 🛡️' : ''}</span><span class="dim">${g.engine === 'hengitys' ? Math.round(sc(id) / 5) + ' % rauhallisuus' : sc(id) + ' p pelissä'}</span><b>${p.delta ? '+' + p.delta : ''}</b></div>`; }).join('')}</div>
+        <div class="reslist">${G.cgRank.map((id, i) => { const p = G.players[id]; if (!p) return ''; return `<div class="rr ${i === 0 && sc(id) > 0 ? 'best' : ''}"><span>${i + 1}. ${avH(p)} ${esc(p.name)}${G.supportTo === id ? ' 🤗' : ''}</span><span class="dim">${g.engine === 'hengitys' ? Math.round(sc(id) / 5) + ' % rauhallisuus' : sc(id) + ' p pelissä'}</span><b>${p.delta ? '+' + p.delta : ''}</b></div>`; }).join('')}</div>
         ${teacherBubble(st.room, G.tline)}</div>`;
     }
   }
@@ -3688,7 +3687,7 @@ function roomsBuilderHTML() {
     <div class="rtypes">${ROOM_ORDER.map(r => `<button class="rtype" data-room="${r}" ${rooms.length >= 8 ? 'disabled' : ''} title="${esc(TEACHERS[r].name)}: ${CG[r].map(g => g.t).join(', ')}"><span class="pe">${TEACHERS[r].emoji}</span><span>${esc(TEACHERS[r].subject)}</span></button>`).join('')}</div>
     <div class="row" style="gap:14px"><label class="dim inl">Minipelejä per aine <select id="s-cgper">${[1, 2, 3].map(v => `<option ${v == per ? 'selected' : ''}>${v}</option>`).join('')}</select></label>
       <label class="inl chk"><input type="checkbox" id="s-erityis" ${er ? 'checked' : ''}> 🫧 Erityisopettajan välituokio</label></div>
-    <p class="dim" style="margin:0;font-size:.8rem">Kaikki pelaavat jokaisen minipelin omalla koneellaan. Ennen minipeliä on jekkuvaihe. Sijoitus tuo pisteitä, eniten pisteitä kerännyt voittaa.</p></div>`;
+    <p class="dim" style="margin:0;font-size:.8rem">Kaikki pelaavat jokaisen minipelin omalla koneellaan. Luokkahuoneissa ei ole jekkuja, vaan pelkkää taitoa. Sijoitus tuo pisteitä, eniten pisteitä kerännyt voittaa.</p></div>`;
 }
 
 /* ---------- pelaaja: minipelit ---------- */
@@ -4391,7 +4390,7 @@ function viewFor(p) {
   if (G.mode === 'luokat' && G.cstep) {
     const st = G.cstep, TT = TEACHERS[st.room];
     if (G.phase === 'room_intro') v.room = {subject: TT.subject, name: TT.name, emoji: TT.emoji, img: TT.img || null, color: TT.color, trait: TT.trait, line: G.tline, n: st.rno + 1, total: st.rooms, games: G.cplan.filter(x => x.rno === st.rno).map(x => CG_ENGINES[CG[x.room][x.gi].e].emoji + ' ' + CG[x.room][x.gi].t)};
-    if (G.phase === 'prep' && G.cg) v.cgPrep = {emoji: G.cg.emoji, name: G.cg.title, desc: G.cg.desc, label: `${TT.subject} · minipeli ${st.i + 1} / ${st.n}`};
+    if (G.phase === 'cg_intro' && G.cg) v.cgPrep = {emoji: G.cg.emoji, name: G.cg.title, desc: G.cg.desc, label: `${TT.subject} · minipeli ${st.i + 1} / ${st.n}`};
     if (G.phase === 'cgame' && G.cg) { v.cg = {id: G.cg.id, engine: G.cg.engine, title: G.cg.title, emoji: G.cg.emoji, dur: G.cg.dur, data: G.cg.data}; v.cgRemain = Math.max(0, G.phaseEnd - Date.now()); v.cgDone = !!(G.cg.results[p.id] && G.cg.results[p.id].final); v.cgMine = G.cg.results[p.id] ? G.cg.results[p.id].score : 0; }
     if (G.phase === 'cg_result' && G.cg) { const r = G.cg.results[p.id] || {}; v.cgRes = {score: r.score || 0, delta: p.delta || 0, rank: G.cgRank.indexOf(p.id) + 1, n: G.cgRank.length, title: G.cg.title, emoji: G.cg.emoji, engine: G.cg.engine, support: G.supportTo === p.id, line: G.tline, teacher: TT.name}; }
   }
@@ -4516,7 +4515,7 @@ function makeQ(raw) {
   return {kind: 'mc', q: raw[0], opts, correct: opts.indexOf(correctText), cat: raw[5] || 'Sekalaiset', img: raw[6] || ''};
 }
 function dealCards(all) {
-  for (const p of plist()) if ((p.ghost || all) && p.cards.length < 3) p.cards.push(pick(ATK));
+  for (const p of plist()) if ((p.ghost || all) && p.cards.length < 2) p.cards.push(pick(ATK));
 }
 /* ---------- shop ---------- */
 function isLeader(p) { const live = plist().filter(x => !x.ghost); const top = Math.max(0, ...live.map(x => x.score)); return !p.ghost && top > 0 && p.score === top; }
@@ -4525,7 +4524,7 @@ function buyBlock(p, k, it) {
   const S = SHOP[k];
   if (it && it.stock <= 0) return 'Loppu';
   if (p.ghost && S.g !== 'atk' && k !== 'murtaja') return 'Haamu ostaa vain jekkuja';
-  if (S.g === 'atk' && p.cards.length >= 3) return 'Kädessä on jo 3 korttia';
+  if (S.g === 'atk' && p.cards.length >= 2) return 'Kädessä on jo 2 korttia';
   if (S.g === 'shield' && p.shield) return 'Sinulla on jo suoja';
   if (S.g === 'cellar' && p.cellarItem) return 'Sinulla on jo kellarisuoja';
   if (S.g === 'flag' && p.flags[k]) return 'Sinulla on jo tämä';
@@ -4613,6 +4612,7 @@ function nextQuestion() {
   else if (rt === 'vihje') { const r = G.clueList[G.ci++ % G.clueList.length]; const opts = shuffle([r[0], ...r[2]]); G.cur = {kind: 'clue', q: 'Kuka tai mikä on kyseessä?', clues: r[1], opts, correct: opts.indexOf(r[0]), shown: 1, cat: r[3] || 'Vihje'}; }
   else if (rt === 'buzz') { let r = G.qList[G.qi]; if (G.usedQ.has(qKey(r))) r = drawQ(G.qList, 'qi2'); G.usedQ.add(qKey(r)); const c = makeQ(r); Object.assign(c, {kind: 'buzz', queue: [], turn: null, tried: [], done: false, winner: null, turnKey: ''}); G.cur = c; }
   else { G.usedQ.add(qKey(G.qList[G.qi])); G.cur = makeQ(G.qList[G.qi]); }
+  if (G.step && G.step.i > 0 && G.roundType !== 'pommi') return startQuestion();   // jekkuvaihe vain kierroksen alussa
   dealCards(false);
   quip('prep');
   setPhase('prep', G.roundType === 'pommi' ? 11000 : 9000, startQuestion);
@@ -4919,7 +4919,7 @@ function endMinigame() {
   for (const id of [...fail]) { const p = G.players[id]; if (p.cellarItem === 'henki') { p.cellarItem = null; fail.delete(id); G.saved.push(id); toast(`${p.name} käytti Toisen hengen ja selvisi!`, '❤️', true); } }
   G.lastDeaths = [...fail];
   for (const id of ids) if (!fail.has(id)) G.players[id].gold = (G.players[id].gold || 0) + 100;
-  for (const id of fail) { const p = G.players[id]; p.ghost = true; p.shield = null; p.cellarItem = null; if (p.cards.length < 3) p.cards.push(pick(ATK)); }
+  for (const id of fail) { const p = G.players[id]; p.ghost = true; p.shield = null; p.cellarItem = null; if (p.cards.length < 2) p.cards.push(pick(ATK)); }
   if (fail.size) { SFX.death(); quip('death', {n: G.lastDeaths.map(id => G.players[id].name).join(' ja ')}); }
   else { SFX.right(); quip('survive'); }
   setPhase('mg_result', 7500, () => { G.qi++; nextQuestion(); });
@@ -4938,6 +4938,7 @@ function startFinale() {
 function finaleQuestion() {
   resetRoundState(); G.roundType = 'nopein';
   G.cur = makeQ(G.qList[G.settings.rounds + G.fq] || pick(QBANK));
+  if (G.fq % 2 === 1) return startQuestion();   // finaalissa jekkuvaihe joka toisessa kysymyksessä
   dealCards(false);
   setPhase('prep', 6000, startQuestion);
 }
@@ -5257,7 +5258,7 @@ function stageHTML() {
     case 'lobby': return lobbyHTML();
     case 'intro': return `<div class="center"><div class="welcome"><img class="schoolimg" src="${SCHOOL_IMG}" alt="Vuoksenniskan koulu kummitusyönä"><div class="wtext"><span class="wsmall">Tervetuloa</span><span class="wbig">Vuoksenniskan kouluun!</span></div><img class="wjumisko" src="${HOST_FULL}" alt="Lehtori Jumisko"></div>
       <div class="roundcard"><h2>${G.mode === 'luokat' ? 'Luokkahuoneet' : 'Hassun hauska Vuoksenniska'}</h2><p>Juontajana ${HOST_NAME}</p></div>${bubble()}
-      ${G.mode === 'luokat' ? `${roomPlanHTML()}<p class="dim" style="max-width:62ch;margin:0">Jokaisessa luokkahuoneessa opettaja teettää minipelejä. Kaikki pelaavat omalla koneellaan, ja sijoitus tuo pisteitä. Ennen minipeliä voi heittää jekkukortteja. Eniten pisteitä kerännyt on luokan priimus.</p></div>` : `<p class="dim" style="max-width:62ch;margin:0">Väärä vastaus vie kellariin. Kellarissa hävinnyt muuttuu haamuksi, joka pelaa silti ja saa jekkukortin joka kierros. Pisteistä saa kultaa, jolla ostetaan jekkuja ja suojia Kellarimestarin puodista jokaisen kierroksen jälkeen. Pisteet ratkaisevat finaalin lähtöpaikan.</p></div>`}`;
+      ${G.mode === 'luokat' ? `${roomPlanHTML()}<p class="dim" style="max-width:62ch;margin:0">Jokaisessa luokkahuoneessa opettaja teettää minipelejä. Kaikki pelaavat omalla koneellaan, ja sijoitus tuo pisteitä. Täällä ei jekuteta, vaan pelkkä taito ratkaisee. Eniten pisteitä kerännyt on luokan priimus.</p></div>` : `<p class="dim" style="max-width:62ch;margin:0">Väärä vastaus vie kellariin. Kellarissa hävinnyt muuttuu haamuksi, joka pelaa silti ja saa jekkukortin joka kierros. Pisteistä saa kultaa, jolla ostetaan jekkuja ja suojia Kellarimestarin puodista jokaisen kierroksen jälkeen. Pisteet ratkaisevat finaalin lähtöpaikan.</p></div>`}`;
     case 'roundintro': { const st = G.step, R = ROUNDS[st.t];
       return `<div class="center"><div class="label">Kierros ${st.rno + 1} / ${st.rounds}</div><div class="roundcard big"><div class="em">${R.emoji}</div><h2>${R.name}</h2><p>${R.desc}</p></div>
         <div class="rplan">${[...new Set(G.plan.map(x => x.rno))].map(r => { const t = G.plan.find(x => x.rno === r).t; return `<span class="rp ${r === st.rno ? 'cur' : r < st.rno ? 'done' : ''}">${ROUNDS[t].emoji} ${r + 1}</span>`; }).join('<i>→</i>')}<i>→</i><span class="rp">🚪</span></div>${bubble()}</div>`; }
@@ -5877,7 +5878,8 @@ function renderPlayer(full) {
     case 'roundintro': main = v.rIntro ? `<div class="label">Kierros ${v.rIntro.n} / ${v.rIntro.total}</div><div class="big">${v.rIntro.emoji}</div><h2>${esc(v.rIntro.name)}</h2><p>${esc(v.rIntro.desc)}</p>` : ''; break;
     case 'room_intro': { const R = v.room; main = R ? `<div class="label">Luokkahuone ${R.n} / ${R.total}</div><div class="tportrait small" style="--tc:${R.color}">${R.img ? `<img src="${R.img}" alt="">` : `<span>${R.emoji}</span>`}</div><h2>${esc(R.subject)}</h2><p style="margin:0"><b>${esc(R.name)}</b> · ${esc(R.trait)}</p><p class="tquote">”${esc(R.line)}”</p><div class="tgames">${R.games.map(t => `<span class="tg">${esc(t)}</span>`).join('')}</div>` : ''; break; }
     case 'cgame': main = v.cgDone ? `<div class="big">✅</div><h2>${v.cgMine} p</h2><p class="dim">Valmis! Odota muita…</p>` : '<div id="cgbox" class="cgbox"></div>'; break;
-    case 'cg_result': { const R = v.cgRes; main = R ? `<div class="label">${R.emoji} ${esc(R.title)}</div><div class="big">${R.engine === 'hengitys' ? '🫧' : R.rank === 1 ? '🏆' : R.rank <= 3 ? '🥈' : '📚'}</div><h2>${R.engine === 'hengitys' ? 'Rauhallisuus ' + Math.round(R.score / 5) + ' %' : R.rank + '. sija / ' + R.n}</h2>${R.engine === 'hengitys' ? '' : `<p style="margin:0">${R.score} p pelissä</p>`}<p class="goldline">+${R.delta} pistettä</p>${R.support ? '<p class="support">🫧 Erityisopettaja antoi sinulle tukikortin: 🛡️ Kilpi suojaa seuraavalta jekulta!</p>' : ''}<p class="tquote">${esc(R.teacher)}: ”${esc(R.line)}”</p>` : ''; foot = reactBar(); break; }
+    case 'cg_result': { const R = v.cgRes; main = R ? `<div class="label">${R.emoji} ${esc(R.title)}</div><div class="big">${R.engine === 'hengitys' ? '🫧' : R.rank === 1 ? '🏆' : R.rank <= 3 ? '🥈' : '📚'}</div><h2>${R.engine === 'hengitys' ? 'Rauhallisuus ' + Math.round(R.score / 5) + ' %' : R.rank + '. sija / ' + R.n}</h2>${R.engine === 'hengitys' ? '' : `<p style="margin:0">${R.score} p pelissä</p>`}<p class="goldline">+${R.delta} pistettä</p>${R.support ? '<p class="support">🫧 Erityisopettaja antoi sinulle +150 tukipistettä. Hienoa, että yrität!</p>' : ''}<p class="tquote">${esc(R.teacher)}: ”${esc(R.line)}”</p>` : ''; foot = reactBar(); break; }
+    case 'cg_intro': { const C = v.cgPrep; main = C ? `<div class="label">${esc(C.label)}</div><div class="big">${C.emoji}</div><h2>${esc(C.name)}</h2><p>${esc(C.desc)}</p><p class="goldline">Valmistaudu, peli alkaa pian!</p>${pTimer(v.remain)}` : ''; break; }
     case 'prep': main = prepHTML(v, others); break;
     case 'shop': main = shopHTML(v); break;
     case 'question': main = (v.hasImg ? '<div class="imgnote">🖼️ Katso kuva valkokankaalta!</div>' : '') + questionHTML(v); break;
