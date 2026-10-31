@@ -794,6 +794,32 @@ details.packgrp>.packrow{margin-top:6px}
 .ghide:hover,.ghide:focus-visible{opacity:1}
 .gcard b{font-size:.95rem} .gcard small{color:var(--dim);font-weight:700}
 @media (max-width:600px){.drawrow{grid-template-columns:1fr}.dmodel .msvg{width:140px}}
+/* etätila */
+.player.remote{grid-template-rows:auto auto 1fr auto}
+.rpanel{display:grid;gap:6px;border-radius:18px;border:3px solid var(--line);background:rgba(0,0,0,.25);padding:6px}
+.rhead{display:flex;align-items:center;gap:8px;font-size:.85rem;padding:0 4px}
+.rhead .grow{flex:1}
+.rstage{min-height:0;padding:10px;border-width:3px;box-shadow:4px 4px 0 var(--line);overflow:auto;max-height:none}
+.rpanel.compact .rstage{max-height:34vh}
+.rpanel.compact .rstage.big,.rstage.big{max-height:none}
+.rstage .host-bubble .txt{font-size:1rem;padding:10px 14px}
+.rstage .face.img img{width:56px}
+.rstage .btn,.rstage .ghide,.rstage .kick{display:none!important}
+.rrail{flex-wrap:nowrap;overflow-x:auto;justify-content:flex-start;min-height:0;gap:6px;padding:2px 2px 6px;scrollbar-width:none}
+.rrail::-webkit-scrollbar{display:none}
+.rrail .chip{flex:none;padding:3px 10px 3px 3px;gap:5px;font-size:.8rem;box-shadow:2px 2px 0 var(--line)}
+.rpanel.mini .rstage,.rpanel.mini .rrail{display:none}
+.rstage .gallery{grid-template-columns:repeat(auto-fill,minmax(110px,1fr));gap:8px}
+.rstage .gcard{padding:5px;box-shadow:3px 3px 0 var(--line)}
+.rstage .cheerrow{grid-template-columns:1fr}
+.rrail .chip .av{width:26px;height:26px;font-size:1rem} .rrail .chip .av .avimg{width:24px;height:24px} .rrail .chip .cards{display:none}
+.remoteon{margin:0;padding:8px 12px;border-radius:12px;background:#123a4a;border:2px solid var(--ghost);font-weight:700}
+.remotesw{display:grid!important;grid-template-columns:auto auto;align-items:center;gap:4px 8px}
+.remotesw small{grid-column:1/-1;font-size:.75rem}
+.tgl{width:52px;height:28px;border-radius:999px;background:var(--wall2);border:3px solid var(--line);position:relative;justify-self:start}
+.tgl i{position:absolute;left:2px;top:2px;width:18px;height:18px;border-radius:50%;background:var(--dim);transition:left .15s}
+.tgl.on{background:var(--g)} .tgl.on i{left:26px;background:#fff}
+.rmark{font-size:.8em}
 @keyframes pop{0%{transform:scale(.2);opacity:0}100%{transform:scale(1);opacity:1}}
 @keyframes pulse{50%{outline-color:var(--y)}}
 @keyframes shake{0%,100%{transform:translateX(0)}20%{transform:translateX(-14px) rotate(-2deg)}40%{transform:translateX(12px) rotate(2deg)}60%{transform:translateX(-8px)}80%{transform:translateX(6px)}}
@@ -4017,13 +4043,13 @@ const QUIPS = {
 let AC = null;
 function audio() { if (!AC) { try { AC = new (window.AudioContext || window.webkitAudioContext)(); } catch (e) {} } return AC; }
 function tone(f, d = .15, type = 'square', vol = .06, when = 0, f2) {
-  const ac = audio(); if (!ac || !G.sound) return;
+  const ac = audio(); if (!ac || !G.sound) return; if (G.role !== 'host') vol *= .55;
   const t = ac.currentTime + when, o = ac.createOscillator(), g = ac.createGain();
   o.type = type; o.frequency.setValueAtTime(f, t); if (f2) o.frequency.exponentialRampToValueAtTime(f2, t + d);
   g.gain.setValueAtTime(vol, t); g.gain.exponentialRampToValueAtTime(.0001, t + d);
   o.connect(g); g.connect(ac.destination); o.start(t); o.stop(t + d + .02);
 }
-const SFX = {
+const SFX0 = {
   start() { [262, 330, 392, 523].forEach((f, i) => tone(f, .18, 'square', .05, i * .1)); },
   attack() { tone(880, .35, 'sawtooth', .05, 0, 120); },
   right() { [523, 659, 784].forEach((f, i) => tone(f, .14, 'triangle', .08, i * .08)); },
@@ -4034,6 +4060,7 @@ const SFX = {
   tick() { tone(1200, .03, 'square', .03); },
   win() { [523, 659, 784, 1046, 784, 1046].forEach((f, i) => tone(f, .2, 'square', .05, i * .14)); },
 };
+const SFX = Object.fromEntries(Object.entries(SFX0).map(([k, f]) => [k, (...a) => { if (k !== 'tick') remoteFx('sfx', [k]); return f(...a); }]));
 function speak(text) {
   return; /* juontajan puhe poistettu */
   if (!G.settings.voice || !window.speechSynthesis) return;
@@ -4058,6 +4085,47 @@ const phaseKey = () => baseKey() + ':' + (G.phase === 'question' && G.cur ? G.cu
 const plist = () => G.order.map(id => G.players[id]).filter(Boolean);
 const present = () => plist().filter(p => p.bot || p.connected);
 
+/* ===== ETÄTILA: valkokangas pelaajien omille ruuduille ===== */
+const REMOTE_ACTIVE = ['question', 'cgame', 'minigame', 'prep', 'shop', 'steal'];
+let IMG_TOKENS = null;
+function imgTokens() {
+  if (IMG_TOKENS) return IMG_TOKENS;
+  const list = [];
+  try { Object.entries(FACES).forEach(([k, v]) => list.push(['F' + k, v])); Object.entries(FULLS).forEach(([k, v]) => list.push(['U' + k, v])); } catch (e) {}
+  try { list.push(['HI', HOST_IMG], ['HF', HOST_FULL], ['KM', KMASTER], ['SC', SCHOOL_IMG]); } catch (e) {}
+  try { Object.entries(TEACHERS).forEach(([k, T]) => { if (T.img) list.push(['T' + k, T.img]); if (T.full) list.push(['TF' + k, T.full]); }); } catch (e) {}
+  IMG_TOKENS = list.filter(x => typeof x[1] === 'string' && x[1].length > 200).sort((a, b) => b[1].length - a[1].length);
+  return IMG_TOKENS;
+}
+function tokenizeImgs(h) { for (const [k, v] of imgTokens()) if (h.includes(v)) h = h.split(v).join('@@IMG:' + k + '@@'); return h; }
+function untokenizeImgs(h) { const m = Object.fromEntries(imgTokens()); return h.replace(/@@IMG:([A-Za-z0-9_]+)@@/g, (_, k) => m[k] || ''); }
+const remoteTargets = () => G.role === 'host' ? plist().filter(p => !p.bot && p.connected && (G.settings.remote || p.remote)) : [];
+function remoteFx(k, a) { if (G.role !== 'host' || G.phase === 'lobby') return; const ts = remoteTargets(); if (!ts.length) return; for (const p of ts) sendTo(p, {t: 'fx', k, a}); }
+function remoteStageSoon() {
+  if (G.role !== 'host' || G.remoteT) return;
+  G.remoteT = setTimeout(() => { G.remoteT = null; sendRemoteStage(); }, 220);
+}
+function remoteShrink(h) {
+  G.rsmall = G.rsmall || {};
+  return h.replace(/data:image\/[a-z]+;base64,[A-Za-z0-9+/=]{30000,}/g, m => {
+    if (G.rsmall[m]) return G.rsmall[m];
+    if (!G.rsmall[m + '#p']) { G.rsmall[m + '#p'] = 1; const im = new Image();
+      im.onload = () => { try { const sc = Math.min(1, 560 / Math.max(im.width, im.height)), c = document.createElement('canvas'); c.width = Math.round(im.width * sc); c.height = Math.round(im.height * sc);
+        const cx = c.getContext('2d'); cx.fillStyle = '#fff'; cx.fillRect(0, 0, c.width, c.height); cx.drawImage(im, 0, 0, c.width, c.height); G.rsmall[m] = c.toDataURL('image/jpeg', .7); } catch (e) { G.rsmall[m] = 'data:image/gif;base64,R0lGODlhAQABAAAAACw='; }
+        for (const p of plist()) p.rsent = null; sendRemoteStage(); };
+      im.src = m; }
+    return 'data:image/gif;base64,R0lGODlhAQABAAAAACw=';
+  });
+}
+function sendRemoteStage(force) {
+  if (G.phase === 'lobby') return; const ts = remoteTargets(); if (!ts.length) return;
+  const st = $('.stage'); if (!st) return;
+  let h = remoteShrink(tokenizeImgs(st.innerHTML)), rail = tokenizeImgs(($('.rail') || {}).innerHTML || ''), status = G.phase === 'end' ? '🏆 Tulokset' : (($('.hstat .lng') || {}).textContent || '').trim();
+  h = h.replace(/ style="width: [\d.]+%;"/g, '').replace(/(data-secs="\d+"[^>]*>)\d+/g, '$1');
+  if (h.length + rail.length > 140000) h = h.replace(/data:image\/[a-z]+;base64,[A-Za-z0-9+/=]{20000,}/g, 'data:image/gif;base64,R0lGODlhAQABAAAAACw=');
+  let x = 5381; const all = h + '|' + rail + '|' + status; for (let i = 0; i < all.length; i++) x = ((x << 5) + x + all.charCodeAt(i)) | 0; const key = x + ':' + all.length;
+  for (const p of ts) { if (!force && p.rsent === key) continue; p.rsent = key; sendTo(p, {t: 'stage', h, rail, status, phase: G.phase, now: Date.now()}); }
+}
 const chipEl = id => document.querySelector(`.chip[data-pid="${id}"]`);
 const reducedMotion = () => { try { return matchMedia('(prefers-reduced-motion: reduce)').matches; } catch (e) { return false; } };
 function fxFly(fromId, toId, html, dur = 900) {
@@ -4090,6 +4158,7 @@ async function fxAttack(fromId, toId, emoji, outcome, shEmoji) {
   fxWord(outcome === 'pierce' ? 'RYSKIS!' : pick(['PAM!', 'ZÄP!', 'KRÄK!', 'POKS!', 'TÄRS!']), {id: toId, color: '#ffd23a', bg: '#ff3b5c'});
 }
 function fxConfetti(n = 70) {
+  remoteFx('conf', [Math.min(n, 80)]);
   if (reducedMotion() || !document.body.animate) return;
   const cols = ['#ffd23a', '#ff3b5c', '#22c46b', '#2f7dff', '#ff8a1f', '#a6ecff'];
   for (let i = 0; i < n; i++) {
@@ -4104,6 +4173,7 @@ const STAR = (() => { const pts = []; for (let i = 0; i < 24; i++) { const r = i
 (function () { const st = document.createElement('style'); st.textContent = `.roundcard .em::before,.fxword i{clip-path:${STAR}}`; document.head.appendChild(st); })();
 const WORD_COLORS = ['#ffd23a', '#ff3b5c', '#a6ecff', '#22c46b', '#ff8a1f'];
 function fxWord(text, opts = {}) {
+  remoteFx('word', [text, {big: !!opts.big, color: opts.color, bg: opts.bg}]);
   if (reducedMotion()) return;
   let x = opts.x, y = opts.y;
   if (opts.id) { const c = chipEl(opts.id); if (c) { const r = c.getBoundingClientRect(); x = r.left + r.width / 2; y = r.top - 40; } }
@@ -4175,6 +4245,7 @@ function playVoice(key) {
 }
 function quip(kind, o = {}) { G.quip = fmt(pick(QUIPS[kind]), o); G.mood = MOOD_OF[kind] || 'angry'; if (!playVoice(VOICE_OF[kind])) speak(G.quip); }
 function toast(text, emoji = '📢', red = false) {
+  remoteFx('toast', [text, emoji, red]);
   const el = document.createElement('div'); el.className = 'toast' + (red ? ' red' : '');
   el.innerHTML = `<span class="e">${emoji}</span><span>${esc(text)}</span>`;
   $('#toasts').appendChild(el); setTimeout(() => el.remove(), 4800);
@@ -4281,7 +4352,7 @@ function addBot() {
 /* ---------- per-player views ---------- */
 function viewFor(p) {
   const now = Date.now();
-  const v = {t: 'view', key: phaseKey(), phase: G.phase, code: G.code, qi: G.qi, rounds: G.settings.rounds, finale: G.finale, fq: G.fq,
+  const v = {t: 'view', key: phaseKey(), phase: G.phase, code: G.code, remote: !!G.settings.remote, qi: G.qi, rounds: G.settings.rounds, finale: G.finale, fq: G.fq,
     remain: G.phaseEnd ? Math.max(0, G.phaseEnd - now) : 0, dur: G.phaseDur,
     me: {id: p.id, name: p.name, emoji: p.emoji, score: p.score, ghost: p.ghost, cards: p.cards, pos: p.pos, answered: p.answer != null,
          incoming: Object.entries(p.effects).map(([k, by]) => ({k, by})), hasAvatar: !!p.avatar, avatarLocked: !!p.avatarLocked, gold: p.gold || 0, shield: p.shield, cellarItem: p.cellarItem, flags: p.flags || {}, shopDone: !!p.shopDone},
@@ -4896,6 +4967,7 @@ function finaleReveal() {
 /* ---------- player actions (host side) ---------- */
 function handle(p, d) {
   const now = Date.now();
+  if (d.t === 'remote') { p.remote = !!d.on; p.rsent = null; if (p.remote) setTimeout(() => sendRemoteStage(), 80); renderHost(); return; }
   if (d.t === 'react') {
     if (now - p.lastReact < 900) return; p.lastReact = now;
     if (['👻','😱','😂','🔥','💀','👏'].includes(d.e)) floater(d.e, p.name); return;
@@ -5160,7 +5232,7 @@ function avH(p, forceGhost) {
 }
 function railHTML() {
   return plist().map(p => `<div class="chip ${p.ghost ? 'ghost' : ''} ${p.bot || p.connected ? '' : 'off'}" title="${esc(p.name)}" data-pid="${p.id}">
-    <span class="av">${avH(p)}</span><span>${esc(p.name)}</span>
+    <span class="av">${avH(p)}</span><span>${esc(p.name)}${!p.bot && (G.settings.remote || p.remote) ? ' <span class="rmark" title="Pelaa etänä">📡</span>' : ''}</span>
     <span class="sc">${G.finale ? '🏃' + p.pos : p.score}</span>${chipStatus(p)}
     <span class="cards" aria-label="${p.cards.length} korttia">${'🃏'.repeat(p.cards.length)}</span>
     ${p.avatar ? `<button class="kick" data-unav="${p.id}" title="Poista piirros" aria-label="Poista pelaajan ${esc(p.name)} piirros">🖌️</button>` : ''}
@@ -5357,6 +5429,7 @@ function lobbyHTML() {
         <div>2. Valitse <b>Liity peliin</b> ja kirjoita koodi <b>${G.code}</b></div>
         <div>3. Keksi nimi ja valitse hahmo</div>
       </div>
+      <div class="row" style="justify-content:center"><button class="btn small" id="copyinv">📋 Kopioi kutsulinkki</button></div>
       <span class="netstat ${G.netOk ? 'ok' : G.netErr ? 'err' : ''}">${G.netOk ? '● Verkko valmis: ' + G.net.filter(n => n.state === 'ok').map(n => n.name).join(', ') : G.netErr ? esc(G.netErr) : '○ Avataan verkkoyhteyttä…'}</span>
     </div></div>
     <div class="panel">
@@ -5366,6 +5439,7 @@ function lobbyHTML() {
       <div class="modesw" role="radiogroup" aria-label="Pelimuoto">${[['quiz', '🎲 Tietovisa', 'Kysymyskierrokset ja kellari'], ['luokat', '🏫 Luokkahuoneet', 'Aineiden minipelit, kaikki pelaavat']].map(([k, l, d]) => `<button role="radio" aria-checked="${(G.settings.mode || 'quiz') === k}" class="msw ${(G.settings.mode || 'quiz') === k ? 'on' : ''}" data-gmode="${k}"><b>${l}</b><small>${d}</small></button>`).join('')}</div>
       <div class="settings">
         <label class="quizonly">Kysymyksiä per kierros<select id="s-per">${[2, 3, 4, 5].map(v => `<option ${v == (G.settings.per || 3) ? 'selected' : ''}>${v}</option>`).join('')}</select></label>
+        <label class="remotesw"><span>📡 Etäpeli</span><button type="button" role="switch" aria-checked="${!!G.settings.remote}" class="tgl ${G.settings.remote ? 'on' : ''}" id="s-remote"><i></i></button><small>${G.settings.remote ? 'Peli näkyy kaikkien omalla ruudulla' : 'Pois: peli näkyy valkokankaalla'}</small></label>
         <label class="quizonly">Vastausaika (s)<select id="s-timer">${[10, 15, 20, 30].map(v => `<option ${v == G.settings.timer ? 'selected' : ''}>${v}</option>`).join('')}</select></label>
         
       </div>
@@ -5405,6 +5479,7 @@ function renderHost() {
   app.innerHTML = `<div class="host ph-${G.phase}">${top}<div class="stage">${stageHTML()}</div>${G.phase === 'lobby' ? '<div></div>' : `<div class="rail">${railHTML()}</div>`}</div>`;
   const pk = phaseKey(); if (G.renderedKey !== pk) { G.renderedKey = pk; const c = $('.stage > .center'); if (c) c.classList.add('enter'); }
   if (keepY) $('.stage').scrollTop = keepY; if (keepApp) app.scrollTop = keepApp; if (keepX && $('.rail')) $('.rail').scrollLeft = keepX;
+  remoteStageSoon();
   bindHost(); tickTimers();
   if (focusId && document.getElementById(focusId)) document.getElementById(focusId).focus();
 }
@@ -5426,6 +5501,11 @@ function bindHost() {
     const k = b.dataset.pack, cur = new Set(G.settings.packs || []);
     cur.has(k) ? cur.delete(k) : cur.add(k); G.settings.packs = [...cur]; saveSettings(); renderHost();
   }));
+  on('s-remote', 'click', () => { G.settings.remote = !G.settings.remote; saveSettings(); for (const p of plist()) p.rsent = null; renderHost(); sync(); });
+  on('copyinv', 'click', async () => { const url = (G.joinUrl || (location.origin + location.pathname).replace(/index\.html$/, '')) + '#' + G.code;
+    let ok = false; try { await navigator.clipboard.writeText(url); ok = true; } catch (e) {}
+    if (!ok) { try { const ta = document.createElement('textarea'); ta.value = url; document.body.appendChild(ta); ta.select(); ok = document.execCommand('copy'); ta.remove(); } catch (e) {} }
+    toast(ok ? 'Kutsulinkki kopioitu! Liitä se WhatsAppiin tai viestiin: ' + url : 'Kopioi tämä linkki: ' + url, '📋'); });
   $$('[data-hidedraw]').forEach(b => b.addEventListener('click', () => { const r = G.cg && G.cg.results[b.dataset.hidedraw]; if (r) { r.img = null; r.hidden = true; toast('Piirros piilotettu', '🙈'); renderHost(); } }));
   $$('[data-gmode]').forEach(b => b.addEventListener('click', () => { G.settings.mode = b.dataset.gmode; saveSettings(); renderHost(); }));
   $$('[data-room]').forEach(b => b.addEventListener('click', () => { const r = (G.settings.rooms || []).slice(); if (r.length < 8) r.push(b.dataset.room); G.settings.rooms = r; saveSettings(); renderHost(); }));
@@ -5670,12 +5750,21 @@ function onHostMsg(d) {
   P.lastHost = Date.now();
   if (d.t === 'hb' || d.t === 'pong') return;
   if (d.t === 'note') { const n = document.createElement('div'); n.className = 'pnote'; n.textContent = d.msg; document.body.appendChild(n); setTimeout(() => n.remove(), 2800); P.local.sentFake = null; renderPlayer(true); return; }
-  if (d.t === 'joined') { P.pid = d.pid; sstore.set('kk-me', {pid: P.pid, code: P.code, name: P.name, emoji: P.emoji, avatar: P.avatar}); return; }
+  if (d.t === 'joined') { if (P.remotePref) setTimeout(() => pSend({t: 'remote', on: true}), 300); P.pid = d.pid; sstore.set('kk-me', {pid: P.pid, code: P.code, name: P.name, emoji: P.emoji, avatar: P.avatar}); return; }
   if (d.t === 'error') { renderJoin(d.msg); return; }
   if (d.t === 'kicked') { sstore.set('kk-me', null); P.send = null; renderJoin('Juontaja poisti sinut pelistä.'); return; }
   if (d.t === 'rejoin') { pSend({t: 'join', pid: P.pid, name: P.name, emoji: P.emoji}); return; }
+  if (d.t === 'stage') { P.stage = d; P.stageRecv = Date.now(); applyStage(); return; }
+  if (d.t === 'fx') { if (!remoteOn()) return; const a = d.a || [];
+    if (d.k === 'word') fxWord(a[0], Object.assign({}, a[1] || {}, {y: innerHeight * .3}));
+    else if (d.k === 'conf') fxConfetti(a[0]);
+    else if (d.k === 'toast') toast(a[0], a[1], a[2]);
+    else if (d.k === 'sfx' && SFX0[a[0]]) SFX0[a[0]]();
+    return; }
   if (d.t === 'view') {
+    const wasOn = remoteOn();
     P.view = d; P.recv = Date.now();
+    if (remoteOn() !== wasOn) P.key = null;
     document.body.classList.toggle('is-ghost', !!d.me.ghost);
     if (d.key !== P.key) { P.key = d.key; P.local = {}; renderPlayer(true); } else renderPlayer(false);
   }
@@ -5749,6 +5838,24 @@ function renderJoin(err = '') {
 }
 function pTimer(ms) { return `<div class="timerbar"><i data-from="${P.recv + ms - (P.view.dur || ms)}" data-until="${P.recv + ms}"></i></div>`; }
 function reactBar() { return `<div class="reacts">${['👻','😱','😂','🔥','💀','👏'].map(e => `<button data-react="${e}" aria-label="Reaktio ${e}">${e}</button>`).join('')}</div>`; }
+function remoteOn() { return !!(P.view && (P.view.remote || P.remotePref)); }
+function rpanelHTML(v) {
+  if (!remoteOn() || v.phase === 'lobby') return '';
+  const mini = ['cgame', 'minigame'].includes(v.phase) && !P.rBig;
+  return `<div class="rpanel ${REMOTE_ACTIVE.includes(v.phase) ? 'compact' : ''} ${mini ? 'mini' : ''}" id="rpanel"><div class="rhead"><span>📺 <b id="rstatus">${esc((P.stage && P.stage.status) || 'Valkokangas')}</b></span><span class="grow"></span>
+    <button class="btn small icon" id="rsnd" aria-label="Äänet">${G.sound ? '🔊' : '🔇'}</button><button class="btn small icon" id="rbig" aria-label="Suurenna tai pienennä">${P.rBig ? '⤡' : '⤢'}</button></div>
+    <div class="stage rstage ${P.rBig ? 'big' : ''}" id="rstage" inert></div><div class="rail rrail" id="rrail" inert></div></div>`;
+}
+function applyStage() {
+  const el = $('#rstage'); if (!el || !P.stage) return;
+  const off = (P.stageRecv || Date.now()) - (P.stage.now || Date.now());
+  const fix = h => untokenizeImgs(h).replace(/\sid="[^"]*"/g, '');
+  el.innerHTML = fix(P.stage.h || ''); const rr = $('#rrail'); if (rr) rr.innerHTML = fix(P.stage.rail || '');
+  el.querySelectorAll('[data-from],[data-until],[data-secs]').forEach(n => { ['from', 'until', 'secs'].forEach(k => { if (n.dataset[k]) n.dataset[k] = String(+n.dataset[k] + off); }); });
+  el.querySelectorAll('button,input,select,textarea').forEach(b => { b.disabled = true; b.tabIndex = -1; });
+  const stt = $('#rstatus'); if (stt) stt.textContent = P.stage.status || 'Valkokangas';
+  tickTimers();
+}
 function renderPlayer(full) {
   const v = P.view; if (!v) return;
   const me = v.me;
@@ -5763,7 +5870,8 @@ function renderPlayer(full) {
     case 'lobby':
       if (P.local.redraw) main = `<h2>✏️ Piirrä hahmosi</h2>${drawPadHTML()}<div class="row" style="justify-content:center"><button class="btn" id="rdcancel">Peruuta</button><button class="btn primary" id="rdsave">Tallenna piirros</button></div>`;
       else main = `<div class="big lobbyav">${myAv(me)}</div><h2>Olet mukana!</h2><p class="dim">Katso valkokangasta. Peli alkaa, kun juontaja painaa aloita.</p>
-        ${me.avatarLocked ? '<p class="err">Juontaja poisti piirroksesi.</p>' : `<button class="btn small" id="redraw">✏️ ${me.hasAvatar ? 'Piirrä uusi hahmo' : 'Piirrä oma hahmo'}</button>`}<p>Pelaajia: ${v.players.length}</p>`;
+        ${me.avatarLocked ? '<p class="err">Juontaja poisti piirroksesi.</p>' : `<button class="btn small" id="redraw">✏️ ${me.hasAvatar ? 'Piirrä uusi hahmo' : 'Piirrä oma hahmo'}</button>`}<p>Pelaajia: ${v.players.length}</p>
+        ${v.remote ? '<p class="remoteon">📡 Etäpeli on päällä: koko peli näkyy omalla ruudullasi.</p>' : `<button class="btn small ${P.remotePref ? 'primary' : ''}" id="rtoggle">📺 ${P.remotePref ? 'Peli näkyy omalla ruudulla ✓' : 'Näytä peli myös omalla ruudulla'}</button><p class="dim" style="margin:0;font-size:.85rem">Valitse tämä, jos et näe valkokangasta (esim. pelaat kotoa).</p>`}`;
       break;
     case 'intro': main = `<img class="schoolimg small" src="${SCHOOL_IMG}" alt="Vuoksenniskan koulu"><h2>Tervetuloa Vuoksenniskan kouluun!</h2><p class="dim">Peli alkaa. Katso valkokangasta.</p>`; break;
     case 'roundintro': main = v.rIntro ? `<div class="label">Kierros ${v.rIntro.n} / ${v.rIntro.total}</div><div class="big">${v.rIntro.emoji}</div><h2>${esc(v.rIntro.name)}</h2><p>${esc(v.rIntro.desc)}</p>` : ''; break;
@@ -5811,7 +5919,11 @@ function renderPlayer(full) {
     case 'end': main = v.iWon ? `<div class="big">🏆</div><h2>${P.view && P.view.cheers ? 'Voitit!' : 'Pakenit koulusta!'}</h2>${(v.cheers || []).map(c => `<div class="pcheer"><span class="pcf" style="--tc:${c.color}">${c.img ? `<img src="${c.img}" alt="">` : c.emoji}</span><span><b style="color:${c.color}">${esc(c.name)}</b> ${esc(c.text)}</span></div>`).join('')}` : `<div class="big">${me.ghost ? '👻' : '🏚️'}</div><h2>${v.winner ? esc(v.winner.name) + ' voitti' : 'Peli päättyi'}</h2><p class="dim">Katso tulokset kankaalta.</p>`; break;
   }
   const pSame = P.renderedKey === P.key, pY = pSame ? app.scrollTop : 0;
-  app.innerHTML = `<div class="player">${bar}<div class="pmain ${pSame ? '' : 'pfade'}">${main}</div><div>${foot}</div></div>`;
+  const rp = rpanelHTML(v);
+  if (rp) main = main.replace(/Katso tulokset kankaalta\.|Seuraa valkokangasta\.|Peli alkaa\. Katso valkokangasta\./g, 'Katso peliä yläreunasta. 👆').replace('🖼️ Katso kuva valkokankaalta!', '🖼️ Kuva näkyy yläreunan näkymässä 👆');
+  app.innerHTML = `<div class="player ${rp ? 'remote' : ''}">${bar}${rp}<div class="pmain ${pSame ? '' : 'pfade'}">${main}</div><div>${foot}</div></div>`;
+  if (rp) { applyStage(); const rs = $('#rsnd'); if (rs) rs.onclick = () => { G.sound = !G.sound; audio(); rs.textContent = G.sound ? '🔊' : '🔇'; };
+    const rb = $('#rbig'); if (rb) rb.onclick = () => { P.rBig = !P.rBig; $('#rstage').classList.toggle('big', P.rBig); $('#rpanel').classList.toggle('mini', !P.rBig && ['cgame', 'minigame'].includes(P.view.phase)); rb.textContent = P.rBig ? '⤡' : '⤢'; }; }
   P.renderedKey = P.key; if (pY) app.scrollTop = pY;
   if (v.phase === 'prep') { const inc = me.incoming.length; if (inc > (P.local.inc || 0)) { const last = me.incoming[inc - 1]; const fl = document.createElement('div'); fl.className = 'hitflash'; fl.innerHTML = `<em class="hfword">PAM!</em><span>${CARDS[last.k].emoji}</span><b>${esc(last.by)} jekutti sinua!</b>`; document.body.appendChild(fl); setTimeout(() => fl.remove(), 1600); } P.local.inc = inc; }
   bindPlayer(v);
@@ -6076,6 +6188,7 @@ function bindPlayer(v) {
     $$('[data-bet]').forEach(b => b.onclick = () => pSend({t: 'bet', amount: b.dataset.bet === 'all' ? 'all' : +b.dataset.bet}));
   }
   if (v.phase === 'lobby') {
+    const rt = $('#rtoggle'); if (rt) rt.onclick = () => { P.remotePref = !P.remotePref; audio(); try { localStorage.setItem('kk-remote', P.remotePref ? '1' : ''); } catch (e) {} pSend({t: 'remote', on: P.remotePref}); renderPlayer(true); };
     const rd = $('#redraw'); if (rd) rd.onclick = () => { P.local.redraw = true; renderPlayer(true); };
     if (P.local.redraw) { const pad = bindDrawPad();
       $('#rdcancel').onclick = () => { P.local.redraw = false; renderPlayer(true); };
@@ -6380,6 +6493,8 @@ function tickTimers() {
   });
 }
 setInterval(tickTimers, 100);
+try { P.remotePref = localStorage.getItem('kk-remote') === '1'; } catch (e) {}
+document.addEventListener('pointerdown', () => { if (G.role === 'host') return; const ac = audio(); if (ac && ac.state === 'suspended') ac.resume(); }, true);
 
 /* ================= landing ================= */
 function renderLanding() {
