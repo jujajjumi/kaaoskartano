@@ -692,6 +692,21 @@ details.packgrp>.packrow{margin-top:6px}
 .hbar .logo .a{font-size:.62em;display:block}
 .landing .logo .a{font-size:.6em}
 @media (max-width:600px){.wjumisko{height:50%}.welcome .schoolimg{max-height:40vh}}
+.cheers{display:grid;gap:8px;width:min(1100px,100%)}
+.cheerrow{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:10px}
+.cheer{display:flex;gap:10px;align-items:center;text-align:left;opacity:0;animation:cheerin .55s var(--d) cubic-bezier(.2,1.5,.4,1) forwards}
+.cheer .tface{flex:none;width:64px;aspect-ratio:1;border-radius:16px;background:radial-gradient(circle at 50% 35%,#fff 0 30%,var(--tc) 75%);border:3px solid var(--line);display:grid;place-items:center;overflow:hidden}
+.cheer .tface span{font-size:2.3rem} .cheer .tface img{width:100%;height:100%;object-fit:cover}
+.cbub{background:#fff;color:#120b1a;border:3px solid var(--line);border-radius:16px;padding:8px 12px;box-shadow:4px 4px 0 var(--line);font-weight:600;font-size:.95rem;display:grid;gap:2px}
+.cbub b{font-family:var(--f-display);font-size:.85rem;letter-spacing:.04em}
+@keyframes cheerin{from{opacity:0;transform:translateY(20px) scale(.8)}to{opacity:1;transform:none}}
+.hostside.sulk{animation:sulk 2.4s ease-in-out infinite;filter:saturate(.75) drop-shadow(0 0 18px rgba(80,120,255,.35))}
+@keyframes sulk{0%,100%{transform:rotate(-2deg) translateY(0)}50%{transform:rotate(2deg) translateY(4px)}}
+.pcheer{display:flex;gap:10px;align-items:center;text-align:left;padding:8px 10px;border-radius:14px;background:var(--wall);border:2px solid var(--line);animation:pfade .4s ease-out both}
+.pcheer:nth-of-type(2){animation-delay:.3s}.pcheer:nth-of-type(3){animation-delay:.6s}.pcheer:nth-of-type(4){animation-delay:.9s}
+.pcf{flex:none;width:44px;height:44px;border-radius:12px;display:grid;place-items:center;overflow:hidden;font-size:1.6rem;background:radial-gradient(circle at 50% 35%,#fff 0 30%,var(--tc) 75%);border:2px solid var(--line)}
+.pcf img{width:100%;height:100%;object-fit:cover}
+@media (prefers-reduced-motion:reduce){.cheer{opacity:1;animation:none}}
 @keyframes pop{0%{transform:scale(.2);opacity:0}100%{transform:scale(1);opacity:1}}
 @keyframes pulse{50%{outline-color:var(--y)}}
 @keyframes shake{0%,100%{transform:translateX(0)}20%{transform:translateX(-14px) rotate(-2deg)}40%{transform:translateX(12px) rotate(2deg)}60%{transform:translateX(-8px)}80%{transform:translateX(6px)}}
@@ -3390,6 +3405,24 @@ function cgEnd() {
   SFX.right(); G.qi++;
   setPhase('cg_result', 8500, classNext);
 }
+const CHEERS = {
+  englanti: ['OH MY GOODNESS, {n}!!! Congratulations! Olet ihan SUPERSTAR!', 'Wheee! Well done, {n}! High five! Molemmilla käsillä!', '{n}, you are AMAZING! Mä itken onnesta!'],
+  matematiikka: ['Onneksi olkoon, {n}. Laskin juuri: voitto oli täsmälleen ansaittu.', 'Hienoa, {n}! Tulos on sata prosenttia oikein.', 'Onnittelut, {n}. Tämä oli selvä kuin yksi plus yksi.'],
+  aidinkieli: ['Onnittelut, {n}! Ja muistakaa: onnittelut kirjoitetaan kahdella n:llä.', 'Ihastuttavaa, {n}! Tästä riittää kirjoitettavaa.', 'Bravo, {n}! Huutomerkki on tässä kohtaa täysin paikallaan!'],
+  erityis: ['Onnea, {n}! Ja kaikki muutkin: te teitte hienoa työtä.', 'Hyvä {n}! Muistetaan hengittää, voittajakin.', 'Lämpimät onnittelut, {n}. Olen ylpeä koko porukasta.'],
+};
+const SULK = ['Hmph. Onneksi olkoon kai, {n}. En minä ole yhtään kateellinen.', 'No niin. {n} voitti. Minä menen murjottamaan opettajainhuoneeseen.', '…Hyvä on, {n}. Mutta ensi kerralla kysymykset ovat vaikeampia.', 'Pöh. {n} voitti. Kirjoitan tästä valituksen rehtorille.', 'Mmh. Ihan sama. Ei tämä minua harmita. Yhtään. {n}.'];
+function prepCheers() {
+  const w = G.winner && G.players[G.winner]; G.cheers = [];
+  if (!w) return;
+  G.cheers = ['englanti', 'matematiikka', 'aidinkieli', 'erityis'].filter(k => TEACHERS[k] && CHEERS[k]).map(k => ({k, text: fmt(pick(CHEERS[k]), {n: w.name})}));
+  G.quip = fmt(pick(SULK), {n: w.name}); G.mood = 'angry';
+}
+function cheersHTML() {
+  if (!G.cheers || !G.cheers.length) return '';
+  return `<div class="cheers"><div class="label">🎉 Opettajat onnittelevat</div><div class="cheerrow">${G.cheers.map((c, i) => { const T = TEACHERS[c.k];
+    return `<div class="cheer" style="--d:${(0.8 + i * 0.9).toFixed(1)}s;--tc:${T.color}"><div class="tface">${teacherFace(c.k)}</div><div class="cbub"><b style="color:${T.color}">${esc(T.name)}</b>${esc(c.text)}</div></div>`; }).join('')}</div></div>`;
+}
 function classEnd() {
   const top = plist().slice().sort((a, b) => b.score - a.score)[0];
   G.winner = top ? top.id : null; G.cstep = null;
@@ -3982,13 +4015,14 @@ function viewFor(p) {
     v.mg.submitted = !!(G.mg.results[p.id] && G.mg.results[p.id].final);
   }
   if (G.phase === 'mg_result') { v.saved = (G.saved || []).includes(p.id); v.died = G.lastDeaths.includes(p.id); v.deadNames = G.lastDeaths.map(id => G.players[id].name); }
-  if (G.phase === 'end') { v.winner = G.winner ? {name: G.players[G.winner].name, emoji: G.players[G.winner].emoji} : null; v.iWon = G.winner === p.id; }
+  if (G.phase === 'end') { v.winner = G.winner ? {name: G.players[G.winner].name, emoji: G.players[G.winner].emoji} : null; v.iWon = G.winner === p.id; if (v.iWon) v.cheers = (G.cheers || []).map(c => ({name: TEACHERS[c.k].name, emoji: TEACHERS[c.k].emoji, img: TEACHERS[c.k].img || null, color: TEACHERS[c.k].color, text: c.text})); }
   return v;
 }
 function sync() { if (G.syncT) return; G.syncT = setTimeout(() => { G.syncT = null; for (const p of plist()) if (!p.bot && p.connected) sendTo(p, viewFor(p)); }, 50); }
 
 /* ---------- phase engine ---------- */
 function setPhase(ph, ms, next) {
+  if (ph === 'end') prepCheers();
   G.phase = ph; G.phaseDur = ms || 0; G.phaseEnd = ms ? Date.now() + ms : 0;
   clearTimeout(G.timer); if (ms && next) G.timer = setTimeout(next, ms);
   G.next = next || null;
@@ -4873,7 +4907,7 @@ function stageHTML() {
     case 'end': {
       const w = G.winner && G.players[G.winner];
       const ranking = plist().slice().sort((a, b) => (b.id === G.winner) - (a.id === G.winner) || b.pos - a.pos || b.score - a.score);
-      return `<div class="center"><div class="endhead"><img class="hostside" src="${FULLS.shock}" alt=""><div class="podium"><div class="crown">${w ? avH(w) : '🏚️'}</div><h2>${w ? esc(w.name) + (G.mode === 'luokat' ? ' on luokan priimus!' : ' pakeni!') : 'Kukaan ei päässyt ulos'}</h2></div></div>${bubble()}
+      return `<div class="center"><div class="endhead"><img class="hostside sulk" src="${FULLS.angry}" alt="Lehtori Jumisko murjottaa"><div class="podium"><div class="crown">${w ? avH(w) : '🏚️'}</div><h2>${w ? esc(w.name) + (G.mode === 'luokat' ? ' on luokan priimus!' : ' pakeni!') : 'Kukaan ei päässyt ulos'}</h2></div></div>${cheersHTML()}${bubble()}
         <div class="scoreboard">${ranking.map((p, i) => `<div class="r"><span>${i + 1}.</span><span>${avH(p)}</span><span>${esc(p.name)}</span><b>${p.score} p</b></div>`).join('')}</div>
         <div class="row" style="justify-content:center"><button class="btn primary" id="again">Uusi peli samoilla pelaajilla</button><button class="btn" id="tolobby">Takaisin aulaan</button></div></div>`;
     }
@@ -5438,7 +5472,7 @@ function renderPlayer(full) {
       else main = v.deadNames.length ? `<div class="big">💀</div><h2>${esc(v.deadNames.join(' ja '))} kummittelee nyt</h2>` : `<div class="big">😇</div><h2>Kaikki selvisivät</h2>`;
       foot = reactBar(); break;
     case 'finale_intro': main = `<div class="big">🚪</div><h2>Pakomatka!</h2><p>Oikea vastaus = askel. Nopein oikea = kaksi askelta. ${me.ghost ? 'Saat elävän kiinni, niin heräät henkiin!' : 'Ensimmäinen elävä ovella voittaa.'}</p><p>Olet ruudussa <b>${me.pos}</b> / ${TRACK}</p>`; break;
-    case 'end': main = v.iWon ? `<div class="big">🏆</div><h2>Pakenit koulusta!</h2>` : `<div class="big">${me.ghost ? '👻' : '🏚️'}</div><h2>${v.winner ? esc(v.winner.name) + ' voitti' : 'Peli päättyi'}</h2><p class="dim">Katso tulokset kankaalta.</p>`; break;
+    case 'end': main = v.iWon ? `<div class="big">🏆</div><h2>${P.view && P.view.cheers ? 'Voitit!' : 'Pakenit koulusta!'}</h2>${(v.cheers || []).map(c => `<div class="pcheer"><span class="pcf" style="--tc:${c.color}">${c.img ? `<img src="${c.img}" alt="">` : c.emoji}</span><span><b style="color:${c.color}">${esc(c.name)}</b> ${esc(c.text)}</span></div>`).join('')}` : `<div class="big">${me.ghost ? '👻' : '🏚️'}</div><h2>${v.winner ? esc(v.winner.name) + ' voitti' : 'Peli päättyi'}</h2><p class="dim">Katso tulokset kankaalta.</p>`; break;
   }
   const pSame = P.renderedKey === P.key, pY = pSame ? app.scrollTop : 0;
   app.innerHTML = `<div class="player">${bar}<div class="pmain ${pSame ? '' : 'pfade'}">${main}</div><div>${foot}</div></div>`;
