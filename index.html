@@ -772,6 +772,41 @@ details.packgrp>.packrow{margin-top:6px}
 .qopts{display:grid;grid-template-columns:1fr 1fr;gap:10px;width:100%}
 .qo{display:flex;align-items:center;justify-content:center;gap:8px;padding:16px 10px;border-radius:16px;background:var(--wall2);border:4px solid var(--line);box-shadow:4px 4px 0 var(--line);font-weight:800;font-size:clamp(.95rem,3.5vw,1.2rem)}
 .qo .dot{width:26px;height:26px;border-radius:50%;border:3px solid var(--line);flex:none}
+.qopts.long{grid-template-columns:1fr}.qopts.long .qo{justify-content:flex-start;text-align:left;padding:12px 14px;font-size:clamp(.9rem,3.2vw,1.05rem)}
+.msvg .axis{stroke:#b46bff;stroke-width:1.4;stroke-dasharray:4 3}
+.typeq{font-family:var(--f-display);font-size:clamp(1.8rem,7vw,3rem);color:var(--y);-webkit-text-stroke:2px var(--line);paint-order:stroke fill;text-align:center}
+.dotfield{position:relative;width:min(420px,100%);aspect-ratio:4/3;border-radius:16px;background:#120b1a;border:4px solid var(--line);box-shadow:5px 5px 0 var(--line);overflow:hidden}
+.dotfield i{position:absolute;width:12px;height:12px;border-radius:50%;transform:translate(-50%,-50%)}
+.dotfield.hid{display:grid;place-items:center;font-size:4rem}
+.ropebox{position:relative;width:min(380px,100%);height:200px;margin:0 auto;border-radius:16px;background:linear-gradient(#2a6fdb,#7fc6ff 70%,#3a9a4a 70%);border:3px solid var(--line);overflow:hidden}
+.ropesvg{position:absolute;inset:0;width:100%;height:100%}
+.rope{fill:none;stroke:#ff3b5c;stroke-width:2.6;stroke-linecap:round}.rope.back{stroke:#8a1f33}
+.jumper2{position:absolute;left:50%;bottom:8%;font-size:4.4rem;transform:translateX(-50%);line-height:1}
+.jumper2.up{animation:njump .32s ease-out}.jumper2.trip{animation:shake .5s}
+@keyframes njump{0%{transform:translate(-50%,0)}45%{transform:translate(-50%,-48px)}100%{transform:translate(-50%,0)}}
+.ropebox .hand{position:absolute;top:44%;font-size:1.6rem}.ropebox .hand.l{left:2%}.ropebox .hand.r{right:2%}
+.lane2{position:relative;width:min(300px,100%);height:250px;margin:0 auto;border-radius:12px;background:repeating-linear-gradient(90deg,#d9a35f 0 18px,#c98f4c 18px 20px);border:3px solid var(--line);overflow:hidden}
+.lane2 .gutter{position:absolute;top:0;bottom:0;width:7%;background:#3a2a1a}.lane2 .gutter.l{left:0}.lane2 .gutter.r{right:0}
+.pins{position:absolute;left:0;right:0;top:6px;display:grid;gap:0;justify-items:center}
+.pinrow{display:flex;gap:10px;margin-bottom:4px}.pin{width:15px;height:34px;border-radius:50% 50% 38% 38%/40% 40% 60% 60%;background:linear-gradient(#fff 0 26%,#e8313a 26% 36%,#fff 36% 46%,#e8313a 46% 54%,#fff 54%);border:2px solid #3a2a1a;transition:transform .35s,opacity .35s}.pin.down{transform:rotate(80deg) translateY(10px);opacity:.15}
+.kball{position:absolute;bottom:8px;left:50%;font-size:2rem;transform:translateX(-50%)}
+.pgoal{position:relative;width:min(380px,100%);height:170px;margin:0 auto;border:6px solid #fff;border-bottom:0;border-radius:6px 6px 0 0;background:repeating-linear-gradient(45deg,rgba(255,255,255,.1) 0 2px,transparent 2px 14px),#1d5f2c;overflow:hidden}
+.pgk{position:absolute;bottom:14px;font-size:3.4rem;transform:translateX(-50%)}
+.paim{position:absolute;top:22px;font-size:2rem;transform:translateX(-50%)}
+.pball{position:absolute;left:50%;bottom:-4px;font-size:2rem;transform:translate(-50%,0);transition:none}
+.pball.go{transition:left .35s ease-out,bottom .35s ease-out;bottom:40px}
+.cwall{position:relative;width:min(380px,100%);height:300px;margin:0 auto;border-radius:16px;border:3px solid var(--line);overflow:hidden;background:radial-gradient(circle at 20% 30%,rgba(0,0,0,.18) 0 3px,transparent 4px) 0 0/46px 46px,radial-gradient(circle at 70% 70%,rgba(0,0,0,.15) 0 2px,transparent 3px) 0 0/38px 38px,linear-gradient(#8a8f99,#5f6570);transition:background-position .3s}
+.climber{position:absolute;left:50%;bottom:0;font-size:3rem;transform:translateX(-50%);transition:bottom .3s;pointer-events:none}
+.hold{position:absolute;width:54px;height:54px;border-radius:46% 54% 50% 50%;border:3px solid var(--line);box-shadow:3px 3px 0 var(--line);transform:translate(-50%,-50%);animation:pop .2s ease;font-size:1.8rem;display:grid;place-items:center;padding:0}
+.hold.gem{background:#fff6c8;animation:pop .2s ease,glowp .6s ease-in-out infinite alternate}
+.hold.got{transform:translate(-50%,-50%) scale(1.4);opacity:0;transition:.2s}.hold.gone{opacity:0;transform:translate(-50%,-50%) scale(.3);transition:.25s}
+@keyframes glowp{to{box-shadow:0 0 18px #ffd23a}}
+.efield{display:grid;grid-template-columns:repeat(auto-fill,minmax(52px,1fr));gap:6px;width:min(560px,100%);padding:10px;border-radius:16px;background:#2f5a2a;border:3px solid var(--line)}
+.eit{font-size:2rem;background:none;border:0;padding:4px;transform:rotate(var(--r)) scale(var(--s));border-radius:12px}
+.eit.ok{background:rgba(127,216,240,.45);outline:3px solid #7fd8f0}.eit.nope{animation:shake .4s}
+.pads{display:grid;grid-template-columns:1fr 1fr;gap:12px;width:min(320px,90%)}
+.pad4{aspect-ratio:1;border-radius:22px;background:var(--c);opacity:.45;border:4px solid var(--line);box-shadow:4px 4px 0 var(--line);transition:opacity .12s,transform .12s}
+.pad4.lit{opacity:1;transform:scale(1.06);box-shadow:0 0 26px var(--c)}
 .qo.right{background:var(--g);color:#08240f} .qo.wrong{background:var(--blood);color:#fff;animation:shake .4s}
 .drawrow{display:grid;grid-template-columns:minmax(0,.8fr) minmax(0,1.2fr);gap:12px;width:100%;align-items:end}
 .dmodel,.dmine{display:grid;gap:4px;justify-items:center}
@@ -3397,7 +3432,17 @@ const CG_ENGINES = {
  vari:      {emoji: '🌈', name: 'Värisilmä', dur: 34000, desc: 'Säädä liukusäätimellä täsmälleen sama värisävy kuin mallissa. Neljä väriä. Mitä lähemmäs osut, sitä enemmän pisteitä.'},
  qmc:       {emoji: '🖼️', name: 'Pikavisa', dur: 30000, desc: 'Vastaa niin moneen kuin ehdit. Väärä vastaus vie vähän pisteitä.'},
  hengitys:  {emoji: '🫧', name: 'Hengitystauko', dur: 31000, desc: 'Pidä nappia pohjassa, kun pallo kasvaa, ja päästä irti, kun se pienenee. Älä välitä häiriöistä!'},
+ typeq:     {emoji: '⌨️', name: 'Pikakirjoitus', dur: 35000, desc: 'Kirjoita vastaus ja paina Enter. Monta oikein putkeen tuo lisäpisteitä. Vaikean voi ohittaa.'},
+ arvio:     {emoji: '👀', name: 'Arviointimestari', dur: 36000, desc: 'Pisteitä vilahtaa ruudulla hetken. Arvioi, montako niitä oli. Mitä lähemmäs osut, sitä enemmän pisteitä.'},
+ naru:      {emoji: '🪢', name: 'Hyppynaru', dur: 30000, desc: 'Hyppää juuri kun naru pyyhkäisee jalkojen alta! Napauta HYPPÄÄ tai välilyöntiä. Naru nopeutuu, kun hypyt onnistuvat putkeen.'},
+ keila:     {emoji: '🎳', name: 'Keilaus', dur: 38000, desc: 'Viisi heittoa. Pysäytä ensin suunta keskelle ja sitten voima mahdollisimman korkealle. Kaato tuo lisäpisteitä!'},
+ laukaus:   {emoji: '⚽', name: 'Rangaistuspotku', dur: 34000, desc: 'Kahdeksan potkua. Tähtäin liikkuu, samoin maalivahti. Laukaise, kun tähtäin on kaukana maalivahdista. Kulmaan osuva tuo lisäpisteitä.'},
+ kiipeily:  {emoji: '🧗', name: 'Kiipeilyseinä', dur: 30000, desc: 'Napauta otteita ennen kuin ne katoavat, niin kiipeät ylöspäin. Jos ote karkaa, lipsut alaspäin. 💎 tuo lisäpisteitä!'},
+ etsi:      {emoji: '🐢', name: 'Etsi kilpikonnat', dur: 35000, desc: 'Etsi kaikki kilpikonnat 🐢 kuvasta. Ei kiirettä eikä miinuspisteitä. Kun kaikki löytyvät, tulee uusi kuva.'},
+ polku:     {emoji: '🟢', name: 'Muistipolku', dur: 42000, desc: 'Katso, missä järjestyksessä värit syttyvät, ja toista sama. Polku pitenee pikkuhiljaa. Jos menee väärin, polku näytetään uudestaan.'},
 };
+const ERI_THR = {hengitys: 300, etsi: 500, polku: 400};
+const ERI_GOAL = {hengitys: 'Vähintään 60 % rauhallisuus', etsi: 'Vähintään 5 löydettyä kilpikonnaa', polku: 'Vähintään 4 värin muistipolku'};
 const histPacks = () => Object.keys(PACKS).filter(k => k === 'historia' || k === 'teollistuminen' || /^h[78]/.test(k)).map(k => PACKS[k]);
 const CG = {
  englanti: [
@@ -3408,6 +3453,20 @@ const CG = {
    ...['play','walk','watch','cook','jump','clean','help','talk','visit','open','like','want','listen','start','stop','travel'].map(w => [w, 0])]},
   {e: 'pika', t: 'Oikein kirjoitettu?', labels: ['Oikein', 'Väärin'], data: [['beautiful',1],['beatiful',0],['necessary',1],['neccessary',0],['friend',1],['freind',0],['Wednesday',1],['Wensday',0],['February',1],['Febuary',0],['because',1],['becouse',0],['different',1],['diffrent',0],['tomorrow',1],['tommorow',0],['receive',1],['recieve',0],['believe',1],['beleive',0],['business',1],['buisness',0],['separate',1],['seperate',0],['which',1],['wich',0],['library',1],['libary',0],['people',1],['peaple',0],['address',1],['adress',0],['island',1],['iland',0]].map(([w, b]) => [w, !!b])},
   {e: 'sotku', t: 'Word scramble', data: [['SCHOOL','koulu'],['TEACHER','opettaja'],['HOLIDAY','loma'],['KITCHEN','keittiö'],['BIRTHDAY','syntymäpäivä'],['BREAKFAST','aamiainen'],['COUNTRY','maa, valtio'],['WEATHER','sää'],['MONDAY','maanantai'],['ORANGE','appelsiini'],['FRIEND','ystävä'],['PENCIL','lyijykynä'],['WINDOW','ikkuna'],['GARDEN','puutarha'],['ANIMAL','eläin'],['SUMMER','kesä']]},
+  {e: 'jarjesta', t: 'Lauserakentaja', em: '🧱', max: 7, d: 'Rakenna englanninkielinen lause napauttamalla sanat oikeassa järjestyksessä. Suomennos auttaa. Kolme lausetta.', data: [
+   ['En ole koskaan käynyt Lontoossa.', ['I', 'have', 'never', 'been', 'to', 'London.']], ['Kissani nukkuu sohvalla.', ['My', 'cat', 'sleeps', 'on', 'the', 'sofa.']], ['Mitä teit eilen?', ['What', 'did', 'you', 'do', 'yesterday?']],
+   ['Hän pelaa jalkapalloa joka päivä.', ['She', 'plays', 'football', 'every', 'day.']], ['Voinko lainata kynääsi?', ['Can', 'I', 'borrow', 'your', 'pen?']], ['Menemme huomenna rannalle.', ['We', 'are', 'going', 'to', 'the', 'beach', 'tomorrow.']],
+   ['Tämä on paras päivä ikinä!', ['This', 'is', 'the', 'best', 'day', 'ever!']], ['Opettajamme on todella hauska.', ['Our', 'teacher', 'is', 'really', 'funny.']], ['Missä on lähin kirjasto?', ['Where', 'is', 'the', 'nearest', 'library?']],
+   ['En ymmärrä tätä kysymystä.', ['I', "don't", 'understand', 'this', 'question.']], ['Pidän kovasti suklaasta.', ['I', 'like', 'chocolate', 'very', 'much.']], ['Paljonko kello on?', ['What', 'time', 'is', 'it?']]]},
+  {e: 'typeq', t: 'Pikakäännös', em: '🇬🇧', d: 'Käännä sana englanniksi niin nopeasti kuin pystyt. Monta oikein putkeen tuo lisäpisteitä!', hint: 'in English…', data: [
+   ['koira', 'dog'], ['kissa', 'cat'], ['talo', 'house'], ['kirja', 'book'], ['vesi', 'water'], ['ystävä', 'friend'], ['koulu', 'school'], ['punainen', 'red'], ['iso', 'big/large'], ['onnellinen', 'happy'], ['nopea', 'fast/quick'], ['ikkuna', 'window'],
+   ['kirjasto', 'library'], ['aamiainen', 'breakfast'], ['sää', 'weather'], ['puhelin', 'phone/telephone/mobile'], ['perhe', 'family'], ['huomenna', 'tomorrow'], ['eilen', 'yesterday'], ['tyttö', 'girl'], ['poika', 'boy'], ['lintu', 'bird'], ['omena', 'apple'],
+   ['juna', 'train'], ['lentokone', 'plane/airplane/aeroplane'], ['keittiö', 'kitchen'], ['kaunis', 'beautiful/pretty'], ['väsynyt', 'tired'], ['opettaja', 'teacher'], ['lumi', 'snow'], ['kesä', 'summer'], ['talvi', 'winter']]},
+  {e: 'qmc', t: 'Rhyme Time', em: '🎵', d: 'Mikä sana rimmaa? Kuuntele mielessäsi sanan loppua. Vastaa niin moneen kuin ehdit!', data: [
+   ['What rhymes with CAT?', 'hat', ['dog', 'cup', 'sun']], ['What rhymes with DOG?', 'frog', ['cat', 'dig', 'door']], ['What rhymes with SUN?', 'fun', ['sea', 'sit', 'moon']], ['What rhymes with CAKE?', 'lake', ['cook', 'cat', 'cap']],
+   ['What rhymes with NIGHT?', 'light', ['nine', 'knit', 'note']], ['What rhymes with BEE?', 'tree', ['bed', 'bear', 'boy']], ['What rhymes with RING?', 'king', ['rang', 'rock', 'run']], ['What rhymes with MOON?', 'spoon', ['moan', 'man', 'mine']],
+   ['What rhymes with MOUSE?', 'house', ['mice', 'mess', 'horse']], ['What rhymes with RAIN?', 'train', ['ran', 'rich', 'road']], ['What rhymes with CAR?', 'star', ['care', 'cat', 'cow']], ['What rhymes with FISH?', 'dish', ['fist', 'fast', 'fresh']],
+   ['What rhymes with BED?', 'red', ['bad', 'bird', 'bead']], ['What rhymes with GOAT?', 'boat', ['goal', 'gate', 'good']], ['What rhymes with SNOW?', 'go', ['now', 'snack', 'sun']], ['What rhymes with CHAIR?', 'bear', ['cheer', 'chain', 'chalk']]]},
   {e: 'kuuntele', t: 'Spelling bee', data: [['Wednesday','keskiviikko'],['because','koska'],['different','erilainen'],['beautiful','kaunis'],['February','helmikuu'],['knife','veitsi'],['island','saari'],['tomorrow','huomenna'],['people','ihmiset'],['friend','ystävä'],['thought','ajatteli'],['library','kirjasto'],['guitar','kitara'],['yellow','keltainen'],['chocolate','suklaa'],['holiday','loma']]},
  ],
  historia: [
@@ -3417,6 +3476,33 @@ const CG = {
    ...['Talvisota','Suomen itsenäistyminen','Titanic uppoaa','Ensimmäinen kuulento','Berliinin muuri murtuu','Suomi liittyy EU:hun','Naisten äänioikeus Suomessa','Wall Streetin pörssiromahdus','Venäjän lokakuun vallankumous','YK perustetaan','Sisällissota','Suurlakko'].map(w => [w, 1])]},
   {e: 'pika', t: 'Totta vai tarua?', dur: 30000, data: () => histPacks().flatMap(pk => pk.tf || []).filter(x => x[0].length <= 80).map(x => [x[0], !!x[1]])},
   {e: 'jarjesta', t: 'Aikajanasprintti', data: () => histPacks().flatMap(pk => pk.order || []).filter(x => !/lain synty|rikosprosessi|ikärajat/i.test(x[0]))},
+  {e: 'qmc', t: 'Jumiskon valhe', em: '🤥', long: true, d: 'Lehtori Jumisko on piilottanut joukkoon yhden valheen. Kolme väitettä on totta, yksi ei. Bongaa VALHE!', data: [
+   ['🤥 Napoleon: mikä on VALHE?', 'Napoleon oli vain noin 140 senttiä pitkä.', ['Napoleon kruunasi itsensä keisariksi vuonna 1804.', 'Napoleon hävisi Waterloon taistelun 1815.', 'Napoleon kuoli maanpaossa Saint Helenan saarella.']],
+   ['🤥 Viikingit: mikä on VALHE?', 'Viikingit käyttivät taisteluissa sarvikypärää.', ['Viikingit purjehtivat Pohjois-Amerikkaan satoja vuosia ennen Kolumbusta.', 'Viikingit kävivät kauppaa Konstantinopoliin asti.', 'Viikinkien kirjoitusmerkkejä kutsutaan riimuiksi.']],
+   ['🤥 Kiinan muuri: mikä on VALHE?', 'Kiinan muuri näkyy paljaalla silmällä Kuusta.', ['Muuria rakennettiin ja korjattiin satojen vuosien ajan.', 'Muurin piti suojata Kiinaa pohjoisen paimentolaisilta.', 'Kiinan muuri on Unescon maailmanperintökohde.']],
+   ['🤥 Presidentit: mikä on VALHE?', 'Mannerheim oli Suomen ensimmäinen presidentti.', ['K. J. Ståhlberg oli Suomen ensimmäinen presidentti.', 'Mannerheim oli presidenttinä vuosina 1944–1946.', 'Tarja Halonen oli Suomen ensimmäinen naispresidentti.']],
+   ['🤥 1. maailmansota: mikä on VALHE?', 'Ensimmäinen maailmansota alkoi vuonna 1918.', ['Ensimmäinen maailmansota alkoi vuonna 1914.', 'Sodan laukaisi Sarajevon laukaukset.', 'Länsirintamalla taisteltiin juoksuhaudoissa.']],
+   ['🤥 Muinainen Egypti: mikä on VALHE?', 'Gizan pyramidit rakennettiin keskiajalla.', ['Kleopatra eli lähempänä kuulentoa kuin Gizan suuren pyramidin rakentamista.', 'Egyptiläiset muumioivat myös kissoja.', 'Hieroglyfit opittiin lukemaan Rosettan kiven avulla.']],
+   ['🤥 Keksinnöt: mikä on VALHE?', 'Thomas Edison keksi puhelimen.', ['Alexander Graham Bell patentoi puhelimen vuonna 1876.', 'Gutenberg kehitti kirjapainotaidon 1400-luvulla.', 'James Watt paransi höyrykonetta merkittävästi.']],
+   ['🤥 Suomi 1900-luvulla: mikä on VALHE?', 'Suomen sisällissota käytiin vuonna 1939.', ['Sisällissota käytiin vuonna 1918.', 'Sisällissodan osapuolet olivat punaiset ja valkoiset.', 'Talvisota alkoi marraskuussa 1939.']],
+   ['🤥 Kustaa Vaasa: mikä on VALHE?', 'Kustaa Vaasa oli Venäjän tsaari.', ['Kustaa Vaasa oli Ruotsin kuningas.', 'Kustaa Vaasa perusti Helsingin vuonna 1550.', 'Kustaa Vaasan aikana Ruotsi muuttui luterilaiseksi.']],
+   ['🤥 Kolumbus: mikä on VALHE?', 'Kolumbus todisti ensimmäisenä, että maapallo on pyöreä.', ['Kolumbus purjehti Amerikkaan vuonna 1492.', 'Kolumbus luuli saapuneensa Intiaan.', 'Kolumbuksen matkan rahoittivat Espanjan hallitsijat.']],
+   ['🤥 Keskiaika: mikä on VALHE?', 'Keskiajan ihmiset uskoivat yleisesti, että maa on litteä.', ['Turun linnan rakentaminen alkoi 1200-luvun lopulla.', 'Musta surma tappoi miljoonia eurooppalaisia 1300-luvulla.', 'Hansakauppiaat kävivät kauppaa Itämeren ympärillä.']]]},
+  {e: 'qmc', t: 'Kuka olen?', em: '🕵️', d: 'Historian henkilö kertoo itsestään. Kuka hän on? Vastaa niin moneen kuin ehdit!', data: [
+   ['🎩⚔️ Kruunasin itseni keisariksi ja hävisin Waterloossa.', 'Napoleon', ['Bismarck', 'Mannerheim', 'Churchill']], ['🎻🌲 Sävelsin Finlandian.', 'Jean Sibelius', ['Fredrik Pacius', 'Elias Lönnrot', 'J. L. Runeberg']],
+   ['📜🎶 Kokosin Kalevalan runonlaulajien lauluista.', 'Elias Lönnrot', ['Mikael Agricola', 'Aleksis Kivi', 'J. V. Snellman']], ['🐴🎖️ Olin marsalkka ja myöhemmin presidentti.', 'C. G. E. Mannerheim', ['K. J. Ståhlberg', 'P. E. Svinhufvud', 'Risto Ryti']],
+   ['⛵🌎 Purjehdin vuonna 1492 länteen ja päädyin Amerikkaan.', 'Kristoffer Kolumbus', ['Vasco da Gama', 'Ferdinand Magellan', 'James Cook']], ['🚂💨 Paransin höyrykonetta niin, että teollistuminen pääsi vauhtiin.', 'James Watt', ['Thomas Edison', 'Johannes Gutenberg', 'Nikola Tesla']],
+   ['🚩✊ Johdin bolševikit valtaan Venäjällä 1917.', 'Lenin', ['Nikolai II', 'Karl Marx', 'Stalin']], ['📖✍️ Kirjoitin ensimmäisen suomenkielisen kirjan, aapisen.', 'Mikael Agricola', ['Elias Lönnrot', 'J. V. Snellman', 'J. L. Runeberg']],
+   ['🚀🌕 Otin ihmiskunnan ensimmäisen askeleen Kuussa.', 'Neil Armstrong', ['Juri Gagarin', 'Buzz Aldrin', 'John Glenn']], ['💡🔌 Kehitin käyttökelpoisen hehkulampun.', 'Thomas Edison', ['Alexander Graham Bell', 'James Watt', 'Nikola Tesla']],
+   ['🇬🇧✌️ Johdin Britanniaa toisessa maailmansodassa.', 'Winston Churchill', ['Franklin D. Roosevelt', 'Charles de Gaulle', 'Josif Stalin']], ['☢️🔬 Sain kaksi Nobel-palkintoa radioaktiivisuuden tutkimisesta.', 'Marie Curie', ['Albert Einstein', 'Isaac Newton', 'Charles Darwin']],
+   ['🐢🏝️ Kirjoitin kirjan Lajien synty.', 'Charles Darwin', ['Isaac Newton', 'Albert Einstein', 'Marie Curie']], ['🖨️📚 Kehitin kirjapainon 1400-luvulla.', 'Johannes Gutenberg', ['Martti Luther', 'Leonardo da Vinci', 'Mikael Agricola']]]},
+  {e: 'qmc', t: 'Aikamatkaajan moka', em: '⏰', d: 'Aikamatkaaja on sotkenut aikakaudet! Mikä EI kuulu joukkoon?', data: [
+   ['⏳ 1800-luvun Suomi: mikä EI kuulu?', 'Matkapuhelin', ['Höyryveturi', 'Kalevala', 'Suuret nälkävuodet']], ['🏰 Keskiaika: mikä EI kuulu?', 'Polkupyörä', ['Ritarit', 'Linnat', 'Musta surma']],
+   ['🏛️ Antiikin Rooma: mikä EI kuulu?', 'Perunamuusi', ['Gladiaattorit', 'Akveduktit', 'Julius Caesar']], ['❄️ Talvisota: mikä EI kuulu?', 'Euroseteli', ['Mannerheim-linja', 'Molotovin cocktail', 'Hiihtopartiot']],
+   ['🪨 Kivikausi: mikä EI kuulu?', 'Rautamiekka', ['Kivikirves', 'Kalliomaalaukset', 'Metsästys ja kalastus']], ['🎷 1920-luku: mikä EI kuulu?', 'Internet', ['Kieltolaki', 'Jazz', 'Mykkäelokuvat']],
+   ['🛶 Viikinkiaika: mikä EI kuulu?', 'Kivääri', ['Pitkälaivat', 'Riimut', 'Kauppamatkat itään']], ['🏭 Teollistuminen: mikä EI kuulu?', 'Robotti-imuri', ['Tehtaat', 'Höyrykone', 'Lapsityö']],
+   ['🏺 Antiikin Kreikka: mikä EI kuulu?', 'Tuliaseet', ['Olympialaiset', 'Demokratia Ateenassa', 'Filosofi Sokrates']], ['🕺 1960-luku: mikä EI kuulu?', 'Älypuhelin', ['Kuulento', 'The Beatles', 'Kylmä sota']],
+   ['🧭 Löytöretket: mikä EI kuulu?', 'Lentokone', ['Kompassi', 'Purjelaivat', 'Mausteet']], ['👑 Ruotsin vallan aika: mikä EI kuulu?', 'Suomen markka', ['Turun linna', 'Kustaa Vaasa', 'Noitavainot']]]},
   {e: 'sotku', t: 'Historian sanasotku', data: [['KALEVALA','Lönnrotin kokoama eepos'],['SENAATTI','Autonomian ajan hallitus'],['TEHDAS','Teollistumisen työpaikka'],['KEISARI','Venäjän hallitsija'],['RAUTATIE','Höyryveturin reitti'],['MARSALKKA','Mannerheimin arvonimi'],['EDUSKUNTA','200 kansanedustajaa'],['SIIRTOMAA','Imperialismin kohde'],['SUURLAKKO','Vuoden 1905 tapahtuma'],['JÄÄKÄRI','Saksassa koulutettu suomalainen sotilas'],['EVAKKO','Kotiseudultaan lähtemään joutunut'],['DIKTAATTORI','Yksinvaltias'],['PROPAGANDA','Vaikuttamista julisteilla ja radiolla'],['ITSENÄISYYS','6.12.1917']]},
  ],
  matematiikka: [
@@ -3424,6 +3510,9 @@ const CG = {
   {e: 'pika', t: 'Totta vai tarua?', gen: 'vertaa'},
   {e: 'pari', t: 'Lasku ja tulos', d: 'Etsi lasku ja sen oikea tulos.', gen: 'mpari'},
   {e: 'lajittelu', t: 'Alkuluku vai ei?', bins: ['Alkuluku', 'Ei alkuluku'], gen: 'alku'},
+  {e: 'arvio', t: 'Arviointimestari'},
+  {e: 'typeq', t: 'Lukujono', em: '🔢', d: 'Mikä luku jatkaa jonoa? Etsi sääntö ja kirjoita seuraava luku.', gen: 'jono', num: true, hint: 'seuraava luku'},
+  {e: 'typeq', t: 'Ratkaise x', em: '✖️', d: 'Ratkaise yhtälöstä x niin nopeasti kuin pystyt. Monta oikein putkeen tuo lisäpisteitä.', gen: 'yhtalo', num: true, hint: 'x ='},
  ],
  aidinkieli: [
   {e: 'lajittelu', t: 'Substantiivi vai verbi?', bins: ['Substantiivi', 'Verbi'], data: [
@@ -3432,6 +3521,14 @@ const CG = {
   {e: 'pika', t: 'Oikein vai väärin kirjoitettu?', labels: ['Oikein', 'Väärin'], data: [['tällainen',1],['tälläinen',0],['jalkapallo',1],['jalka pallo',0],['vaaleanpunainen',1],['vaalean punainen',0],['koulumatka',1],['koulu matka',0],['kaksikymmentä',1],['kaksi kymmentä',0],['ensimmäinen',1],['ensimäinen',0],['välttämättä',1],['välttämätä',0],['kuitenkin',1],['kuitenki',0],['alkaa tehdä',1],['alkaa tekemään',0],['hän on suomalainen',1],['hän on Suomalainen',0],['synnyin tammikuussa',1],['synnyin Tammikuussa',0],['yhtäkkiä',1],['yhtäkiä',0],['kirjoittaa',1],['kirjottaa',0]].map(([w, b]) => [w, !!b])},
   {e: 'pari', t: 'Sananlaskut', d: 'Yhdistä sananlaskun alku ja loppu.', data: [['Joka toiselle kuoppaa kaivaa,','itse siihen lankeaa'],['Ei oppi ojaan kaada,','eikä tieto tieltä työnnä'],['Parempi myöhään','kuin ei milloinkaan'],['Hiljaa hyvä','tulee'],['Oma maa mansikka,','muu maa mustikka'],['Ei savua','ilman tulta'],['Vierivä kivi','ei sammaloidu'],['Niin metsä vastaa','kuin sinne huudetaan'],['Ahkeruus kovankin','onnen voittaa'],['Rapatessa','roiskuu'],['Tyhjä tynnyri','kolisee eniten'],['Aika','parantaa haavat']]},
   {e: 'pari', t: 'Synonyymit', d: 'Yhdistä sanat, jotka tarkoittavat samaa.', data: [['iloinen','riemukas'],['nopea','vikkelä'],['kaunis','sievä'],['iso','suuri'],['pelokas','arka'],['viisas','fiksu'],['vihainen','suuttunut'],['hauska','huvittava'],['väsynyt','uupunut'],['hiljainen','äänetön']]},
+  {e: 'pari', t: 'Murresanat', em: '🗣️', d: 'Yhdistä murresana ja sen yleiskielinen vastine. Mie ja sie, tiijjätkö?', data: [['mie', 'minä'], ['sie', 'sinä'], ['hää', 'hän'], ['myö', 'me'], ['työ', 'te'], ['hyö', 'he'], ['pruukata', 'olla tapana'], ['ihtiään', 'itseään'], ['kahtoo', 'katsoo'], ['tehhä', 'tehdä'], ['tiijjä', 'tietää'], ['mukula', 'lapsi']]},
+  {e: 'pari', t: 'Yhdyssanatehdas', em: '🏭', d: 'Yhdistä sanan alku- ja loppuosa yhdyssanaksi. Jalka… + …käytävä = jalkakäytävä!', data: [['jalka…', '…käytävä'], ['kirjan…', '…merkki'], ['koulu…', '…reppu'], ['lumi…', '…ukko'], ['sateen…', '…varjo'], ['jää…', '…kaappi'], ['auringon…', '…kukka'], ['tieto…', '…kone'], ['pää…', '…kallo'], ['hammas…', '…harja'], ['kala…', '…puikko'], ['sanoma…', '…lehti']]},
+  {e: 'qmc', t: 'Sananlaskun loppu', em: '📜', long: true, d: 'Miten sananlasku oikeasti päättyy? Varo hassuja loppuja!', data: [
+   ['Parempi myöhään kuin…', 'ei milloinkaan', ['ei koulussa', 'eilen illalla', 'kaksi kertaa']], ['Ei savua ilman…', 'tulta', ['grillimakkaraa', 'palovaroitinta', 'saunaa']], ['Vierivä kivi ei…', 'sammaloidu', ['pysähdy liikennevaloissa', 'tee läksyjä', 'mahdu kenkään']],
+   ['Tyhjä tynnyri…', 'kolisee eniten', ['on halvin', 'kelluu järvellä', 'nukkuu pitkään']], ['Oma maa mansikka, muu maa…', 'mustikka', ['banaani', 'maksalaatikko', 'kurkkusalaatti']], ['Niin metsä vastaa kuin…', 'sinne huudetaan', ['sinne soitetaan', 'kartta näyttää', 'kännykkä kertoo']],
+   ['Joka kuuseen kurkottaa, se…', 'katajaan kapsahtaa', ['saa käpyjä', 'näkee kauas', 'pääsee Lappiin']], ['Hiljaa hyvä…', 'tulee', ['nukkuu', 'syö', 'kuiskaa']], ['Rapatessa…', 'roiskuu', ['sataa', 'kutittaa', 'laulaa']],
+   ['Ei oppi ojaan…', 'kaada', ['ui', 'mahdu', 'eksy']], ['Kell\' onni on, se…', 'onnen kätkeköön', ['jakakoon sen somessa', 'ostakoon jäätelöä', 'kertokoon opettajalle']], ['Ahkeruus kovankin onnen…', 'voittaa', ['hukkaa', 'pelästyttää', 'jäädyttää']],
+   ['Ei kysyvä tieltä…', 'eksy', ['väsy', 'kastu', 'myöhästy']], ['Sitä kuusta kuuleminen, jonka…', 'juurella asuu', ['oksalla istuu', 'kävyistä tykkää', 'neulasia keräilee']]]},
   {e: 'sotku', t: 'Äidinkielen sanasotku', data: [['SANAKIRJA','Sanojen selitykset'],['LAUSE','Alkaa isolla, päättyy pisteeseen'],['RUNO','Säkeitä ja säkeistöjä'],['ROMAANI','Pitkä kertomus'],['VERBI','Tekemisen sana'],['ADJEKTIIVI','Ominaisuuden sana'],['KIELIOPPI','Kielen säännöt'],['KIRJASTO','Täältä lainataan kirjoja'],['SUBSTANTIIVI','Asian tai olion nimi'],['PILKKU','Erottaa lauseita'],['SATU','Olipa kerran…'],['OTSIKKO','Tekstin nimi']]},
  ],
  liikunta: [
@@ -3440,18 +3537,24 @@ const CG = {
   {e: 'maali', t: 'Maalivahti'},
   {e: 'kori', t: 'Koripallon vapaaheitot'},
   {e: 'tasa', t: 'Puomitasapaino'},
+  {e: 'naru', t: 'Hyppynaru'},
+  {e: 'keila', t: 'Keilaus'},
+  {e: 'laukaus', t: 'Rangaistuspotku'},
  ],
  kuvataide: [
   {e: 'piirra', t: 'Piirrä mallista'},
   {e: 'ympyra', t: 'Täydellinen ympyrä'},
   {e: 'vari', t: 'Värisilmä'},
-  {e: 'qmc', t: 'Värisekoitus', d: 'Värioppia salamavauhtia: mitä syntyy, kun värejä sekoitetaan? Vastaa niin moneen kuin ehdit.', colors: true, data: [
+  {e: 'kiipeily', t: 'Kiipeilyseinä', d: 'Jollin lempilaji! Napauta otteita ennen kuin ne katoavat, niin kiipeät ylös. Jos ote karkaa, lipsut alaspäin. 💎 tuo lisäpisteitä!'},
+  {e: 'piirra', t: 'Peilikuva', em: '🪞', mirror: true, d: 'Näet mallista vain vasemman puolen. Piirrä koko kuva peilaamalla puuttuva puoli katkoviivan yli. Lopuksi piirustukset näytetään valkokankaalla!'},
+  {e: 'pari', t: 'Kivitietäjä', em: '🪨', d: 'Jolli rakastaa kiviä! Yhdistä kivi ja sen kuvaus.', data: [['Rapakivi', 'Imatran seudun oma graniitti, jossa on pyöreitä kehiä'], ['Marmori', 'Kalkkikivestä muuttunut patsaskivi'], ['Liuskekivi', 'Halkeaa ohuiksi levyiksi'], ['Hohkakivi', 'Tulivuorikivi, joka kelluu vedessä'], ['Vuorikristalli', 'Kirkas kvartsikide'], ['Basaltti', 'Tumma laavasta jähmettynyt kivi'], ['Kalkkikivi', 'Syntyy kuorien ja simpukoiden jäänteistä'], ['Timantti', 'Luonnon kovin mineraali'], ['Spektroliitti', 'Ylämaan sateenkaarenvärinen kivi'], ['Vuolukivi', 'Pehmeä kivi, josta tehdään takkoja']]},
+  {e: 'qmc', t: 'Värisekoitus', em: '🎨', d: 'Värioppia salamavauhtia: mitä syntyy, kun värejä sekoitetaan? Vastaa niin moneen kuin ehdit.', colors: true, data: [
    ['Sininen + keltainen = ?', 'vihreä', ['oranssi', 'violetti', 'ruskea']], ['Punainen + keltainen = ?', 'oranssi', ['vihreä', 'violetti', 'vaaleanpunainen']], ['Punainen + sininen = ?', 'violetti', ['vihreä', 'oranssi', 'ruskea']],
    ['Punainen + valkoinen = ?', 'vaaleanpunainen', ['oranssi', 'violetti', 'harmaa']], ['Musta + valkoinen = ?', 'harmaa', ['sininen', 'violetti', 'ruskea']], ['Sininen + valkoinen + vähän vihreää = ?', 'turkoosi', ['violetti', 'harmaa', 'oranssi']],
    ['Punaisen vastaväri?', 'vihreä', ['oranssi', 'sininen', 'keltainen']], ['Sinisen vastaväri?', 'oranssi', ['vihreä', 'violetti', 'punainen']], ['Keltaisen vastaväri?', 'violetti', ['vihreä', 'sininen', 'oranssi']],
    ['Mikä näistä on pääväri?', 'keltainen', ['vihreä', 'oranssi', 'violetti']], ['Mikä näistä on lämmin väri?', 'oranssi', ['sininen', 'turkoosi', 'harmaa']], ['Mikä näistä on kylmä väri?', 'sininen', ['oranssi', 'punainen', 'keltainen']],
    ['Kaikki kolme pääväriä sekaisin = ?', 'ruskea', ['valkoinen', 'vihreä', 'vaaleanpunainen']], ['Vihreä + punainen = ?', 'ruskea', ['keltainen', 'violetti', 'turkoosi']]]},
-  {e: 'qmc', t: 'Kuka maalasi?', d: 'Tunnista taiteilija teoksen nimestä. Vastaa niin moneen kuin ehdit.', data: [
+  {e: 'qmc', t: 'Kuka maalasi?', em: '🖼️', d: 'Tunnista taiteilija teoksen nimestä. Vastaa niin moneen kuin ehdit.', data: [
    ['Mona Lisa', 'Leonardo da Vinci', ['Michelangelo', 'Rafael', 'Rembrandt']], ['Tähtikirkas yö', 'Vincent van Gogh', ['Claude Monet', 'Paul Cézanne', 'Edvard Munch']], ['Huuto', 'Edvard Munch', ['Vincent van Gogh', 'Hugo Simberg', 'Salvador Dalí']],
    ['Haavoittunut enkeli', 'Hugo Simberg', ['Akseli Gallen-Kallela', 'Albert Edelfelt', 'Helene Schjerfbeck']], ['Sammon puolustus', 'Akseli Gallen-Kallela', ['Hugo Simberg', 'Eero Järnefelt', 'Albert Edelfelt']], ['Toipilas', 'Helene Schjerfbeck', ['Fanny Churberg', 'Tove Jansson', 'Hugo Simberg']],
    ['Guernica', 'Pablo Picasso', ['Salvador Dalí', 'Henri Matisse', 'Joan Miró']], ['Muistin pysyvyys (sulavat kellot)', 'Salvador Dalí', ['Pablo Picasso', 'René Magritte', 'Andy Warhol']], ['Tyttö ja helmikorvakoru', 'Johannes Vermeer', ['Rembrandt', 'Leonardo da Vinci', 'Claude Monet']],
@@ -3460,6 +3563,8 @@ const CG = {
  ],
  erityis: [
   {e: 'hengitys', t: 'Hengitystauko'},
+  {e: 'etsi', t: 'Etsi kilpikonnat'},
+  {e: 'polku', t: 'Muistipolku'},
  ],
 };
 function genMath(kind) {
@@ -3495,6 +3600,24 @@ function genMath(kind) {
     const ps = shuffle([2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41, 43, 47, 53, 59]).slice(0, 9), np = shuffle([1, 4, 9, 15, 21, 25, 27, 33, 35, 39, 49, 51, 57, 9, 45, 55]).filter((v, i, s) => s.indexOf(v) === i).slice(0, 9);
     return shuffle([...ps.map(n => [String(n), 0]), ...np.map(n => [String(n), 1])]).map(([n, b]) => [n, isP(+n) ? 0 : 1]);
   }
+  if (kind === 'jono') return Array.from({length: 30}, (_, i) => {
+    const t = i % 6; let seq;
+    if (t === 0) { const s = a(1, 20), d = a(2, 9); seq = [0, 1, 2, 3, 4].map(k => s + d * k); }
+    else if (t === 1) { const s = a(60, 99), d = a(3, 9); seq = [0, 1, 2, 3, 4].map(k => s - d * k); }
+    else if (t === 2) { const s = a(1, 4), r = pick([2, 3]); seq = [0, 1, 2, 3, 4].map(k => s * r ** k); }
+    else if (t === 3) { const s = a(1, 5); seq = [0, 1, 2, 3, 4].map(k => (s + k) ** 2); }
+    else if (t === 4) { let x = a(1, 4), y = a(1, 5); seq = [x, y]; while (seq.length < 5) seq.push(seq[seq.length - 1] + seq[seq.length - 2]); }
+    else { const s = a(1, 10), d = a(1, 4); seq = [s]; for (let k = 1; k < 5; k++) seq.push(seq[k - 1] + d * k); }
+    return [seq.slice(0, 4).join(', ') + ', ?', String(seq[4])];
+  });
+  if (kind === 'yhtalo') return Array.from({length: 30}, (_, i) => {
+    const t = i % 5, x = a(2, 12);
+    if (t === 0) { const b = a(2, 30); return [`x + ${b} = ${x + b}`, String(x)]; }
+    if (t === 1) { const b = a(1, x - 1 || 1); return [`x − ${b} = ${x - b}`, String(x)]; }
+    if (t === 2) { const k = a(2, 9); return [`${k}x = ${k * x}`, String(x)]; }
+    if (t === 3) { const k = a(2, 6), b = a(1, 15); return [`${k}x + ${b} = ${k * x + b}`, String(x)]; }
+    const k = a(2, 5); return [`x : ${k} = ${x}`, String(x * k)];
+  });
   return [];
 }
 function scramble(w) { const up = String(w).toUpperCase(); for (let k = 0; k < 12; k++) { const s = shuffle([...up]).join(''); if (s !== up) return s; } return [...up].reverse().join(''); }
@@ -3507,7 +3630,7 @@ function cgBuild(room, def) {
     case 'pika': data.items = shuffle(src).slice(0, 40); data.labels = def.labels || ['Totta', 'Tarua']; break;
     case 'sotku': data.items = shuffle(src).slice(0, 8).map(([w, h]) => ({a: w, h, s: scramble(w)})); break;
     case 'kuuntele': data.items = shuffle(src).slice(0, 8).map(([w, h]) => ({a: w, h})); break;
-    case 'jarjesta': data.sets = shuffle(src).slice(0, 3).map(([t, items]) => { const it = items.slice(0, 5).map(x => String(x).split('|')[0]); return {t, items: it, order: shuffle(it.map((_, i) => i))}; }); break;
+    case 'jarjesta': data.sets = shuffle(src).slice(0, 3).map(([t, items]) => { const it = items.slice(0, def.max || 5).map(x => String(x).split('|')[0]); return {t, items: it, order: shuffle(it.map((_, i) => i))}; }); break;
     case 'laske': data.items = src; break;
     case 'hengitys': data = {cycles: 3, inhale: 4000, exhale: 4000, lead: 3000}; break;
     case 'juoksu': data = {goal: 100}; break;
@@ -3516,11 +3639,19 @@ function cgBuild(room, def) {
     case 'kori': data = {shots: Array.from({length: 10}, () => ({c: .35 + Math.random() * .45}))}; break;
     case 'tasa': data = {}; break;
     case 'ympyra': data = {att: 3}; break;
-    case 'piirra': data = {model: pick(Object.keys(DRAW_MODELS))}; break;
+    case 'piirra': data = def.mirror ? {model: pick(['sydan', 'tahti', 'puu', 'kissa', 'aurinko']), mirror: true} : {model: pick(Object.keys(DRAW_MODELS))}; break;
+    case 'typeq': data = {num: !!def.num, hint: def.hint || '', items: shuffle(src).slice(0, 30).map(([p, a]) => ({p, a: String(a).split('/')}))}; break;
+    case 'arvio': data = {rounds: Array.from({length: 5}, (_, i) => ({n: [12 + rnd(14), 25 + rnd(20), 40 + rnd(30), 60 + rnd(40), 90 + rnd(60)][i], show: 1700}))}; break;
+    case 'naru': data = {}; break;
+    case 'keila': data = {frames: 5}; break;
+    case 'laukaus': data = {shots: Array.from({length: 8}, () => ({gs: .7 + Math.random() * .9, gp: Math.random() * 6, as: 1.6 + Math.random() * .8}))}; break;
+    case 'kiipeily': data = {}; break;
+    case 'etsi': data = {}; break;
+    case 'polku': data = {seq: Array.from({length: 14}, () => rnd(4)), start: 2}; break;
     case 'vari': data = {hues: Array.from({length: 4}, () => rnd(360)), sat: 80, lig: 52}; break;
-    case 'qmc': data = {colors: !!def.colors, items: shuffle(src).slice(0, 14).map(([q, a, w]) => { const opts = shuffle([a, ...w.slice(0, 3)]); return {q, opts, c: opts.indexOf(a)}; })}; break;
+    case 'qmc': data = {colors: !!def.colors, long: !!def.long, items: shuffle(src).slice(0, 14).map(([q, a, w]) => { const opts = shuffle([a, ...w.slice(0, 3)]); return {q, opts, c: opts.indexOf(a)}; })}; break;
   }
-  return {id: uid(), room, engine: def.e, title: def.t, desc: def.d || E.desc, emoji: E.emoji, dur: def.dur || E.dur, data, results: {}};
+  return {id: uid(), room, engine: def.e, title: def.t, desc: def.d || E.desc, emoji: def.em || E.emoji, dur: def.dur || E.dur, data, results: {}};
 }
 
 /* ---------- host: kulku ---------- */
@@ -3557,8 +3688,9 @@ function cgStart() { G.cg.results = {}; G.cg.started = Date.now(); setPhase('cga
 function cgEnd() {
   const cg = G.cg, ps = plist(), sc = p => (cg.results[p.id] && cg.results[p.id].score) || 0;
   const sorted = ps.slice().sort((a, b) => sc(b) - sc(a)); G.cgRank = sorted.map(p => p.id);
-  if (cg.engine === 'hengitys') {
-    for (const p of ps) { const s = sc(p); p.delta = s >= 300 ? 200 : s > 0 ? 50 : 0; p.score += p.delta; }
+  if (cg.room === 'erityis') {
+    const thr = ERI_THR[cg.engine] || 300;
+    for (const p of ps) { const s = sc(p); p.delta = s >= thr ? 200 : s > 0 ? 50 : 0; p.score += p.delta; }
     const last = ps.slice().sort((a, b) => a.score - b.score)[0];
     if (last && ps.length > 1) { last.score += 150; last.delta = (last.delta || 0) + 150; G.supportTo = last.id; setTimeout(() => toast(`Erityisopettaja antoi pelaajalle ${last.name} +150 tukipistettä. Jokainen ansaitsee kannustusta!`, '🫧', true), 900); }
     G.tline = pick(TEACHERS.erityis.lines.good);
@@ -3585,7 +3717,10 @@ const DRAW_MODELS = {
   vuori: {name: 'Jollin kiipeilyvuori', paths: [[[6, 88], [32, 40], [44, 56], [62, 18], [94, 88], [6, 88]], [[62, 18], [62, 4], [74, 9], [62, 13]]]},
   kivi: {name: 'Jollin lempikivi', paths: [[[18, 70], [14, 52], [26, 34], [48, 26], [72, 30], [86, 46], [84, 66], [66, 78], [36, 80], [18, 70]], [[40, 40], [48, 52], [44, 62]], [[64, 44], [70, 56]]]},
 };
-function modelSVG(id, cls = '') { const M = DRAW_MODELS[id]; return `<svg class="msvg ${cls}" viewBox="0 0 100 100" aria-label="Malli: ${esc(M.name)}">${M.paths.map(p => `<polyline points="${p.map(q => q.map(v => v.toFixed(1)).join(',')).join(' ')}" />`).join('')}</svg>`; }
+function modelSVG(id, cls = '', half = false) { const M = DRAW_MODELS[id], lines = M.paths.map(p => `<polyline points="${p.map(q => q.map(v => v.toFixed(1)).join(',')).join(' ')}" />`).join('');
+  if (!half) return `<svg class="msvg ${cls}" viewBox="0 0 100 100" aria-label="Malli: ${esc(M.name)}">${lines}</svg>`;
+  const cid = 'hc' + Math.random().toString(36).slice(2, 7);
+  return `<svg class="msvg half ${cls}" viewBox="0 0 100 100" aria-label="Mallin vasen puoli"><defs><clipPath id="${cid}"><rect x="0" y="0" width="50" height="100"/></clipPath></defs><g clip-path="url(#${cid})">${lines}</g><line class="axis" x1="50" y1="2" x2="50" y2="98"/></svg>`; }
 function drawScore(modelPaths, userPaths) {
   const N = 64, norm = paths => { const all = paths.flat(); if (all.length < 2) return null; const xs = all.map(p => p[0]), ys = all.map(p => p[1]);
     const x0 = Math.min(...xs), y0 = Math.min(...ys), w = Math.max(...xs) - x0, h = Math.max(...ys) - y0, sc = (N - 6) / Math.max(w, h, 1e-6), ox = (N - w * sc) / 2, oy = (N - h * sc) / 2;
@@ -3624,7 +3759,7 @@ function classEnd() {
   quip('classEnd', {n: top ? top.name : ''});
   setPhase('end');
 }
-const cgBotScore = e => ({piirra: 400 + rnd(350), ympyra: 600 + rnd(300), vari: 500 + rnd(400), qmc: 500 + rnd(700), juoksu: 450 + rnd(400), pituus: 500 + rnd(330), maali: 700 + rnd(1200), kori: 400 + rnd(700), tasa: 200 + rnd(250), pari: 400 + rnd(600), lajittelu: 600 + rnd(900), pika: 600 + rnd(1000), sotku: 300 + rnd(750), kuuntele: 300 + rnd(750), jarjesta: 300 + rnd(500), laske: 500 + rnd(1000), hengitys: 250 + rnd(250)})[e] || 300;
+const cgBotScore = e => ({piirra: 400 + rnd(350), ympyra: 600 + rnd(300), vari: 500 + rnd(400), qmc: 500 + rnd(700), juoksu: 450 + rnd(400), pituus: 500 + rnd(330), maali: 700 + rnd(1200), kori: 400 + rnd(700), tasa: 200 + rnd(250), pari: 400 + rnd(600), lajittelu: 600 + rnd(900), pika: 600 + rnd(1000), sotku: 300 + rnd(750), kuuntele: 300 + rnd(750), jarjesta: 300 + rnd(500), laske: 500 + rnd(1000), hengitys: 250 + rnd(250), typeq: 500 + rnd(900), arvio: 350 + rnd(450), naru: 400 + rnd(700), keila: 500 + rnd(700), laukaus: 300 + rnd(600), kiipeily: 500 + rnd(800), etsi: 400 + rnd(600), polku: 300 + rnd(400)})[e] || 300;
 function hostSoon() { if (G.hostT) return; G.hostT = setTimeout(() => { G.hostT = null; renderHost(); }, 250); }
 
 /* ---------- host: näkymät ---------- */
@@ -3646,7 +3781,7 @@ function classStageHTML() {
       const games = G.cplan.filter(s => s.rno === st.rno).map(s => CG[s.room][s.gi]);
       return `<div class="center"><div class="label">Luokkahuone ${st.rno + 1} / ${st.rooms}</div>
         <div class="troom" style="--tc:${T.color}">${T.full ? `<img class="tfull" src="${T.full}" alt="${esc(T.name)}">` : `<div class="tportrait">${teacherFace(st.room)}</div>`}<div class="tinfo"><div class="tsubj">${esc(T.subject)}</div><h2>${esc(T.name)}</h2><span class="ttrait">${esc(T.trait)}</span>
-        <div class="tgames">${games.map(gd => `<span class="tg">${CG_ENGINES[gd.e].emoji} ${esc(gd.t)}</span>`).join('')}</div></div></div>
+        <div class="tgames">${games.map(gd => `<span class="tg">${gd.em || CG_ENGINES[gd.e].emoji} ${esc(gd.t)}</span>`).join('')}</div></div></div>
         ${teacherBubble(st.room, G.tline)}${roomPlanHTML()}</div>`;
     }
     case 'cg_intro': {
@@ -3660,7 +3795,7 @@ function classStageHTML() {
       const fin = rows.filter(x => x.r.final).length;
       return `<div class="center"><div class="row" style="justify-content:center"><span class="cat" style="background:${T.color}">${esc(T.subject)}</span><span class="label">${g.emoji} ${esc(g.title)}</span></div>
         ${g.engine === 'hengitys' ? '<div class="breathhost"><div class="bball"></div><p>Hengitetään yhdessä. Sisään… ja ulos…</p></div>' : ''}
-        ${g.engine === 'piirra' ? `<div class="hostmodel"><span class="label">Malli: ${esc(DRAW_MODELS[g.data.model].name)}</span>${modelSVG(g.data.model, 'big')}</div>` : ''}
+        ${g.engine === 'piirra' ? `<div class="hostmodel"><span class="label">${g.data.mirror ? 'Peilaa puuttuva puoli!' : 'Malli: ' + esc(DRAW_MODELS[g.data.model].name)}</span>${modelSVG(g.data.model, 'big', g.data.mirror)}</div>` : ''}
         <div class="cglive">${rows.map(({p, r}, i) => `<div class="cgl ${r.final ? 'fin' : ''}"><span class="pl">${i + 1}.</span><span class="nm">${avH(p)} ${esc(p.name)}</span><div class="bar"><i style="width:${(r.score || 0) / mx * 100}%;background:${T.color}"></i></div><b>${r.score || 0}</b><small>${r.final ? '✓ valmis' : esc(r.prog || 'pelaa…')}</small></div>`).join('')}</div>
         <div class="dim">${fin} / ${rows.length} valmiina</div>
         <div class="row" style="width:100%;flex-wrap:nowrap"><div class="secs" data-secs="${G.phaseEnd}"></div><div style="flex:1">${timerBar()}</div></div></div>`;
@@ -3672,7 +3807,7 @@ function classStageHTML() {
         ${G.cgRank.map((id, i) => { const p = G.players[id], r = g.results[id] || {}; if (!p) return ''; return `<div class="gcard ${i === 0 && sc(id) > 0 ? 'best' : ''}" style="--d:${(0.3 + i * 0.25).toFixed(2)}s"><div class="gimg">${r.img ? `<img src="${r.img}" alt="Pelaajan ${esc(p.name)} piirros"><button class="ghide" data-hidedraw="${id}" title="Piilota piirros" aria-label="Piilota pelaajan ${esc(p.name)} piirros">🙈</button>` : `<span class="gph">${p.bot ? '🤖' : r.hidden ? '🙈' : '🖼️'}</span>`}</div><b>${i + 1}. ${esc(p.name)}</b><small>${Math.round(sc(id) / 10)} % · +${p.delta || 0} p</small></div>`; }).join('')}</div>
         ${teacherBubble(st.room, G.tline)}</div>`;
       return `<div class="center"><div class="mgname">${g.emoji} ${esc(g.title)}</div>
-        ${g.engine === 'hengitys' ? '<p style="margin:0;font-size:1.2rem">Vähintään 60 % rauhallisuus: <b>+200 p</b> kaikille, jotka siihen pystyivät.</p>' : ''}
+        ${g.room === 'erityis' ? `<p style="margin:0;font-size:1.2rem">${ERI_GOAL[g.engine] || 'Hyvä suoritus'}: <b>+200 p</b> kaikille, jotka siihen pystyivät.</p>` : ''}
         <div class="reslist">${G.cgRank.map((id, i) => { const p = G.players[id]; if (!p) return ''; return `<div class="rr ${i === 0 && sc(id) > 0 ? 'best' : ''}"><span>${i + 1}. ${avH(p)} ${esc(p.name)}${G.supportTo === id ? ' 🤗' : ''}</span><span class="dim">${g.engine === 'hengitys' ? Math.round(sc(id) / 5) + ' % rauhallisuus' : sc(id) + ' p pelissä'}</span><b>${p.delta ? '+' + p.delta : ''}</b></div>`; }).join('')}</div>
         ${teacherBubble(st.room, G.tline)}</div>`;
     }
@@ -3865,10 +4000,11 @@ function startCG(v) {
     },
     piirra() {
       const M = DRAW_MODELS[D.model]; let paths = [], cur = null, drawing = false;
-      A().innerHTML = `<div class="drawrow"><div class="dmodel"><small>MALLI: ${esc(M.name)}</small>${modelSVG(D.model)}</div><div class="dmine"><small>SINUN PIIRROS</small><canvas id="pcv" class="pcv" width="500" height="500"></canvas></div></div>
-        <div class="row" style="justify-content:center"><button class="btn small" id="pundo">↶ Kumoa</button><button class="btn small" id="pclr">Tyhjennä</button><button class="btn primary" id="pdone">✅ Valmis</button></div><p class="dim" style="margin:0">Piirrä malli omaan ruutuusi. Koolla ja paikalla ei ole väliä, muodolla on!</p>`;
+      A().innerHTML = `<div class="drawrow"><div class="dmodel"><small>${D.mirror ? 'PEILAA KUVA' : 'MALLI: ' + esc(M.name)}</small>${modelSVG(D.model, '', D.mirror)}</div><div class="dmine"><small>SINUN PIIRROS</small><canvas id="pcv" class="pcv" width="500" height="500"></canvas></div></div>
+        <div class="row" style="justify-content:center"><button class="btn small" id="pundo">↶ Kumoa</button><button class="btn small" id="pclr">Tyhjennä</button><button class="btn primary" id="pdone">✅ Valmis</button></div><p class="dim" style="margin:0">${D.mirror ? 'Piirrä koko kuva: kopioi vasen puoli ja peilaa se katkoviivan oikealle puolelle.' : 'Piirrä malli omaan ruutuusi. Koolla ja paikalla ei ole väliä, muodolla on!'}</p>`;
       const cv = $('#pcv'), cx = cv.getContext('2d');
       const redraw = () => { cx.fillStyle = '#fff'; cx.fillRect(0, 0, 500, 500); cx.strokeStyle = '#120b1a'; cx.lineWidth = 9; cx.lineCap = 'round'; cx.lineJoin = 'round';
+        if (D.mirror) { cx.save(); cx.strokeStyle = '#c9b8e0'; cx.lineWidth = 3; cx.setLineDash([14, 12]); cx.beginPath(); cx.moveTo(250, 8); cx.lineTo(250, 492); cx.stroke(); cx.restore(); cx.strokeStyle = '#120b1a'; cx.lineWidth = 9; }
         for (const p of paths) { cx.beginPath(); cx.moveTo(p[0][0] * 5, p[0][1] * 5); for (const q of p) cx.lineTo(q[0] * 5, q[1] * 5); if (p.length === 1) cx.lineTo(p[0][0] * 5 + .1, p[0][1] * 5); cx.stroke(); } };
       const pos = e => { const r = cv.getBoundingClientRect(); return [(e.clientX - r.left) / r.width * 100, (e.clientY - r.top) / r.height * 100]; };
       cv.addEventListener('pointerdown', e => { if (done) return; e.preventDefault(); cv.setPointerCapture(e.pointerId); drawing = true; cur = [pos(e)]; paths.push(cur); redraw(); });
@@ -3924,7 +4060,7 @@ function startCG(v) {
     qmc() {
       const I = D.items; let i = 0, ok = 0;
       const draw = () => { if (done) return; if (i >= I.length) return finish('Kaikki kysymykset käyty!'); const it = I[i];
-        A().innerHTML = `<div class="sortcard">${esc(it.q)}</div><div class="qopts">${it.opts.map((o, k) => `<button class="qo" data-k="${k}">${D.colors && CG_COLORS[o] ? `<span class="dot" style="background:${CG_COLORS[o]}"></span>` : ''}${esc(o)}</button>`).join('')}</div><p class="dim" style="margin:0">${i + 1} / ${I.length} · näppäimet 1–4 toimivat</p>`;
+        A().innerHTML = `<div class="sortcard">${esc(it.q)}</div><div class="qopts${D.long ? ' long' : ''}">${it.opts.map((o, k) => `<button class="qo" data-k="${k}">${D.colors && CG_COLORS[o] ? `<span class="dot" style="background:${CG_COLORS[o]}"></span>` : ''}${esc(o)}</button>`).join('')}</div><p class="dim" style="margin:0">${i + 1} / ${I.length} · näppäimet 1–4 toimivat</p>`;
         $$('.qo').forEach(b => b.onclick = () => pickA(+b.dataset.k)); };
       let busy = false;
       const pickA = k => { if (done || busy) return; busy = true; const it = I[i], right = k === it.c; const bs = $$('.qo'); bs[it.c].classList.add('right'); if (!right && bs[k]) bs[k].classList.add('wrong');
@@ -3949,6 +4085,135 @@ function startCG(v) {
       ivs.push(iv);
       const DIS = ['📢 KUULUTUS!', '🔔 BUZZ!', '😱', '🤡 HEI KATSO!', '💥 PAM!', '📱 PLING!', '🧨 KAAOS!', '👻 BÖÖ!'];
       for (let k = 0; k < 8; k++) T(() => { const d = $('#bdis'); if (!d) return; const el = document.createElement('span'); el.textContent = pick(DIS); el.style.left = (5 + rnd(70)) + '%'; el.style.top = (5 + rnd(70)) + '%'; d.appendChild(el); setTimeout(() => el.remove(), 1500); }, lead + 1500 + k * 2900 + rnd(1000));
+    },
+    typeq() {
+      const I = D.items; let i = 0, ok = 0, streak = 0;
+      const draw = () => { if (done) return; if (i >= I.length) return finish('Kaikki käyty läpi!'); const it = I[i];
+        A().innerHTML = `<div class="typeq">${esc(it.p)}</div><form class="mathrow" id="tqf"><input id="tqi" ${D.num ? 'inputmode="numeric"' : ''} autocomplete="off" spellcheck="false" autocapitalize="off" placeholder="${esc(D.hint)}" aria-label="Vastaus"><button class="btn primary" type="submit">OK</button></form>
+          <div class="row" style="justify-content:center"><button class="btn small" id="tqs">Ohita ⏭</button><span class="dim" id="tqm">${streak >= 2 ? `🔥 ${streak} putkeen!` : `${ok} oikein`}</span></div>`;
+        const inp = $('#tqi'); inp.focus();
+        $('#tqf').onsubmit = e => { e.preventDefault(); const v = normTxt(inp.value); if (!v) return;
+          if (it.a.some(x => normTxt(x) === v)) { const bonus = Math.min(150, streak * 50); streak++; ok++; add(100 + bonus, `${ok} oikein`); i++; draw(); }
+          else { streak = 0; inp.classList.remove('shake'); void inp.offsetWidth; inp.classList.add('shake'); inp.select(); const m = $('#tqm'); if (m) m.textContent = 'Ei aivan… yritä uudestaan tai ohita'; } };
+        $('#tqs').onclick = () => { streak = 0; const m = it.a[0]; i++; draw(); const q = $('#tqm'); if (q) q.innerHTML = `Ohitettu: ${esc(it.p)} → <b>${esc(m)}</b>`; }; };
+      draw();
+    },
+    arvio() {
+      const R = D.rounds; let i = 0, tot = 0;
+      const draw = () => { if (done) return; if (i >= R.length) return finish(`Arviot valmiina: ${tot} p!`); const n = R[i].n;
+        const dots = Array.from({length: n}, () => `<i style="left:${(3 + Math.random() * 94).toFixed(1)}%;top:${(4 + Math.random() * 92).toFixed(1)}%;background:hsl(${rnd(360)},85%,60%)"></i>`).join('');
+        A().innerHTML = `<div class="jumpinfo"><span>Arvio ${i + 1} / ${R.length}</span><span>${tot} p</span></div><div class="dotfield" id="df">${dots}</div>
+          <form class="mathrow" id="af"><input id="ai" inputmode="numeric" autocomplete="off" placeholder="montako?" aria-label="Arvio" disabled><button class="btn primary" type="submit" disabled id="ab">OK</button></form><p class="dim" id="at" style="margin:0">Katso tarkkaan…</p>`;
+        T(() => { if (done) return; const df = $('#df'); if (df) { df.classList.add('hid'); df.innerHTML = '<span>❓</span>'; } const inp = $('#ai'); inp.disabled = false; $('#ab').disabled = false; inp.focus(); $('#at').textContent = 'Montako pistettä oli?'; }, R[i].show);
+        $('#af').onsubmit = e => { e.preventDefault(); const inp = $('#ai'); const g0 = parseInt(inp.value, 10); if (isNaN(g0) || inp.disabled) return; inp.disabled = true;
+          const err = Math.abs(g0 - n) / n, p = Math.round(200 * Math.max(0, 1 - err * 2.5)) + (g0 === n ? 50 : 0); tot += p; add(p, `${tot} p`);
+          $('#at').innerHTML = `${g0 === n ? '🎯 TÄYSOSUMA!' : err <= .1 ? '👏 Tosi lähellä!' : err <= .25 ? '👍 Hyvä arvio!' : '😅 Vähän pielessä!'} Oikea määrä: <b>${n}</b> · +${p} p`; i++; T(draw, 1700); }; };
+      draw();
+    },
+    naru() {
+      let ph = .5, last = performance.now(), raf = 0, combo = 0, best = 0, jumps = 0, jf = 0, pause = 0, P0 = 1400, up = 0;
+      A().innerHTML = `<div class="jumpinfo"><span>Hyppyjä: <b id="nj">0</b></span><span>Putki: <b id="nc">0</b></span></div>
+        <div class="ropebox"><svg viewBox="0 0 100 100" class="ropesvg"><path id="rb" class="rope back"/></svg><div class="jumper2" id="njp">🧍</div><svg viewBox="0 0 100 100" class="ropesvg"><path id="rf" class="rope front"/></svg><span class="hand l">✊</span><span class="hand r">✊</span></div>
+        <button class="btn primary bigpress" id="nb">⬆ HYPPÄÄ</button><p class="dim" id="nt" style="margin:0">Hyppää, kun naru tulee jalkojen kohdalle. Välilyönti toimii.</p>`;
+      const rb = $('#rb'), rf = $('#rf'), jp = $('#njp'), nt = $('#nt');
+      const per = () => Math.max(650, P0 - combo * 45);
+      const fail = msg => { combo = 0; pause = performance.now() + 900; nt.textContent = msg; jp.classList.remove('trip'); void jp.offsetWidth; jp.classList.add('trip'); $('#nc').textContent = 0; };
+      const loop = now => { if (done) return; const dt = now - last; last = now;
+        if (now > pause) { const prev = ph; ph += dt / per(); const k = Math.round(prev); if (prev - k <= .14 && ph - k > .14 && jf !== k && k > 0) { jf = k; fail('💥 Naru osui jalkoihin! Uusi yritys…'); } }
+        const c = Math.cos(2 * Math.PI * ph), y = 50 + 44 * c, d = `M8 50 Q50 ${y.toFixed(1)} 92 50`; rf.setAttribute('d', d); rb.setAttribute('d', d);
+        rf.style.opacity = c > 0 ? 1 : 0; rb.style.opacity = c > 0 ? 0 : .55; raf = requestAnimationFrame(loop); };
+      P.cleanup.push(() => cancelAnimationFrame(raf));
+      const jump = () => { if (done) return; const now = performance.now(); if (now < up) return; up = now + 260; jp.classList.remove('up'); void jp.offsetWidth; jp.classList.add('up');
+        if (now < pause) return; const k = Math.round(ph);
+        if (Math.abs(ph - k) <= .14 && jf !== k) { jf = k; combo++; jumps++; best = Math.max(best, combo); add(40 + Math.min(combo, 15) * 4, `${jumps} hyppyä`); $('#nj').textContent = jumps; $('#nc').textContent = combo; nt.textContent = combo >= 5 ? `🔥 ${combo} putkeen! Naru nopeutuu!` : 'Hyvä hyppy!'; }
+        else if (jf !== k && Math.abs(ph - k) < .35) { jf = k; fail('Hyppäsit väärään aikaan! Kuuntele rytmiä…'); } };
+      $('#nb').addEventListener('pointerdown', e => { e.preventDefault(); jump(); }); onKey(e => { if (e.code === 'Space' && !e.repeat) { e.preventDefault(); jump(); } });
+      raf = requestAnimationFrame(loop);
+    },
+    keila() {
+      let f = 0, stage = 0, aim = .5, raf = 0, t0 = performance.now(), tot = 0, strikes = 0;
+      const pinsHTML = () => [[0], [1, 2], [3, 4, 5], [6, 7, 8, 9]].reverse().map(r => `<div class="pinrow">${r.map(k => `<span class="pin" data-p="${k}"></span>`).join('')}</div>`).join('');
+      A().innerHTML = `<div class="jumpinfo"><span id="kf">Heitto 1 / ${D.frames}</span><span>Kaatoja: <b id="ks">0</b></span></div>
+        <div class="lane2"><div class="pins" id="kpins">${pinsHTML()}</div><div class="kball" id="kbl">🔵</div><div class="gutter l"></div><div class="gutter r"></div></div>
+        <div class="meter"><div class="mlbl" id="kml">SUUNTA</div><div class="mbar pw"><span class="zone" style="left:44%;width:12%"></span><i id="kmi"></i></div></div>
+        <button class="btn primary bigpress" id="kpb">⏹ PYSÄYTÄ</button><p class="dim" id="kt" style="margin:0">Pysäytä suunta keskelle. Välilyönti toimii.</p>`;
+      const mi = $('#kmi'), kbl = $('#kbl'), kt = $('#kt'), ml = $('#kml');
+      const loop = now => { if (done) return; const t = (now - t0) / 1000, v = (Math.sin(t * (stage === 0 ? 3.1 : 4.2) - Math.PI / 2) + 1) / 2; mi.style.left = (v * 100) + '%'; mi.dataset.v = v; if (stage === 0) kbl.style.left = (8 + v * 84) + '%'; raf = requestAnimationFrame(loop); };
+      P.cleanup.push(() => cancelAnimationFrame(raf));
+      const press = () => { if (done || stage < 0) return; const v = +mi.dataset.v || 0;
+        if (stage === 0) { aim = v; stage = 1; t0 = performance.now(); ml.textContent = 'VOIMA'; kt.textContent = 'Nyt voima mahdollisimman korkealle!'; mi.parentNode.querySelector('.zone').style.cssText = 'left:85%;width:15%'; return; }
+        stage = -1; cancelAnimationFrame(raf); const pw = v, off = Math.abs(aim - .5) * 2;
+        let pins = off > .9 ? 0 : Math.round(10 * Math.max(0, Math.min(1, (1 - off) ** 1.4 * (.5 + .5 * pw) + (Math.random() - .5) * .12)));
+        if (off < .08 && pw > .82) pins = 10;
+        kbl.style.transition = 'top .8s ease-in, left .8s ease-in'; kbl.style.top = '6%'; kbl.style.left = (off > .9 ? (aim < .5 ? 4 : 96) : 50 + (aim - .5) * 40) + '%';
+        T(() => { const order = shuffle([0, 1, 2, 3, 4, 5, 6, 7, 8, 9]).sort((x, y) => Math.abs(x - 4.5 + (aim - .5) * 8) - Math.abs(y - 4.5 + (aim - .5) * 8)); order.slice(0, pins).forEach(k => { const el = $(`.pin[data-p="${k}"]`); if (el) el.classList.add('down'); });
+          const strike = pins === 10; if (strike) strikes++; const p = pins * 20 + (strike ? 100 : 0); tot += p; add(p, `${tot} p`); $('#ks').textContent = strikes;
+          kt.textContent = strike ? '💥 KAATO! STRIKE!' : pins === 0 ? '😬 Kouruun…' : `${pins} keilaa kaatui · +${p} p`; f++;
+          T(() => { if (done) return; if (f >= D.frames) return finish(`${tot} p, kaatoja ${strikes}!`); $('#kpins').innerHTML = pinsHTML(); kbl.style.transition = 'none'; kbl.style.top = ''; $('#kf').textContent = `Heitto ${f + 1} / ${D.frames}`;
+            stage = 0; t0 = performance.now(); ml.textContent = 'SUUNTA'; mi.parentNode.querySelector('.zone').style.cssText = 'left:44%;width:12%'; kt.textContent = 'Pysäytä suunta keskelle.'; raf = requestAnimationFrame(loop); }, 1500); }, 800); };
+      $('#kpb').onclick = press; onKey(e => { if (e.code === 'Space' && !e.repeat) { e.preventDefault(); press(); } });
+      raf = requestAnimationFrame(loop);
+    },
+    laukaus() {
+      const S = D.shots; let i = 0, goals = 0, raf = 0, t0 = performance.now(), lock = false;
+      A().innerHTML = `<div class="jumpinfo"><span id="la">Potku 1 / ${S.length}</span><span>Maaleja: <b id="lg">0</b></span></div>
+        <div class="pgoal"><div class="pgk" id="lk">🧤</div><div class="paim" id="lm">🎯</div><div class="pball" id="lb">⚽</div></div>
+        <button class="btn primary bigpress" id="lp">⚽ LAUKAISE</button><p class="dim" id="lt" style="margin:0">Laukaise, kun tähtäin on kaukana maalivahdista. Välilyönti toimii.</p>`;
+      const lk = $('#lk'), lm = $('#lm'), lb = $('#lb'), lt = $('#lt');
+      const gx = t => .5 + .36 * Math.sin(t * S[i].gs + S[i].gp), ax = t => (Math.sin(t * S[i].as) + 1) / 2;
+      const loop = now => { if (done) return; const t = (now - t0) / 1000; lk.style.left = (gx(t) * 100) + '%'; lm.style.left = (ax(t) * 100) + '%'; lk.dataset.v = gx(t); lm.dataset.v = ax(t); raf = requestAnimationFrame(loop); };
+      P.cleanup.push(() => cancelAnimationFrame(raf));
+      const shoot = () => { if (done || lock) return; lock = true; cancelAnimationFrame(raf); const a = +lm.dataset.v, g0 = +lk.dataset.v;
+        const post = a < .05 || a > .95, saved = !post && Math.abs(a - g0) < .2, corner = a < .2 || a > .8;
+        lb.style.left = (a * 100) + '%'; lb.classList.add('go'); if (saved) lk.style.left = (a * 100) + '%';
+        if (post) lt.textContent = '🥅 TOLPPAAN! Voi harmi…'; else if (saved) lt.textContent = '🧤 Maalivahti torjui!';
+        else { goals++; add(100 + (corner ? 60 : 0), `${goals} maalia`); lt.textContent = corner ? '🔥 MAALI suoraan kulmaan!' : '⚽ MAALI!'; $('#lg').textContent = goals; }
+        i++; T(() => { if (done) return; if (i >= S.length) return finish(`${goals} / ${S.length} maalia!`); lb.classList.remove('go'); lb.style.left = '50%'; $('#la').textContent = `Potku ${i + 1} / ${S.length}`; lt.textContent = 'Valmiina…'; lock = false; t0 = performance.now(); raf = requestAnimationFrame(loop); }, 1300); };
+      $('#lp').onclick = shoot; onKey(e => { if (e.code === 'Space' && !e.repeat) { e.preventDefault(); shoot(); } });
+      raf = requestAnimationFrame(loop);
+    },
+    kiipeily() {
+      let h = 0, top = 0, n = 0, live = 0;
+      A().innerHTML = `<div class="jumpinfo"><span>Korkeus: <b id="kh">0 m</b></span><span>Ennätys: <b id="kt2">0 m</b></span></div>
+        <div class="cwall" id="cw"><div class="climber" id="cl">🧗</div></div><p class="dim" id="ktx" style="margin:0">Napauta otteita nopeasti! Jolli huutaa: VAUHTIA!</p>`;
+      const cw = $('#cw'), cl = $('#cl'), ktx = $('#ktx');
+      const upd = () => { $('#kh').textContent = h + ' m'; $('#kt2').textContent = top + ' m'; cl.style.bottom = Math.min(70, h * 2.2) + '%'; cw.style.backgroundPositionY = (h * 18) + 'px'; };
+      const spawn = () => { if (done) return; n++; const gem = n > 3 && Math.random() < .12, life = Math.max(750, 1700 - n * 22);
+        const b = document.createElement('button'); b.className = 'hold' + (gem ? ' gem' : ''); b.setAttribute('aria-label', gem ? 'Timantti' : 'Ote');
+        b.style.left = (6 + Math.random() * 80) + '%'; b.style.top = (6 + Math.random() * 64) + '%'; if (!gem) b.style.background = `hsl(${pick([10, 35, 140, 200, 280, 320])},85%,55%)`; b.textContent = gem ? '💎' : '';
+        let hit = false; live++;
+        b.addEventListener('pointerdown', e => { e.preventDefault(); if (hit || done) return; hit = true; live--; b.classList.add('got'); setTimeout(() => b.remove(), 200);
+          h += gem ? 3 : 1; top = Math.max(top, h); add(gem ? 150 : 50, `${top} m`); ktx.textContent = gem ? '💎 KIVIAARRE! Jolli ilahtui!' : pick(['Hyvä ote!', 'Ylös, ylös!', 'Tiukka ote!', 'Jatka!']); upd(); });
+        cw.appendChild(b);
+        T(() => { if (hit) return; live--; b.classList.add('gone'); setTimeout(() => b.remove(), 250); if (done || gem) return; h = Math.max(0, h - 1); add(-25, `${top} m`); ktx.textContent = '😬 Ote karkasi, lipsuit alas!'; upd(); }, life);
+        T(spawn, Math.max(380, 900 - n * 12) + rnd(250)); };
+      T(spawn, 500); upd();
+    },
+    etsi() {
+      const DEC = ['🦎', '🐸', '🐊', '🍀', '🌿', '🐛', '🦖', '🥒', '🐉', '🍃', '🥦', '🐍'];
+      let found = 0, lvl = 0;
+      const field = () => { if (done) return; lvl++; const nt = 3 + Math.min(3, lvl), nd = 18 + lvl * 6, items = shuffle([...Array(nt).fill('🐢'), ...Array.from({length: nd}, () => pick(DEC))]); let left = nt;
+        A().innerHTML = `<div class="jumpinfo"><span>Kuva ${lvl}</span><span>Löydetty: <b>${found}</b> 🐢</span></div><div class="efield">${items.map((e, k) => `<button class="eit" data-t="${e === '🐢' ? 1 : 0}" style="--r:${rnd(50) - 25}deg;--s:${(.85 + Math.random() * .5).toFixed(2)}" aria-label="${e === '🐢' ? 'Kilpikonna' : 'Kuva'}">${e}</button>`).join('')}</div><p class="dim" id="et" style="margin:0">Etsi kuvasta ${nt} kilpikonnaa. Ei kiirettä.</p>`;
+        $$('.eit').forEach(b => b.onclick = () => { if (done || b.classList.contains('ok')) return;
+          if (b.dataset.t === '1') { b.classList.add('ok'); found++; left--; add(100, `${found} 🐢`); $('.jumpinfo b').textContent = found; $('#et').textContent = left ? `Hienoa! Vielä ${left}.` : 'Kaikki löytyivät! Uusi kuva tulossa…'; if (!left) T(field, 1100); }
+          else { b.classList.remove('nope'); void b.offsetWidth; b.classList.add('nope'); $('#et').textContent = 'Melkein! Tuo ei ollut kilpikonna.'; } }); };
+      field();
+    },
+    polku() {
+      const SEQ = D.seq, COL = ['#22c46b', '#ff5a5a', '#2f8dff', '#ffd23a'], NM = ['vihreä', 'punainen', 'sininen', 'keltainen'];
+      let len = D.start, pos = 0, showing = true, best = 0;
+      A().innerHTML = `<div class="jumpinfo"><span>Polun pituus: <b id="pl">${len}</b></span><span>Paras: <b id="pb">0</b></span></div>
+        <div class="pads">${COL.map((c, k) => `<button class="pad4" data-k="${k}" style="--c:${c}" aria-label="${NM[k]}"></button>`).join('')}</div><p class="dim" id="pt" style="margin:0">Katso tarkkaan…</p>`;
+      const pads = $$('.pad4'), pt = $('#pt');
+      const flash = (k, ms = 420) => { const b = pads[k]; b.classList.add('lit'); setTimeout(() => b.classList.remove('lit'), ms); try { SFX0.tick && SFX0.tick(); } catch (e) {} };
+      const show = () => { if (done) return; showing = true; pos = 0; pt.textContent = 'Katso tarkkaan…'; $('#pl').textContent = Math.min(len, SEQ.length);
+        for (let j = 0; j < len && j < SEQ.length; j++) T(() => flash(SEQ[j]), 700 + j * 650);
+        T(() => { showing = false; pt.textContent = 'Sinun vuorosi! Toista polku.'; }, 700 + len * 650); };
+      pads.forEach(b => b.addEventListener('pointerdown', e => { e.preventDefault(); if (done || showing) return; const k = +b.dataset.k; flash(k, 220);
+        if (k === SEQ[pos]) { pos++; if (pos >= len) { best = len; score = best * 100; prog = `${best} väriä`; sc(); push(false); $('#pb').textContent = best;
+            if (len >= SEQ.length) return finish(`Muistit koko ${best} värin polun!`); len++; showing = true; pt.textContent = '🌟 Hienoa! Polku pitenee…'; T(show, 900); } }
+        else { showing = true; pt.textContent = 'Ei haittaa! Katsotaan sama polku uudestaan.'; T(show, 1100); } }));
+      show();
     },
   };
   (ENG[g.engine] || (() => {}))();
