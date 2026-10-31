@@ -773,6 +773,27 @@ details.packgrp>.packrow{margin-top:6px}
 .qo{display:flex;align-items:center;justify-content:center;gap:8px;padding:16px 10px;border-radius:16px;background:var(--wall2);border:4px solid var(--line);box-shadow:4px 4px 0 var(--line);font-weight:800;font-size:clamp(.95rem,3.5vw,1.2rem)}
 .qo .dot{width:26px;height:26px;border-radius:50%;border:3px solid var(--line);flex:none}
 .qo.right{background:var(--g);color:#08240f} .qo.wrong{background:var(--blood);color:#fff;animation:shake .4s}
+.drawrow{display:grid;grid-template-columns:minmax(0,.8fr) minmax(0,1.2fr);gap:12px;width:100%;align-items:end}
+.dmodel,.dmine{display:grid;gap:4px;justify-items:center}
+.dmodel small,.dmine small{font-family:var(--f-display);letter-spacing:.06em;color:var(--y)}
+.msvg{width:100%;aspect-ratio:1;background:#fff;border-radius:16px;border:4px solid var(--line);box-shadow:5px 5px 0 var(--line)}
+.msvg polyline{fill:none;stroke:#120b1a;stroke-width:3.2;stroke-linecap:round;stroke-linejoin:round}
+.msvg.big{width:min(300px,40vh)}
+.pcv{width:100%;aspect-ratio:1;border-radius:16px;border:4px solid var(--line);box-shadow:5px 5px 0 var(--line);touch-action:none;cursor:crosshair;background:#fff}
+.hostmodel{display:grid;gap:6px;justify-items:center}
+.gallery{display:grid;grid-template-columns:repeat(auto-fill,minmax(185px,1fr));gap:12px;width:min(1150px,100%)}
+.gcard{display:grid;gap:4px;justify-items:center;padding:8px;border-radius:16px;background:var(--wall);border:3px solid var(--line);box-shadow:5px 5px 0 var(--line);transform:rotate(-1.5deg);opacity:0;animation:cheerin .5s var(--d,0s) cubic-bezier(.2,1.5,.4,1) forwards}
+.gcard:nth-child(even){transform:rotate(1.5deg)}
+.gcard.model{background:#2e2512;opacity:1;animation:none;outline:3px dashed var(--y)}
+.gcard.best{outline:4px solid var(--y);background:#3a2e10}
+.gimg{width:100%;aspect-ratio:1;border-radius:10px;background:#fff;border:3px solid #c9a46a;overflow:hidden;display:grid;place-items:center}
+.gimg img,.gimg .msvg{width:100%;height:100%;border:0;box-shadow:none;border-radius:0}
+.gph{font-size:3rem}
+.gimg{position:relative}
+.ghide{position:absolute;top:4px;right:4px;width:30px;height:30px;border-radius:50%;background:rgba(18,11,26,.75);font-size:1rem;opacity:.35}
+.ghide:hover,.ghide:focus-visible{opacity:1}
+.gcard b{font-size:.95rem} .gcard small{color:var(--dim);font-weight:700}
+@media (max-width:600px){.drawrow{grid-template-columns:1fr}.dmodel .msvg{width:140px}}
 @keyframes pop{0%{transform:scale(.2);opacity:0}100%{transform:scale(1);opacity:1}}
 @keyframes pulse{50%{outline-color:var(--y)}}
 @keyframes shake{0%,100%{transform:translateX(0)}20%{transform:translateX(-14px) rotate(-2deg)}40%{transform:translateX(12px) rotate(2deg)}60%{transform:translateX(-8px)}80%{transform:translateX(6px)}}
@@ -3345,6 +3366,7 @@ const CG_ENGINES = {
  maali:     {emoji: '🧤', name: 'Maalivahti', dur: 36000, desc: 'Olet maalivahti! Katso mihin pallo lähtee ja torju oikeaan suuntaan: ⬅ ⬆ ➡. Nopea torjunta tuo lisäpisteitä.'},
  kori:      {emoji: '🏀', name: 'Vapaaheitot', dur: 32000, desc: 'Kymmenen vapaaheittoa. Pysäytä voimamittari vihreälle alueelle. Keskelle osuva on SWISH ja tuo lisäpisteitä.'},
  tasa:      {emoji: '🤸', name: 'Puomitasapaino', dur: 26000, desc: 'Pidä puomi suorassa kallistamalla vasemmalle ja oikealle. Jos putoat, nouset uudelleen. Mitä kauemmin pysyt suorassa, sitä paremmin.'},
+ piirra:    {emoji: '✏️', name: 'Piirrä mallista', dur: 45000, desc: 'Kaikki piirtävät saman mallin. Mitä lähemmäs mallia piirros osuu, sitä enemmän pisteitä. Lopuksi piirustukset näytetään valkokankaalla!'},
  ympyra:    {emoji: '⭕', name: 'Täydellinen ympyrä', dur: 30000, desc: 'Piirrä yhdellä vedolla mahdollisimman täydellinen ympyrä. Kolme yritystä, paras jää voimaan.'},
  vari:      {emoji: '🌈', name: 'Värisilmä', dur: 34000, desc: 'Säädä liukusäätimellä täsmälleen sama värisävy kuin mallissa. Neljä väriä. Mitä lähemmäs osut, sitä enemmän pisteitä.'},
  qmc:       {emoji: '🖼️', name: 'Pikavisa', dur: 30000, desc: 'Vastaa niin moneen kuin ehdit. Väärä vastaus vie vähän pisteitä.'},
@@ -3394,6 +3416,7 @@ const CG = {
   {e: 'tasa', t: 'Puomitasapaino'},
  ],
  kuvataide: [
+  {e: 'piirra', t: 'Piirrä mallista'},
   {e: 'ympyra', t: 'Täydellinen ympyrä'},
   {e: 'vari', t: 'Värisilmä'},
   {e: 'qmc', t: 'Värisekoitus', d: 'Värioppia salamavauhtia: mitä syntyy, kun värejä sekoitetaan? Vastaa niin moneen kuin ehdit.', colors: true, data: [
@@ -3467,6 +3490,7 @@ function cgBuild(room, def) {
     case 'kori': data = {shots: Array.from({length: 10}, () => ({c: .35 + Math.random() * .45}))}; break;
     case 'tasa': data = {}; break;
     case 'ympyra': data = {att: 3}; break;
+    case 'piirra': data = {model: pick(Object.keys(DRAW_MODELS))}; break;
     case 'vari': data = {hues: Array.from({length: 4}, () => rnd(360)), sat: 80, lig: 52}; break;
     case 'qmc': data = {colors: !!def.colors, items: shuffle(src).slice(0, 14).map(([q, a, w]) => { const opts = shuffle([a, ...w.slice(0, 3)]); return {q, opts, c: opts.indexOf(a)}; })}; break;
   }
@@ -3520,9 +3544,35 @@ function cgEnd() {
     G.tline = fmt(pick(TEACHERS[cg.room].lines.good), {n: w});
   }
   SFX.right(); G.qi++;
-  setPhase('cg_result', 8500, classNext);
+  setPhase('cg_result', cg.engine === 'piirra' ? 14000 : 8500, classNext);
 }
 const CG_COLORS = {punainen: '#e8313a', sininen: '#2f6fe0', keltainen: '#ffd23a', vihreä: '#22a84f', oranssi: '#ff8a1f', violetti: '#8a4fd0', vaaleanpunainen: '#ff9ec4', harmaa: '#8a8a8a', ruskea: '#8a5a2b', musta: '#1b1b1f', valkoinen: '#ffffff', turkoosi: '#20c1c9'};
+const circ = (cx, cy, r, n = 28, a0 = 0, a1 = Math.PI * 2) => Array.from({length: n + 1}, (_, i) => { const a = a0 + (a1 - a0) * i / n; return [cx + r * Math.cos(a), cy + r * Math.sin(a)]; });
+const DRAW_MODELS = {
+  talo: {name: 'Talo', paths: [[[20, 90], [20, 45], [80, 45], [80, 90], [20, 90]], [[12, 50], [50, 14], [88, 50]], [[42, 90], [42, 66], [58, 66], [58, 90]], [[28, 56], [38, 56], [38, 64], [28, 64], [28, 56]]]},
+  aurinko: {name: 'Aurinko', paths: [circ(50, 50, 20), ...Array.from({length: 8}, (_, i) => { const a = i * Math.PI / 4; return [[50 + 28 * Math.cos(a), 50 + 28 * Math.sin(a)], [50 + 42 * Math.cos(a), 50 + 42 * Math.sin(a)]]; })]},
+  kala: {name: 'Kala', paths: [[...circ(45, 50, 1, 30).map(([x, y]) => [45 + (x - 45) * 32, 50 + (y - 50) * 18])], [[75, 50], [92, 36], [92, 64], [75, 50]], circ(30, 46, 3, 10)]},
+  sydan: {name: 'Sydän', paths: [Array.from({length: 41}, (_, i) => { const t = i / 40 * Math.PI * 2; return [50 + 2.3 * 16 * Math.sin(t) ** 3, 48 - 2.3 * (13 * Math.cos(t) - 5 * Math.cos(2 * t) - 2 * Math.cos(3 * t) - Math.cos(4 * t))]; })]},
+  tahti: {name: 'Tähti', paths: [Array.from({length: 11}, (_, i) => { const a = -Math.PI / 2 + i * Math.PI / 5, r = i % 2 ? 18 : 42; return [50 + r * Math.cos(a), 54 + r * Math.sin(a)]; })]},
+  puu: {name: 'Puu', paths: [[[44, 92], [44, 62], [56, 62], [56, 92]], circ(50, 40, 26)]},
+  kissa: {name: 'Kissa', paths: [circ(50, 56, 30), [[26, 40], [24, 10], [44, 28]], [[74, 40], [76, 10], [56, 28]], circ(40, 52, 3, 8), circ(60, 52, 3, 8), [[50, 62], [46, 66], [54, 66], [50, 62]], [[18, 62], [38, 64]], [[82, 62], [62, 64]]]},
+  auto: {name: 'Auto', paths: [[[10, 70], [10, 52], [28, 52], [38, 36], [66, 36], [76, 52], [90, 52], [90, 70], [10, 70]], circ(28, 72, 9, 16), circ(72, 72, 9, 16)]},
+  vuori: {name: 'Jollin kiipeilyvuori', paths: [[[6, 88], [32, 40], [44, 56], [62, 18], [94, 88], [6, 88]], [[62, 18], [62, 4], [74, 9], [62, 13]]]},
+  kivi: {name: 'Jollin lempikivi', paths: [[[18, 70], [14, 52], [26, 34], [48, 26], [72, 30], [86, 46], [84, 66], [66, 78], [36, 80], [18, 70]], [[40, 40], [48, 52], [44, 62]], [[64, 44], [70, 56]]]},
+};
+function modelSVG(id, cls = '') { const M = DRAW_MODELS[id]; return `<svg class="msvg ${cls}" viewBox="0 0 100 100" aria-label="Malli: ${esc(M.name)}">${M.paths.map(p => `<polyline points="${p.map(q => q.map(v => v.toFixed(1)).join(',')).join(' ')}" />`).join('')}</svg>`; }
+function drawScore(modelPaths, userPaths) {
+  const N = 64, norm = paths => { const all = paths.flat(); if (all.length < 2) return null; const xs = all.map(p => p[0]), ys = all.map(p => p[1]);
+    const x0 = Math.min(...xs), y0 = Math.min(...ys), w = Math.max(...xs) - x0, h = Math.max(...ys) - y0, sc = (N - 6) / Math.max(w, h, 1e-6), ox = (N - w * sc) / 2, oy = (N - h * sc) / 2;
+    const g = new Uint8Array(N * N); for (const p of paths) for (let k = 0; k < p.length; k++) { const a = p[Math.max(0, k - 1)], b = p[k], steps = Math.max(1, Math.ceil(Math.hypot(b[0] - a[0], b[1] - a[1]) * sc * 2));
+      for (let s = 0; s <= steps; s++) { const t = s / steps, x = Math.round(ox + (a[0] + (b[0] - a[0]) * t - x0) * sc), y = Math.round(oy + (a[1] + (b[1] - a[1]) * t - y0) * sc); if (x >= 0 && y >= 0 && x < N && y < N) g[y * N + x] = 1; } }
+    return g; };
+  const dil = (g, r) => { const o = new Uint8Array(N * N); for (let y = 0; y < N; y++) for (let x = 0; x < N; x++) if (g[y * N + x]) for (let dy = -r; dy <= r; dy++) for (let dx = -r; dx <= r; dx++) { const X = x + dx, Y = y + dy; if (X >= 0 && Y >= 0 && X < N && Y < N) o[Y * N + X] = 1; } return o; };
+  const M = norm(modelPaths), U = norm(userPaths); if (!M || !U) return 0;
+  const Md = dil(M, 2), Ud = dil(U, 2); let um = 0, ut = 0, mu = 0, mt = 0;
+  for (let i = 0; i < N * N; i++) { if (U[i]) { ut++; if (Md[i]) um++; } if (M[i]) { mt++; if (Ud[i]) mu++; } }
+  const pr = ut ? um / ut : 0, rc = mt ? mu / mt : 0, f = pr + rc ? 2 * pr * rc / (pr + rc) : 0; return f * f;
+}
 const CHEERS = {
   englanti: ['OH MY GOODNESS, {n}!!! Congratulations! Olet ihan SUPERSTAR!', 'Wheee! Well done, {n}! High five! Molemmilla käsillä!', '{n}, you are AMAZING! Mä itken onnesta!'],
   matematiikka: ['Onneksi olkoon, {n}. Laskin juuri: voitto oli täsmälleen ansaittu.', 'Hienoa, {n}! Tulos on sata prosenttia oikein.', 'Onnittelut, {n}. Tämä oli selvä kuin yksi plus yksi.'],
@@ -3549,7 +3599,7 @@ function classEnd() {
   quip('classEnd', {n: top ? top.name : ''});
   setPhase('end');
 }
-const cgBotScore = e => ({ympyra: 600 + rnd(300), vari: 500 + rnd(400), qmc: 500 + rnd(700), juoksu: 450 + rnd(400), pituus: 500 + rnd(330), maali: 700 + rnd(1200), kori: 400 + rnd(700), tasa: 200 + rnd(250), pari: 400 + rnd(600), lajittelu: 600 + rnd(900), pika: 600 + rnd(1000), sotku: 300 + rnd(750), kuuntele: 300 + rnd(750), jarjesta: 300 + rnd(500), laske: 500 + rnd(1000), hengitys: 250 + rnd(250)})[e] || 300;
+const cgBotScore = e => ({piirra: 400 + rnd(350), ympyra: 600 + rnd(300), vari: 500 + rnd(400), qmc: 500 + rnd(700), juoksu: 450 + rnd(400), pituus: 500 + rnd(330), maali: 700 + rnd(1200), kori: 400 + rnd(700), tasa: 200 + rnd(250), pari: 400 + rnd(600), lajittelu: 600 + rnd(900), pika: 600 + rnd(1000), sotku: 300 + rnd(750), kuuntele: 300 + rnd(750), jarjesta: 300 + rnd(500), laske: 500 + rnd(1000), hengitys: 250 + rnd(250)})[e] || 300;
 function hostSoon() { if (G.hostT) return; G.hostT = setTimeout(() => { G.hostT = null; renderHost(); }, 250); }
 
 /* ---------- host: näkymät ---------- */
@@ -3585,12 +3635,17 @@ function classStageHTML() {
       const fin = rows.filter(x => x.r.final).length;
       return `<div class="center"><div class="row" style="justify-content:center"><span class="cat" style="background:${T.color}">${esc(T.subject)}</span><span class="label">${g.emoji} ${esc(g.title)}</span></div>
         ${g.engine === 'hengitys' ? '<div class="breathhost"><div class="bball"></div><p>Hengitetään yhdessä. Sisään… ja ulos…</p></div>' : ''}
+        ${g.engine === 'piirra' ? `<div class="hostmodel"><span class="label">Malli: ${esc(DRAW_MODELS[g.data.model].name)}</span>${modelSVG(g.data.model, 'big')}</div>` : ''}
         <div class="cglive">${rows.map(({p, r}, i) => `<div class="cgl ${r.final ? 'fin' : ''}"><span class="pl">${i + 1}.</span><span class="nm">${avH(p)} ${esc(p.name)}</span><div class="bar"><i style="width:${(r.score || 0) / mx * 100}%;background:${T.color}"></i></div><b>${r.score || 0}</b><small>${r.final ? '✓ valmis' : esc(r.prog || 'pelaa…')}</small></div>`).join('')}</div>
         <div class="dim">${fin} / ${rows.length} valmiina</div>
         <div class="row" style="width:100%;flex-wrap:nowrap"><div class="secs" data-secs="${G.phaseEnd}"></div><div style="flex:1">${timerBar()}</div></div></div>`;
     }
     case 'cg_result': {
       const g = G.cg, sc = id => (g.results[id] && g.results[id].score) || 0;
+      if (g.engine === 'piirra') return `<div class="center"><div class="mgname">${g.emoji} Taidenäyttely</div>
+        <div class="gallery"><div class="gcard model"><div class="gimg">${modelSVG(g.data.model)}</div><b>MALLI</b><small>${esc(DRAW_MODELS[g.data.model].name)}</small></div>
+        ${G.cgRank.map((id, i) => { const p = G.players[id], r = g.results[id] || {}; if (!p) return ''; return `<div class="gcard ${i === 0 && sc(id) > 0 ? 'best' : ''}" style="--d:${(0.3 + i * 0.25).toFixed(2)}s"><div class="gimg">${r.img ? `<img src="${r.img}" alt="Pelaajan ${esc(p.name)} piirros"><button class="ghide" data-hidedraw="${id}" title="Piilota piirros" aria-label="Piilota pelaajan ${esc(p.name)} piirros">🙈</button>` : `<span class="gph">${p.bot ? '🤖' : r.hidden ? '🙈' : '🖼️'}</span>`}</div><b>${i + 1}. ${esc(p.name)}</b><small>${Math.round(sc(id) / 10)} % · +${p.delta || 0} p</small></div>`; }).join('')}</div>
+        ${teacherBubble(st.room, G.tline)}</div>`;
       return `<div class="center"><div class="mgname">${g.emoji} ${esc(g.title)}</div>
         ${g.engine === 'hengitys' ? '<p style="margin:0;font-size:1.2rem">Vähintään 60 % rauhallisuus: <b>+200 p</b> kaikille, jotka siihen pystyivät.</p>' : ''}
         <div class="reslist">${G.cgRank.map((id, i) => { const p = G.players[id]; if (!p) return ''; return `<div class="rr ${i === 0 && sc(id) > 0 ? 'best' : ''}"><span>${i + 1}. ${avH(p)} ${esc(p.name)}${G.supportTo === id ? ' 🛡️' : ''}</span><span class="dim">${g.engine === 'hengitys' ? Math.round(sc(id) / 5) + ' % rauhallisuus' : sc(id) + ' p pelissä'}</span><b>${p.delta ? '+' + p.delta : ''}</b></div>`; }).join('')}</div>
@@ -3614,20 +3669,20 @@ function roomsBuilderHTML() {
 function startCG(v) {
   const box = $('#cgbox'); if (!box) return;
   const g = v.cg, D = g.data, eff = new Set((v.me.incoming || []).map(x => x.k));
-  let score = 0, done = false, lastSend = 0, prog = '', pend = null;
+  let score = 0, done = false, lastSend = 0, prog = '', pend = null, extra = null, onEnd = null;
   const ends = P.recv + v.cgRemain * (eff.has('hidaste') ? .7 : 1);
   const timers = [], ivs = [], keys = [];
   const T = (fn, ms) => { const t = setTimeout(fn, ms); timers.push(t); return t; };
   const onKey = (fn, ev = 'keydown') => { document.addEventListener(ev, fn); keys.push([ev, fn]); };
   P.cleanup.push(() => { timers.forEach(clearTimeout); ivs.forEach(clearInterval); clearTimeout(pend); keys.forEach(([e, f]) => document.removeEventListener(e, f)); try { if (window.speechSynthesis) speechSynthesis.cancel(); } catch (e) {} });
-  const push = fin => { clearTimeout(pend); const now = Date.now(); if (!fin && now - lastSend < 350) { pend = setTimeout(() => push(false), 400); return; } lastSend = now; pSend({t: 'cg', id: g.id, r: {score, prog, final: !!fin}}); };
+  const push = fin => { clearTimeout(pend); const now = Date.now(); if (!fin && now - lastSend < 350) { pend = setTimeout(() => push(false), 400); return; } lastSend = now; pSend({t: 'cg', id: g.id, r: Object.assign({score, prog, final: !!fin}, fin && extra ? {img: extra} : {})}); };
   const sc = () => { const e = $('#cgsc'); if (e) e.textContent = score + ' p'; };
   const add = (d, pr) => { score = Math.max(0, score + d); if (pr != null) prog = pr; sc(); push(false); };
   const A = () => $('#cga'), fmt2 = n => Number(n).toFixed(2).replace('.', ',');
-  const finish = msg => { if (done) return; done = true; push(true); timers.forEach(clearTimeout); ivs.forEach(clearInterval); const a = A(); if (a) a.innerHTML = `<div class="cgdone"><div class="big">✅</div><h2>${score} p</h2><p class="dim">${esc(msg || 'Valmis!')} Odota muita…</p></div>`; };
+  const finish = msg => { if (done) return; if (onEnd) { try { onEnd(); } catch (e) {} } done = true; push(true); timers.forEach(clearTimeout); ivs.forEach(clearInterval); const a = A(); if (a) a.innerHTML = `<div class="cgdone"><div class="big">✅</div><h2>${score} p</h2><p class="dim">${esc(msg || 'Valmis!')} Odota muita…</p></div>`; };
   box.innerHTML = `<div class="cghead"><b>${g.emoji} ${esc(g.title)}</b>${eff.has('hidaste') ? '<small>🐌 Hidaste: vähemmän aikaa</small>' : ''}<span id="cgsc" class="cgsc">0 p</span></div>
     <div class="cgwrap" id="cgw"><div id="cga" class="cga"></div><div id="cgfx" class="cgfx"></div></div><div class="timerbar"><i data-from="${ends - g.dur}" data-until="${ends}"></i></div>`;
-  T(() => finish('Aika loppui!'), Math.max(0, ends - Date.now()));
+  T(() => finish('Aika loppui!'), Math.max(0, ends - Date.now() - 700));
   const w = $('#cgw'), fx = $('#cgfx');
   if (eff.has('peili')) { w.classList.add('mirror'); T(() => w.classList.remove('mirror'), 8000); }
   if (eff.has('pyorre')) { w.classList.add('wobble'); T(() => w.classList.remove('wobble'), 8000); }
@@ -3782,6 +3837,26 @@ function startCG(v) {
         n++; if (Math.abs(a) < 12) good++; const pc = Math.round(good / n * 100); bm.style.transform = `rotate(${a.toFixed(1)}deg)`; const tp = $('#tpc'); if (tp) tp.textContent = pc + ' % suorassa';
         if (n % 12 === 0) { score = pc * 5; prog = pc + ' %'; sc(); push(false); } }, 40);
       ivs.push(iv);
+    },
+    piirra() {
+      const M = DRAW_MODELS[D.model]; let paths = [], cur = null, drawing = false;
+      A().innerHTML = `<div class="drawrow"><div class="dmodel"><small>MALLI: ${esc(M.name)}</small>${modelSVG(D.model)}</div><div class="dmine"><small>SINUN PIIRROS</small><canvas id="pcv" class="pcv" width="500" height="500"></canvas></div></div>
+        <div class="row" style="justify-content:center"><button class="btn small" id="pundo">↶ Kumoa</button><button class="btn small" id="pclr">Tyhjennä</button><button class="btn primary" id="pdone">✅ Valmis</button></div><p class="dim" style="margin:0">Piirrä malli omaan ruutuusi. Koolla ja paikalla ei ole väliä, muodolla on!</p>`;
+      const cv = $('#pcv'), cx = cv.getContext('2d');
+      const redraw = () => { cx.fillStyle = '#fff'; cx.fillRect(0, 0, 500, 500); cx.strokeStyle = '#120b1a'; cx.lineWidth = 9; cx.lineCap = 'round'; cx.lineJoin = 'round';
+        for (const p of paths) { cx.beginPath(); cx.moveTo(p[0][0] * 5, p[0][1] * 5); for (const q of p) cx.lineTo(q[0] * 5, q[1] * 5); if (p.length === 1) cx.lineTo(p[0][0] * 5 + .1, p[0][1] * 5); cx.stroke(); } };
+      const pos = e => { const r = cv.getBoundingClientRect(); return [(e.clientX - r.left) / r.width * 100, (e.clientY - r.top) / r.height * 100]; };
+      cv.addEventListener('pointerdown', e => { if (done) return; e.preventDefault(); cv.setPointerCapture(e.pointerId); drawing = true; cur = [pos(e)]; paths.push(cur); redraw(); });
+      cv.addEventListener('pointermove', e => { if (!drawing) return; const p = pos(e), l = cur[cur.length - 1]; if (Math.hypot(p[0] - l[0], p[1] - l[1]) < .6) return; cur.push(p); redraw(); });
+      const up = () => { if (!drawing) return; drawing = false; const f = drawScore(M.paths, paths); score = Math.round(f * 1000); prog = Math.round(f * 100) + ' %'; sc(); push(false); };
+      cv.addEventListener('pointerup', up); cv.addEventListener('pointercancel', up);
+      $('#pundo').onclick = () => { paths.pop(); redraw(); up(); drawing = false; score = Math.round(drawScore(M.paths, paths) * 1000); sc(); };
+      $('#pclr').onclick = () => { paths = []; redraw(); score = 0; sc(); };
+      onEnd = () => { const f = drawScore(M.paths, paths); score = Math.round(f * 1000); prog = Math.round(f * 100) + ' %';
+        const t = document.createElement('canvas'); t.width = t.height = 220; const tx = t.getContext('2d'); tx.drawImage(cv, 0, 0, 220, 220);
+        try { extra = t.toDataURL('image/webp', .6); if (!extra.startsWith('data:image/webp')) extra = t.toDataURL('image/jpeg', .6); } catch (e) { extra = null; } };
+      $('#pdone').onclick = () => { if (!paths.length) return; finish(`Piirros valmis: ${Math.round(drawScore(M.paths, paths) * 100)} % mallin mukainen!`); };
+      redraw();
     },
     ympyra() {
       let att = 0, best = 0, pts = [], drawing = false;
@@ -4829,10 +4904,13 @@ function handle(p, d) {
     if (G.phase !== 'lobby' || p.avatarLocked || !validAvatar(d.data)) return;
     p.avatar = d.data; renderHost(); sync(); return;
   }
+  if (d.t === 'cg' && G.phase === 'cg_result' && G.cg && d.id === G.cg.id && d.r && typeof d.r.img === 'string' && /^data:image\/(webp|jpeg|png);base64,/.test(d.r.img) && d.r.img.length < 90000) {
+    const r0 = G.cg.results[p.id] || (G.cg.results[p.id] = {score: 0, final: true}); if (!r0.img && !r0.hidden) { r0.img = d.r.img; hostSoon(); } return;
+  }
   if (d.t === 'cg' && G.phase === 'cgame' && G.cg && d.id === G.cg.id) {
     const prev = G.cg.results[p.id]; if (prev && prev.final) return;
     const r = d.r || {}, scv = Math.max(0, Math.min(5000, Math.round(Number(r.score) || 0)));
-    G.cg.results[p.id] = {score: r.final ? scv : Math.max(scv, prev ? prev.score : 0), prog: String(r.prog || '').slice(0, 24), final: !!r.final};
+    G.cg.results[p.id] = {score: r.final ? scv : Math.max(scv, prev ? prev.score : 0), prog: String(r.prog || '').slice(0, 24), final: !!r.final, img: typeof r.img === 'string' && /^data:image\/(webp|jpeg|png);base64,/.test(r.img) && r.img.length < 90000 ? r.img : (prev && prev.img) || null};
     if (r.final) sync();
     hostSoon();
     if (present().every(x => G.cg.results[x.id] && G.cg.results[x.id].final)) { clearTimeout(G.timer); G.next = null; G.timer = setTimeout(cgEnd, 1200); }
@@ -5348,6 +5426,7 @@ function bindHost() {
     const k = b.dataset.pack, cur = new Set(G.settings.packs || []);
     cur.has(k) ? cur.delete(k) : cur.add(k); G.settings.packs = [...cur]; saveSettings(); renderHost();
   }));
+  $$('[data-hidedraw]').forEach(b => b.addEventListener('click', () => { const r = G.cg && G.cg.results[b.dataset.hidedraw]; if (r) { r.img = null; r.hidden = true; toast('Piirros piilotettu', '🙈'); renderHost(); } }));
   $$('[data-gmode]').forEach(b => b.addEventListener('click', () => { G.settings.mode = b.dataset.gmode; saveSettings(); renderHost(); }));
   $$('[data-room]').forEach(b => b.addEventListener('click', () => { const r = (G.settings.rooms || []).slice(); if (r.length < 8) r.push(b.dataset.room); G.settings.rooms = r; saveSettings(); renderHost(); }));
   $$('[data-rmroom]').forEach(b => b.addEventListener('click', () => { const r = (G.settings.rooms || []).slice(); r.splice(+b.dataset.rmroom, 1); G.settings.rooms = r; saveSettings(); renderHost(); }));
