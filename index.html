@@ -536,6 +536,8 @@ body{background:#1a0f24}
 .giins small{font-size:.65rem;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .gidel{position:absolute;top:-6px;right:-6px;width:22px;height:22px;border-radius:50%;background:var(--blood);color:#fff;font-size:.7rem;border:2px solid var(--line)}
 textarea.drop{outline:4px dashed var(--y);outline-offset:-4px}
+.packgrp{margin-top:8px;gap:10px}
+.packgrp+.packrow .pack span:nth-child(2){font-size:.9em}
 @keyframes pop{0%{transform:scale(.2);opacity:0}100%{transform:scale(1);opacity:1}}
 @keyframes pulse{50%{outline-color:var(--y)}}
 @keyframes shake{0%,100%{transform:translateX(0)}20%{transform:translateX(-14px) rotate(-2deg)}40%{transform:translateX(12px) rotate(2deg)}60%{transform:translateX(-8px)}80%{transform:translateX(6px)}}
@@ -2371,6 +2373,281 @@ const CLUES = {
 };
 Object.entries(CLUES).forEach(([k, v]) => { if (PACKS[k]) PACKS[k].clue = v; });
 
+/* Historia 7 (OPS 2014, vuosiluokat 7–9: 7. luokan tyypilliset sisällöt) */
+PACKS.teollistuminen.group = 'Historia 7';
+PACKS.h7aatteet = {name: 'Aatteet ja kansat', emoji: '💡', group: 'Historia 7',
+ mc: [
+  ['Mikä aate korosti yksilön vapautta, sananvapautta ja vapaata kauppaa?','Liberalismi','Konservatismi','Sosialismi','Nationalismi'],
+  ['Mikä aate halusi säilyttää vanhan yhteiskuntajärjestyksen ja perinteet?','Konservatismi','Liberalismi','Anarkismi','Sosialismi'],
+  ['Mikä aate korosti oman kansan kieltä, kulttuuria ja omaa valtiota?','Nationalismi','Liberalismi','Konservatismi','Anarkismi'],
+  ['Mikä aate vaati tehtaita ja maata yhteiseen omistukseen ja työläisten aseman parantamista?','Sosialismi','Liberalismi','Konservatismi','Nationalismi'],
+  ['Ketä kutsuttiin Saksan yhdistäjäksi ja "rautakansleriksi"?','Otto von Bismarck','Vilhelm II','Napoleon III','Giuseppe Garibaldi'],
+  ['Minä vuonna Saksan keisarikunta perustettiin?','1871','1848','1815','1914'],
+  ['Missä Saksan keisarikunta julistettiin vuonna 1871?',"Versailles'n peilisalissa",'Berliinin linnassa','Wienin Hofburgissa','Kölnin tuomiokirkossa'],
+  ['Kuka johti punapaitoja Italian yhdistymisessä?','Giuseppe Garibaldi','Camillo di Cavour','Otto von Bismarck','Benito Mussolini'],
+  ['Mikä kokous järjesti Euroopan rajat uudelleen Napoleonin sotien jälkeen 1814–1815?','Wienin kongressi','Berliinin konferenssi','Pariisin rauha',"Versailles'n rauha"],
+  ['Mitä Euroopassa tapahtui "hulluna vuonna" 1848?','Vallankumouksia monissa maissa','Ensimmäinen maailmansota alkoi','Saksa yhdistyi','Napoleon kruunattiin'],
+  ['Mitä kansallisvaltio tarkoittaa?','Valtiota, jonka asukkaat muodostavat yhden kansakunnan','Valtiota, jota hallitsee keisari','Siirtomaata','Kaupunkivaltiota'],
+  ['Kuka julkaisi evoluutioteoriaa esittelevän teoksen Lajien synty (1859)?','Charles Darwin','Karl Marx','Isaac Newton','Louis Pasteur'],
+  ['Kuka oli Yhdysvaltain presidentti sisällissodan aikana?','Abraham Lincoln','George Washington','Ulysses S. Grant','Thomas Jefferson'],
+  ['Minä vuonna orjuus lakkautettiin koko Yhdysvalloissa?','1865','1776','1820','1900'],
+  ['Minä vuonna maaorjuus lakkautettiin Venäjällä?','1861','1789','1905','1917'],
+  ['Miksi kutsuttiin brittiläisiä naisia, jotka vaativat näkyvästi äänioikeutta?','Suffragetit','Luddiitit','Jakobiinit','Dekabristit'],
+  ['Mitä ammattiliitot ajoivat?','Työläisten etuja, kuten parempaa palkkaa','Aatelin etuoikeuksia','Kuninkaan valtaa','Siirtomaiden laajentamista'],
+  ['Kuka ranskalainen keisari hävisi Waterloon taistelun 1815?','Napoleon I','Ludvig XVI','Napoleon III','Kaarle X'],
+ ],
+ num: [
+  ['Minä vuonna Saksan keisarikunta perustettiin?', 1871],
+  ['Minä vuonna Italian kuningaskunta perustettiin?', 1861],
+  ['Minä vuonna Wienin kongressi päättyi?', 1815],
+  ['Minä vuonna Darwinin Lajien synty julkaistiin?', 1859],
+  ['Minä vuonna Yhdysvaltain sisällissota alkoi?', 1861],
+ ],
+ order: [
+  ['Järjestä vanhimmasta uusimpaan', ['Wienin kongressi päättyy|1815', 'Hullu vuosi|1848', 'Italian kuningaskunta|1861', 'Saksan keisarikunta|1871']],
+  ['Järjestä vanhimmasta uusimpaan', ['Ranskan vallankumous|1789', 'Napoleon keisariksi|1804', 'Waterloon taistelu|1815', 'Kommunistinen manifesti|1848']],
+  ['Järjestä vanhimmasta uusimpaan', ['Lajien synty|1859', 'Yhdysvaltain sisällissota alkaa|1861', 'Orjuus lakkautetaan Yhdysvalloissa|1865', 'Saksa yhdistyy|1871']],
+ ],
+ tf: [
+  ['Liberalismi korosti yksilön vapautta.', true, 'Liberalismi puolusti mm. sananvapautta ja vapaata kauppaa.'],
+  ['Konservatismi halusi nopeita muutoksia yhteiskuntaan.', false, 'Konservatismi halusi säilyttää vanhaa ja muuttaa asioita hitaasti.'],
+  ['Saksa yhdistyi yhdeksi valtioksi vasta vuonna 1871.', true, 'Sitä ennen Saksa koostui monista pienistä valtioista.'],
+  ['Italia oli yhtenäinen valtio jo keskiajalla.', false, 'Italia yhdistyi kuningaskunnaksi vasta vuonna 1861.'],
+  ['Karl Marx oli sosialismin keskeinen ajattelija.', true, 'Hän kirjoitti Kommunistisen manifestin ja Pääoman.'],
+  ['Nationalismi korosti oman kansan kieltä ja kulttuuria.', true, 'Suomessa se näkyi kansallisena heräämisenä.'],
+  ['Otto von Bismarck oli Ranskan keisari.', false, 'Hän oli Preussin pääministeri ja Saksan valtakunnankansleri.'],
+  ['Orjuus lakkautettiin Yhdysvalloissa sisällissodan jälkeen.', true, 'Perustuslain 13. lisäys hyväksyttiin vuonna 1865.'],
+  ['Wienin kongressissa päätettiin Euroopan rajoista Napoleonin sotien jälkeen.', true, 'Kongressi kokoontui 1814–1815.'],
+  ['Naiset saivat äänioikeuden useimmissa Euroopan maissa jo 1850-luvulla.', false, 'Suomi oli Euroopan ensimmäinen vasta vuonna 1906.'],
+ ],
+ list: [
+  ['Nimeä 1800-luvun aatteita', ['Liberalismi', 'Konservatismi', 'Nationalismi/Kansallisuusaate', 'Sosialismi', 'Kommunismi', 'Anarkismi', 'Imperialismi', 'Feminismi/Naisasia/Naisasialiike', 'Romantiikka/Kansallisromantiikka']],
+  ['Nimeä Napoleonin sotien osapuolia (valtioita)', ['Ranska', 'Britannia/Iso-Britannia/Englanti', 'Venäjä', 'Preussi', 'Itävalta', 'Espanja', 'Portugali', 'Ruotsi', 'Alankomaat/Hollanti']],
+ ],
+ clue: [
+  ['Otto von Bismarck', ['Hän oli Preussin pääministeri', 'Hän sanoi suurten kysymysten ratkeavan "raudalla ja verellä"', 'Häntä kutsuttiin Saksan rautakansleriksi'], ['Vilhelm II', 'Napoleon III', 'Karl Marx']],
+  ['Karl Marx', ['Hän asui suuren osan elämästään Lontoossa', 'Hän kirjoitti teoksen Pääoma', 'Hän kirjoitti Kommunistisen manifestin Engelsin kanssa'], ['Adam Smith', 'Charles Darwin', 'Vladimir Lenin']],
+  ['Abraham Lincoln', ['Hän oli ammatiltaan asianajaja', 'Hän piti kuuluisan Gettysburgin puheen', 'Hän johti Yhdysvaltoja sisällissodassa ja vastusti orjuutta'], ['George Washington', 'Thomas Jefferson', 'Ulysses S. Grant']],
+ ]};
+
+PACKS.h7imperialismi = {name: 'Imperialismi', emoji: '🌍', group: 'Historia 7',
+ mc: [
+  ['Mitä imperialismi tarkoittaa?','Pyrkimystä laajentaa valtaa muihin maihin esimerkiksi siirtomaiden avulla','Kuninkaan yksinvaltaa','Vapaata kauppaa kaikkien maiden välillä','Kansan valtaa'],
+  ['Missä kokouksessa suurvallat sopivat Afrikan jakamisen säännöistä 1884–1885?','Berliinin konferenssissa','Wienin kongressissa','Pariisin rauhassa','Haagin konferenssissa'],
+  ['Millä valtiolla oli 1900-luvun alussa maailman suurin siirtomaavaltakunta?','Iso-Britannia','Ranska','Saksa','Espanja'],
+  ['Mitä aluetta kutsuttiin Britannian imperiumin kruununjalokiveksi?','Intiaa','Kanadaa','Australiaa','Egyptiä'],
+  ['Minkä maan kuninkaan henkilökohtaista omaisuutta Kongon vapaavaltio oli?','Belgian','Alankomaiden','Portugalin','Tanskan'],
+  ['Mitkä kaksi Afrikan maata säilyivät itsenäisinä siirtomaakaudella?','Etiopia ja Liberia','Egypti ja Marokko','Kongo ja Nigeria','Kenia ja Tansania'],
+  ['Minkä Euroopan maan Etiopia voitti Adwan taistelussa 1896?','Italian','Britannian','Ranskan','Saksan'],
+  ['Mikä kanava avattiin vuonna 1869 yhdistämään Välimeren ja Punaisen meren?','Suezin kanava','Panaman kanava','Kielin kanava','Korintin kanava'],
+  ['Mitä sotia Britannia kävi Kiinaa vastaan 1800-luvulla turvatakseen kauppansa?','Oopiumisotia','Buurisotia','Krimin sotaa','Zulusotia'],
+  ['Minkä kaupungin Kiina luovutti Britannialle ensimmäisen oopiumisodan jälkeen 1842?','Hongkongin','Shanghain','Pekingin','Macaon'],
+  ['Ketkä kävivät buurisotia Britanniaa vastaan Etelä-Afrikassa?','Hollantilaisperäiset siirtolaiset','Zulut','Intialaiset sotilaat','Ranskalaiset'],
+  ['Mitä tarkoitti ajatus "valkoisen miehen taakasta"?','Eurooppalaisten muka velvollisuutta "sivistää" muita kansoja','Siirtolaisten raskasta verotusta','Orjakaupan kieltoa','Kauppasaartoa'],
+  ['Mitä raaka-ainetta Kongossa kerättiin julmalla pakkotyöllä 1890-luvulla?','Kumia','Kahvia','Öljyä','Puuvillaa'],
+  ['Minkä Aasian maan Yhdysvallat sai Espanjalta vuonna 1898?','Filippiinit','Japanin','Korean','Vietnamin'],
+  ['Mikä Aasian maa modernisoitui nopeasti Meiji-kaudella ja ryhtyi itse imperialistiksi?','Japani','Kiina','Intia','Thaimaa'],
+  ['Kuka brittiläinen liikemies unelmoi rautatiestä Kapkaupungista Kairoon?','Cecil Rhodes','David Livingstone','Henry Stanley','Winston Churchill'],
+  ['Mikä oli Intian vuoden 1857 suuren kapinan nimi?','Sepoykapina','Boksarikapina','Mau Mau -kapina','Oopiumikapina'],
+  ['Minkä suurvallan Japani voitti sodassa 1904–1905?','Venäjän','Kiinan','Britannian','Yhdysvaltojen'],
+ ],
+ num: [
+  ['Minä vuonna Berliinin Afrikka-konferenssi alkoi?', 1884],
+  ['Minä vuonna Suezin kanava avattiin?', 1869],
+  ['Minä vuonna Intian sepoykapina alkoi?', 1857],
+  ['Minä vuonna Etiopia voitti Italian Adwan taistelussa?', 1896],
+  ['Montako prosenttia Afrikasta oli eurooppalaisten hallussa vuonna 1914 (noin)?', 90],
+ ],
+ order: [
+  ['Järjestä vanhimmasta uusimpaan', ['Sepoykapina Intiassa|1857', 'Suezin kanava avataan|1869', 'Berliinin konferenssi|1884', 'Adwan taistelu|1896']],
+  ['Järjestä vanhimmasta uusimpaan', ['Hongkong Britannialle|1842', 'Meiji-kausi alkaa Japanissa|1868', 'Boksarikapina Kiinassa|1900', 'Japani voittaa Venäjän|1905']],
+ ],
+ tf: [
+  ['Afrikka jaettiin lähes kokonaan eurooppalaisten kesken 1800-luvun lopulla.', true, 'Vuonna 1914 vain Etiopia ja Liberia olivat itsenäisiä.'],
+  ['Etiopia oli Britannian siirtomaa.', false, 'Etiopia säilyi itsenäisenä ja voitti Italian 1896.'],
+  ['Intia oli Britannian tärkein siirtomaa.', true, 'Sitä kutsuttiin imperiumin kruununjalokiveksi.'],
+  ['Suezin kanava yhdistää Atlantin ja Tyynenmeren.', false, 'Se yhdistää Välimeren ja Punaisen meren. Atlantin ja Tyynenmeren yhdistää Panaman kanava.'],
+  ['Japani oli 1900-luvun alussa itsekin imperialistinen suurvalta.', true, 'Se valloitti mm. Taiwanin ja Korean.'],
+  ['Siirtomaiden rajat vedettiin usein välittämättä paikallisista kansoista.', true, 'Rajoja piirrettiin viivaimella kartalle Euroopassa.'],
+  ['Oopiumisodat käytiin Intiassa.', false, 'Ne käytiin Kiinassa.'],
+  ['Kongon vapaavaltio oli Belgian kuninkaan Leopold II:n henkilökohtaista omaisuutta.', true, 'Pakkotyössä kuoli valtava määrä ihmisiä.'],
+  ['Suomella oli 1800-luvulla omia siirtomaita Afrikassa.', false, 'Suomi oli itse osa Venäjän keisarikuntaa.'],
+  ['Saksalla oli siirtomaita Afrikassa.', true, 'Esimerkiksi nykyiset Namibia, Tansania, Kamerun ja Togo.'],
+ ],
+ list: [
+  ['Nimeä maita, joilla oli siirtomaita 1900-luvun alussa', ['Britannia/Iso-Britannia/Englanti', 'Ranska', 'Saksa', 'Belgia', 'Portugali', 'Espanja', 'Italia', 'Alankomaat/Hollanti', 'Yhdysvallat/USA', 'Japani', 'Venäjä', 'Tanska']],
+  ['Nimeä alueita, joita Britannia hallitsi 1900-luvun alussa', ['Intia', 'Kanada', 'Australia', 'Uusi-Seelanti', 'Egypti', 'Etelä-Afrikka', 'Kenia', 'Nigeria', 'Hongkong', 'Jamaika', 'Sudan', 'Burma/Myanmar', 'Kultarannikko/Ghana', 'Singapore', 'Malesia/Malaiji', 'Uganda', 'Rhodesia/Zimbabwe', 'Malta', 'Kypros', 'Irlanti']],
+ ],
+ clue: [
+  ['Intia', ['Siellä puhkesi suuri kapina vuonna 1857', 'Kuningatar Viktoria oli sen keisarinna', 'Sitä kutsuttiin Britannian imperiumin kruununjalokiveksi'], ['Egypti', 'Kiina', 'Australia']],
+  ['Suezin kanava', ['Se avattiin vuonna 1869', 'Sen rakentamista johti ranskalainen Ferdinand de Lesseps', 'Se yhdistää Välimeren ja Punaisen meren'], ['Panaman kanava', 'Kielin kanava', 'Gibraltarinsalmi']],
+  ['Etiopia', ['Sen keisari Menelik II johti armeijaa', 'Se voitti Italian Adwan taistelussa 1896', 'Se oli Liberian ohella ainoa siirtomaavallan ulkopuolelle jäänyt Afrikan maa'], ['Egypti', 'Marokko', 'Kenia']],
+ ]};
+
+PACKS.h7autonomia = {name: 'Autonomian Suomi', emoji: '🇫🇮', group: 'Historia 7',
+ mc: [
+  ['Minkä sodan seurauksena Suomi liitettiin Venäjään?','Suomen sodan 1808–1809','Krimin sodan','Isonvihan','Pohjan sodan'],
+  ['Missä Suomen säädyt kokoontuivat valtiopäiville vuonna 1809?','Porvoossa','Turussa','Helsingissä','Haminassa'],
+  ['Kuka Venäjän keisari liitti Suomen valtakuntaansa 1809?','Aleksanteri I','Nikolai I','Pietari Suuri','Aleksanteri II'],
+  ['Mikä kaupunki tehtiin Suomen pääkaupungiksi vuonna 1812?','Helsinki','Turku','Tampere','Viipuri'],
+  ['Mikä oli Suomen asema Venäjän vallan aikana?','Autonominen suuriruhtinaskunta','Venäjän tavallinen lääni','Itsenäinen kuningaskunta','Ruotsin maakunta'],
+  ['Kuka kokosi Kalevalan kansanrunoista?','Elias Lönnrot','J. L. Runeberg','Aleksis Kivi','Zachris Topelius'],
+  ['Kuka kirjoitti Vänrikki Stoolin tarinat ja Maamme-laulun sanat?','J. L. Runeberg','Elias Lönnrot','J. V. Snellman','Eino Leino'],
+  ['Kuka ajoi voimakkaasti suomen kielen asemaa ja kansallista herätystä 1800-luvulla?','J. V. Snellman','Zachris Topelius','Fredrik Pacius','C. L. Engel'],
+  ['Minkä keisarin patsas seisoo Helsingin Senaatintorilla?','Aleksanteri II','Aleksanteri I','Nikolai II','Pietari Suuri'],
+  ['Minä vuonna annettiin kieliasetus, joka nosti suomen virkakieleksi ruotsin rinnalle?','1863','1809','1906','1917'],
+  ['Mikä oli Suomen oma raha vuodesta 1860 alkaen?','Markka','Rupla','Kruunu','Taaleri'],
+  ['Mikä on ensimmäinen suomenkielinen romaani?','Seitsemän veljestä','Kalevala','Vänrikki Stoolin tarinat','Tuntematon sotilas'],
+  ['Milloin olivat Suomen suuret nälkävuodet?','1866–1868','1918–1920','1808–1809','1939–1940'],
+  ['Mitä helmikuun manifesti 1899 merkitsi?','Venäjä sai säätää Suomea koskevia lakeja ohi Suomen säätyjen','Suomi itsenäistyi','Naiset saivat äänioikeuden','Markka lakkautettiin'],
+  ['Kenet Eugen Schauman ampui vuonna 1904?','Kenraalikuvernööri Nikolai Bobrikovin','Keisari Nikolai II:n','Ministeri Pjotr Stolypinin','Munkki Grigori Rasputinin'],
+  ['Mikä tapahtuma johti eduskuntauudistukseen 1906?','Suurlakko 1905','Helmikuun manifesti','Krimin sota','Suomen sota'],
+  ['Mitkä olivat säätyvaltiopäivien neljä säätyä?','Aatelisto, papisto, porvaristo ja talonpojat','Kuningas, aatelisto, kirkko ja kansa','Upseerit, papit, kauppiaat ja torpparit','Senaatti, kirkko, armeija ja yliopisto'],
+  ['Minkä sodan aikana brittiläinen laivasto hyökkäsi Suomen rannikolle, esimerkiksi Bomarsundiin?','Krimin sodan','Suomen sodan','Ensimmäisen maailmansodan','Napoleonin sotien'],
+  ['Mitä eduskuntauudistus 1906 toi?','Yksikamarisen eduskunnan ja yleisen äänioikeuden','Kuninkaan','Itsenäisyyden','Oman armeijan'],
+ ],
+ num: [
+  ['Minä vuonna Porvoon valtiopäivät pidettiin?', 1809],
+  ['Minä vuonna Kalevala julkaistiin ensimmäisen kerran?', 1835],
+  ['Minä vuonna oli nälkävuosien pahin kuolonvuosi?', 1868],
+  ['Minä vuonna Bobrikov ammuttiin?', 1904],
+  ['Montako kansanedustajaa valittiin ensimmäiseen eduskuntaan vuonna 1907?', 200],
+ ],
+ order: [
+  ['Järjestä vanhimmasta uusimpaan', ['Suomen sota alkaa|1808', 'Porvoon valtiopäivät|1809', 'Helsinki pääkaupungiksi|1812', 'Kalevala julkaistaan|1835']],
+  ['Järjestä vanhimmasta uusimpaan', ['Kieliasetus|1863', 'Suuret nälkävuodet|1866–1868', 'Helmikuun manifesti|1899', 'Suurlakko|1905']],
+  ['Järjestä vanhimmasta uusimpaan', ['Krimin sota Suomen rannikolla|1854', 'Oma raha markka|1860', 'Seitsemän veljestä julkaistaan|1870', 'Eduskuntauudistus|1906']],
+ ],
+ tf: [
+  ['Suomi oli Venäjän vallan aikana autonominen suuriruhtinaskunta.', true, 'Suomella oli omat lait, senaatti ja myöhemmin oma raha.'],
+  ['Suomen pääkaupunki siirrettiin Turusta Helsinkiin vuonna 1812.', true, 'Helsinki oli lähempänä Pietaria.'],
+  ['Elias Lönnrot kirjoitti Kalevalan kokonaan omasta päästään.', false, 'Hän kokosi sen kansanrunoista, joita keräsi keruumatkoillaan.'],
+  ['Suomessa käytettiin autonomian aikana omaa rahaa, markkaa.', true, 'Markka otettiin käyttöön vuonna 1860.'],
+  ['Suomalaiset naiset saivat äänioikeuden ensimmäisinä Euroopassa.', true, 'Vuonna 1906 he saivat myös oikeuden asettua ehdolle, ensimmäisinä maailmassa.'],
+  ['Ensimmäinen sortokausi alkoi helmikuun manifestista 1899.', true, 'Venäläistämistoimet herättivät laajaa vastarintaa.'],
+  ['Aleksanteri II oli suomalaisten keskuudessa vihattu keisari.', false, 'Hän oli pidetty, sillä hänen aikanaan valtiopäivät kokoontuivat taas ja Suomi sai oman rahan.'],
+  ['Suurlakko 1905 johti eduskuntauudistukseen.', true, 'Säätyvaltiopäivät korvattiin yksikamarisella eduskunnalla.'],
+  ['Säätyvaltiopäivillä oli viisi säätyä.', false, 'Säätyjä oli neljä: aatelisto, papisto, porvaristo ja talonpojat.'],
+  ['Krimin sodan taisteluita käytiin myös Suomen rannikolla.', true, 'Brittien ja ranskalaisten laivasto hyökkäsi mm. Bomarsundiin ja Viaporiin.'],
+  ['Maamme-laulun sanat kirjoitti J. V. Snellman.', false, 'Sanat kirjoitti J. L. Runeberg, sävelen Fredrik Pacius.'],
+ ],
+ list: [
+  ['Nimeä kansallisen heräämisen ja kulttuurin merkkihenkilöitä', ['Elias Lönnrot/Lönnrot', 'J. L. Runeberg/Runeberg/Johan Ludvig Runeberg', 'J. V. Snellman/Snellman/Johan Vilhelm Snellman', 'Aleksis Kivi/Kivi', 'Zachris Topelius/Topelius', 'Fredrik Pacius/Pacius', 'Jean Sibelius/Sibelius', 'Akseli Gallen-Kallela/Gallen-Kallela', 'Minna Canth/Canth', 'Albert Edelfelt/Edelfelt', 'Yrjö-Koskinen/Yrjö Koskinen', 'Juhani Aho/Aho', 'Eino Leino/Leino', 'Eero Järnefelt/Järnefelt', 'Adolf Ivar Arwidsson/Arwidsson']],
+  ['Nimeä säätyvaltiopäivien neljä säätyä', ['Aatelisto/Aateli/Aateliset', 'Papisto/Papit', 'Porvaristo/Porvarit', 'Talonpojat/Talonpoikaissääty/Talonpoikaisto']],
+ ],
+ clue: [
+  ['Elias Lönnrot', ['Hän työskenteli Kajaanin piirilääkärinä', 'Hän teki runonkeruumatkoja Vienan Karjalaan', 'Hän kokosi Kalevalan'], ['J. L. Runeberg', 'Aleksis Kivi', 'Zachris Topelius']],
+  ['Nikolai Bobrikov', ['Hän oli Suomen kenraalikuvernööri', 'Hänen nimensä liitetään ensimmäiseen sortokauteen', 'Eugen Schauman ampui hänet vuonna 1904'], ['Aleksanteri II', 'Pjotr Stolypin', 'Grigori Rasputin']],
+  ['Helsinki', ['C. L. Engel suunnitteli sen empirekeskustan', 'Yliopisto siirrettiin sinne Turun palon jälkeen', 'Siitä tuli Suomen pääkaupunki vuonna 1812'], ['Turku', 'Porvoo', 'Viipuri']],
+ ]};
+
+PACKS.h7sota = {name: '1. maailmansota', emoji: '⚔️', group: 'Historia 7',
+ mc: [
+  ['Kenen salamurha Sarajevossa 1914 laukaisi ensimmäisen maailmansodan?','Itävalta-Unkarin kruununperijän Frans Ferdinandin','Venäjän tsaarin','Saksan keisarin','Serbian kuninkaan'],
+  ['Ketkä muodostivat keskusvallat?','Saksa, Itävalta-Unkari, Osmanien valtakunta ja Bulgaria','Britannia, Ranska ja Venäjä','Italia, Japani ja Yhdysvallat','Ruotsi, Norja ja Tanska'],
+  ['Millaista sotaa länsirintamalla käytiin suurimman osan aikaa?','Juoksuhautasotaa','Ratsuväen hyökkäyksiä','Sissisotaa','Pelkkää ilmasotaa'],
+  ['Minä vuonna ensimmäinen maailmansota päättyi aselepoon?','1918','1917','1919','1916'],
+  ['Mikä rauhansopimus solmittiin Saksan kanssa vuonna 1919?',"Versailles'n rauha",'Brest-Litovskin rauha','Wienin kongressi','Tarton rauha'],
+  ['Minkä matkustajalaivan upottaminen 1915 käänsi Yhdysvaltojen mielialaa Saksaa vastaan?','Lusitanian','Titanicin','Bismarckin','Auroran'],
+  ['Minä vuonna Yhdysvallat liittyi sotaan?','1917','1914','1916','1918'],
+  ['Mitä uutta asetta käytettiin laajasti ensimmäisen kerran Ypresissä 1915?','Myrkkykaasua','Atomipommia','Ohjuksia','Ruutia'],
+  ['Kuka oli Venäjän viimeinen keisari?','Nikolai II','Aleksanteri III','Pietari Suuri','Aleksanteri II'],
+  ['Kuka johti bolševikkeja lokakuun vallankumouksessa 1917?','Vladimir Lenin','Josif Stalin','Aleksanteri Kerenski','Grigori Rasputin'],
+  ['Kuka johti Venäjän väliaikaista hallitusta ennen bolševikkien vallankaappausta?','Aleksanteri Kerenski','Vladimir Lenin','Josif Stalin','Nikolai II'],
+  ['Minkä rauhan Neuvosto-Venäjä ja Saksa solmivat maaliskuussa 1918?','Brest-Litovskin rauhan',"Versailles'n rauhan",'Tarton rauhan','Moskovan rauhan'],
+  ['Mikä järjestö perustettiin sodan jälkeen ylläpitämään rauhaa?','Kansainliitto','YK','Nato','EU'],
+  ['Mikä suomalainen liike lähetti nuoria miehiä Saksaan sotilaskoulutukseen?','Jääkäriliike','Punakaarti','Lotta Svärd','Partioliike'],
+  ['Mitkä keisarikunnat hajosivat sodan seurauksena?','Venäjä, Saksa, Itävalta-Unkari ja Osmanien valtakunta','Britannia ja Ranska','Japani ja Kiina','Ruotsi ja Norja'],
+  ['Mikä taistelu Ranskassa 1916 oli yksi historian pisimmistä ja verisimmistä?','Verdunin taistelu','Waterloon taistelu','Stalingradin taistelu','Tannenbergin taistelu'],
+  ['Mikä uusi sotaväline nähtiin ensimmäisen kerran Sommen taistelussa 1916?','Panssarivaunu','Helikopteri','Lentotukialus','Sukellusvene'],
+  ['Millä nimellä tunnettiin Venäjän vallankumouksellisten johtajien työläisneuvostot?','Neuvostot','Kolhoosit','Duumat','Kasakat'],
+ ],
+ num: [
+  ['Minä vuonna Sarajevon laukaukset ammuttiin?', 1914],
+  ['Minä vuonna Venäjän lokakuun vallankumous tapahtui?', 1917],
+  ['Monentenako päivänä marraskuuta 1918 aselepo astui voimaan?', 11],
+  ["Minä vuonna Versailles'n rauhansopimus allekirjoitettiin?", 1919],
+  ['Kuinka monta suomalaista (noin) sai jääkärikoulutuksen Saksassa?', 1900],
+ ],
+ order: [
+  ['Järjestä vanhimmasta uusimpaan', ['Sarajevon laukaukset|1914', 'Lusitania upotetaan|1915', 'Yhdysvallat liittyy sotaan|1917', 'Aselepo|1918']],
+  ['Järjestä vanhimmasta uusimpaan', ['Helmikuun vallankumous|maaliskuu 1917', 'Lokakuun vallankumous|marraskuu 1917', 'Brest-Litovskin rauha|maaliskuu 1918', "Versailles'n rauha|1919"]],
+  ['Järjestä vanhimmasta uusimpaan', ['Marnen taistelu|1914', 'Verdunin taistelu|1916', 'Aselepo|1918', 'Kansainliitto perustetaan|1920']],
+ ],
+ tf: [
+  ['Ensimmäinen maailmansota alkoi vuonna 1914.', true, 'Itävalta-Unkari julisti sodan Serbialle heinäkuussa 1914.'],
+  ['Suomalaisia kutsuttiin asevelvollisina taistelemaan Venäjän armeijaan.', false, 'Suomalaisia ei kutsuttu asevelvollisiksi, mutta osa lähti vapaaehtoisina.'],
+  ['Länsirintamalla käytiin pitkää juoksuhautasotaa.', true, 'Rintama pysyi vuosia lähes paikallaan.'],
+  ['Yhdysvallat taisteli sodassa alusta loppuun.', false, 'Se liittyi sotaan vasta vuonna 1917.'],
+  ["Versailles'n rauhassa Saksa joutui maksamaan suuret sotakorvaukset.", true, 'Lisäksi Saksa menetti alueita ja siirtomaansa.'],
+  ['Lenin johti helmikuun vallankumousta.', false, 'Lenin oli silloin maanpaossa. Bolševikit kaappasivat vallan vasta lokakuussa.'],
+  ['Tsaari Nikolai II perheineen surmattiin vuonna 1918.', true, 'Bolševikit teloittivat perheen Jekaterinburgissa.'],
+  ['Kansainliitto perustettiin ensimmäisen maailmansodan jälkeen.', true, 'Sen piti estää uudet sodat.'],
+  ['Suomalaiset jääkärit koulutettiin Ruotsissa.', false, 'He saivat koulutuksen Saksassa.'],
+  ['Panssarivaunu otettiin käyttöön ensimmäisessä maailmansodassa.', true, 'Britit käyttivät tankkeja Sommessa 1916.'],
+ ],
+ list: [
+  ['Nimeä ensimmäisen maailmansodan osapuolia (valtioita)', ['Saksa', 'Itävalta-Unkari/Itävalta', 'Osmanien valtakunta/Turkki/Osmanivaltakunta', 'Bulgaria', 'Britannia/Iso-Britannia/Englanti', 'Ranska', 'Venäjä', 'Italia', 'Yhdysvallat/USA', 'Serbia', 'Belgia', 'Japani', 'Romania', 'Kreikka', 'Portugali', 'Montenegro']],
+  ['Nimeä ensimmäisessä maailmansodassa käytettyjä aseita tai sotavälineitä', ['Konekivääri', 'Panssarivaunu/Tankki', 'Myrkkykaasu/Kaasu/Sinappikaasu/Kloorikaasu', 'Sukellusvene/U-vene', 'Lentokone/Hävittäjä', 'Tykki/Tykistö', 'Kivääri', 'Piikkilanka', 'Liekinheitin', 'Ilmalaiva/Zeppeliini', 'Käsikranaatti', 'Sotalaiva/Taistelulaiva/Panssarilaiva']],
+ ],
+ clue: [
+  ['Vladimir Lenin', ['Hän eli pitkään maanpaossa Sveitsissä', 'Saksa auttoi hänet junalla takaisin Venäjälle 1917', 'Hän johti bolševikkien vallankaappausta lokakuussa 1917'], ['Josif Stalin', 'Aleksanteri Kerenski', 'Nikolai II']],
+  ['Frans Ferdinand', ['Hän oli arkkiherttua', 'Hän oli Itävalta-Unkarin kruununperijä', 'Gavrilo Princip ampui hänet Sarajevossa 1914'], ['Frans Joosef I', 'Vilhelm II', 'Nikolai II']],
+  ['Juoksuhauta', ['Niitä kaivettiin satoja kilometrejä Belgiasta Sveitsiin', 'Niiden väliä kutsuttiin ei-kenenkään-maaksi', 'Ne olivat länsirintaman sotilaiden koti mudan ja rottien keskellä'], ['Bunkkeri', 'Linnoitus', 'Panssarivaunu']],
+ ]};
+
+PACKS.h7itsenaisyys = {name: 'Itsenäistyminen', emoji: '🕊️', group: 'Historia 7',
+ mc: [
+  ['Minä päivänä eduskunta hyväksyi Suomen itsenäisyysjulistuksen?','6.12.1917','1.1.1918','16.5.1918','6.12.1918'],
+  ['Kuka johti senaattia, joka antoi itsenäisyysjulistuksen?','P. E. Svinhufvud','K. J. Ståhlberg','C. G. E. Mannerheim','J. K. Paasikivi'],
+  ['Kenen hallitus tunnusti ensimmäisenä Suomen itsenäisyyden?','Neuvosto-Venäjän','Ruotsin','Saksan','Yhdysvaltojen'],
+  ['Mitkä olivat Suomen sisällissodan osapuolet?','Valkoiset ja punaiset','Suomalaiset ja ruotsalaiset','Jääkärit ja kasakat','Siniset ja vihreät'],
+  ['Kuka johti valkoisten armeijaa sisällissodassa?','C. G. E. Mannerheim','P. E. Svinhufvud','Ali Aaltonen','Kullervo Manner'],
+  ['Minkä kaupungin valtaus huhtikuussa 1918 ratkaisi sisällissodan?','Tampereen','Turun','Oulun','Kuopion'],
+  ['Minkä maan joukot valtasivat Helsingin huhtikuussa 1918?','Saksan','Ruotsin','Venäjän','Britannian'],
+  ['Mikä oli punaisten hallituksen nimi?','Kansanvaltuuskunta','Senaatti','Suojeluskunta','Eduskunta'],
+  ['Mitä suojeluskunnat olivat?','Valkoisten vapaaehtoisia aseellisia joukkoja','Punaisten hallitus','Venäjän sotaväkeä','Kirkollisia järjestöjä'],
+  ['Mistä punaisten kannatus tuli pääasiassa?','Teollisuustyöväestä ja maattomasta väestöstä','Aatelistosta','Suurtilallisista','Virkamiehistä'],
+  ['Mitä tapahtui monille punavangeille sodan jälkeen?','He kuolivat nälkään ja tauteihin vankileireillä','He pääsivät heti vapaiksi','Heidät siirrettiin Ruotsiin','He saivat korvauksia'],
+  ['Kuka valittiin Suomen kuninkaaksi syksyllä 1918?','Hessenin prinssi Friedrich Karl','Saksan keisari Vilhelm II','Ruotsin kuningas Kustaa V','Tsaari Nikolai II'],
+  ['Kuka oli Suomen ensimmäinen presidentti?','K. J. Ståhlberg','P. E. Svinhufvud','C. G. E. Mannerheim','Lauri Kristian Relander'],
+  ['Minä vuonna Suomi sai hallitusmuodon, joka teki siitä tasavallan?','1919','1917','1918','1922'],
+  ['Missä kaupungissa solmittiin rauha Suomen ja Neuvosto-Venäjän välille vuonna 1920?','Tartossa','Moskovassa','Pietarissa','Tukholmassa'],
+  ['Mikä alue liitettiin Suomeen Tarton rauhassa?','Petsamo','Itä-Karjala','Ahvenanmaa','Inkeri'],
+  ['Mikä järjestö ratkaisi Ahvenanmaan kysymyksen vuonna 1921?','Kansainliitto','YK','Pohjoismaiden neuvosto','Nato'],
+ ],
+ num: [
+  ['Minä vuonna Suomi julistautui itsenäiseksi?', 1917],
+  ['Kuinka monta ihmistä (noin) kuoli sisällissodan ja sen jälkiselvittelyjen seurauksena?', 36000],
+  ['Minä vuonna Tarton rauha solmittiin?', 1920],
+  ['Minä vuonna K. J. Ståhlberg valittiin presidentiksi?', 1919],
+ ],
+ order: [
+  ['Järjestä vanhimmasta uusimpaan', ['Itsenäisyysjulistus|6.12.1917', 'Sisällissota alkaa|tammikuu 1918', 'Tampereen valtaus|huhtikuu 1918', 'Hallitusmuoto ja tasavalta|1919']],
+  ['Järjestä vanhimmasta uusimpaan', ['Suurlakko|1905', 'Eduskuntauudistus|1906', 'Itsenäisyysjulistus|1917', 'Tarton rauha|1920']],
+ ],
+ tf: [
+  ['Suomi julistautui itsenäiseksi 6.12.1917.', true, 'Eduskunta hyväksyi senaatin itsenäisyysjulistuksen.'],
+  ['Venäjän bolševikkihallitus tunnusti Suomen itsenäisyyden.', true, 'Leninin hallitus tunnusti sen vuodenvaihteessa 1917–1918.'],
+  ['Valkoisia johti sisällissodassa Lenin.', false, 'Valkoisia johti C. G. E. Mannerheim.'],
+  ['Saksalaiset joukot osallistuivat sisällissotaan valkoisten puolella.', true, 'Itämeren divisioona valtasi Helsingin huhtikuussa 1918.'],
+  ['Sisällissota kesti useita vuosia.', false, 'Se kesti tammikuusta toukokuuhun 1918.'],
+  ['Suomesta tuli kuningaskunta, jolla oli kruunattu kuningas.', false, 'Kuningas valittiin, mutta hän luopui ennen kuin tuli Suomeen.'],
+  ['Molemmat osapuolet käyttivät sodassa propagandaa.', true, 'Julisteilla ja lehdillä vastapuoli esitettiin vihollisena.'],
+  ['Suomen ensimmäinen presidentti oli K. J. Ståhlberg.', true, 'Hänet valittiin vuonna 1919.'],
+  ['Tarton rauhassa Suomi sai Petsamon.', true, 'Suomi sai yhteyden Jäämerelle.'],
+  ['Vankileireillä kuoli tuhansia punavankeja.', true, 'Nälkä ja taudit tappoivat vuonna 1918 noin 12 000–13 000 vankia.'],
+ ],
+ list: [
+  ['Nimeä itsenäistymisen ja sisällissodan ajan henkilöitä', ['P. E. Svinhufvud/Svinhufvud', 'C. G. E. Mannerheim/Mannerheim', 'K. J. Ståhlberg/Ståhlberg', 'Vladimir Lenin/Lenin', 'Kullervo Manner/Manner', 'Ali Aaltonen/Aaltonen', 'O. W. Kuusinen/Kuusinen/Otto Wille Kuusinen', 'Rüdiger von der Goltz/von der Goltz/Goltz', 'Friedrich Karl', 'J. K. Paasikivi/Paasikivi', 'Yrjö Sirola/Sirola', 'Eero Haapalainen/Haapalainen']],
+  ['Nimeä Suomen presidenttejä', ['K. J. Ståhlberg/Ståhlberg', 'L. K. Relander/Relander', 'P. E. Svinhufvud/Svinhufvud', 'Kyösti Kallio/Kallio', 'Risto Ryti/Ryti', 'C. G. E. Mannerheim/Mannerheim', 'J. K. Paasikivi/Paasikivi', 'Urho Kekkonen/Kekkonen', 'Mauno Koivisto/Koivisto', 'Martti Ahtisaari/Ahtisaari', 'Tarja Halonen/Halonen', 'Sauli Niinistö/Niinistö', 'Alexander Stubb/Stubb']],
+ ],
+ clue: [
+  ['P. E. Svinhufvud', ['Hänet karkotettiin Siperiaan vuonna 1914', 'Hän johti itsenäisyyssenaattia', 'Häntä kutsuttiin Ukko-Pekaksi'], ['K. J. Ståhlberg', 'C. G. E. Mannerheim', 'J. K. Paasikivi']],
+  ['Tampere', ['Siellä sijaitsi Finlaysonin tehdas', 'Se oli punaisten tärkeä tukikohta', 'Sen valtaus huhtikuussa 1918 ratkaisi sisällissodan'], ['Turku', 'Viipuri', 'Lahti']],
+  ['K. J. Ståhlberg', ['Hän oli oikeustieteen professori', 'Hän oli vuoden 1919 hallitusmuodon pääarkkitehti', 'Hänestä tuli Suomen ensimmäinen presidentti'], ['P. E. Svinhufvud', 'L. K. Relander', 'J. K. Paasikivi']],
+ ]};
+
 const nfmt = n => Number(n).toLocaleString('fi-FI', {maximumFractionDigits: 3, useGrouping: Math.abs(Number(n)) >= 10000});
 const ROUND_ORDER = ['nopein', 'kirjoita', 'bluffi', 'vihje', 'buzz', 'lahin', 'aikajana', 'tottatarua', 'lista', 'pommi', 'ryosto', 'sekalainen'];
 const PRESETS = [
@@ -3764,9 +4041,13 @@ function lobbyHTML() {
       </div>
       ${roundsBuilderHTML()}
       <div class="packs" role="group" aria-label="Kysymysaiheet"><div class="label">Aiheet (valitse yksi tai useampi)</div><div class="packrow">
-        ${[...Object.entries(PACKS).map(([k, pk]) => [k, pk.emoji, pk.name, ['mc', 'num', 'order', 'tf', 'list', 'clue'].reduce((a, f) => a + (pk[f] || []).length, 0), false]), ...G.sets.map(x => ['c:' + x.id, '✏️', x.name, setCount(x), true])].map(([k, e, nm, c, own]) =>
-          `<button class="pack ${own ? 'own' : ''} ${(G.settings.packs || []).includes(k) ? 'on' : ''}" data-pack="${k}" aria-pressed="${(G.settings.packs || []).includes(k)}" ${!c ? 'disabled' : ''}><span class="pe">${e}</span><span>${esc(nm)}</span><small>${c} tehtävää</small></button>`).join('')}
-        <button class="pack addpack" id="newset"><span class="pe">＋</span><span>Oma kategoria</span><small>lisää kysymyksiä</small></button>
+        ${(() => { const cnt = pk => ['mc', 'num', 'order', 'tf', 'list', 'clue'].reduce((a, f) => a + (pk[f] || []).length, 0);
+          const btn = ([k, e, nm, c, own]) => `<button class="pack ${own ? 'own' : ''} ${(G.settings.packs || []).includes(k) ? 'on' : ''}" data-pack="${k}" aria-pressed="${(G.settings.packs || []).includes(k)}" ${!c ? 'disabled' : ''}><span class="pe">${e}</span><span>${esc(nm)}</span><small>${c} tehtävää</small></button>`;
+          const gen = Object.entries(PACKS).filter(([, pk]) => !pk.group), groups = [...new Set(Object.values(PACKS).map(pk => pk.group).filter(Boolean))];
+          return gen.map(([k, pk]) => btn([k, pk.emoji, pk.name, cnt(pk), false])).join('') + G.sets.map(x => btn(['c:' + x.id, '✏️', x.name, setCount(x), true])).join('')
+            + `<button class="pack addpack" id="newset"><span class="pe">＋</span><span>Oma kategoria</span><small>lisää kysymyksiä</small></button></div>`
+            + groups.map(g => { const ks = Object.keys(PACKS).filter(k => PACKS[k].group === g), allOn = ks.every(k => (G.settings.packs || []).includes(k));
+              return `<div class="row packgrp"><span class="label">📚 ${esc(g)} · OPS</span><button class="btn small" data-grp="${esc(g)}">${allOn ? 'Poista kaikki' : 'Valitse kaikki'}</button></div><div class="packrow">${ks.map(k => btn([k, PACKS[k].emoji, PACKS[k].name, cnt(PACKS[k]), false])).join('')}`; }).join('</div>'); })()}
       </div></div>
       <div class="row">
         <button class="btn primary" id="start" ${n && (G.settings.plan || []).length ? '' : 'disabled'}>Aloita peli</button>
@@ -3808,6 +4089,10 @@ function bindHost() {
   $$('[data-pack]').forEach(b => b.addEventListener('click', () => {
     const k = b.dataset.pack, cur = new Set(G.settings.packs || []);
     cur.has(k) ? cur.delete(k) : cur.add(k); G.settings.packs = [...cur]; saveSettings(); renderHost();
+  }));
+  $$('[data-grp]').forEach(b => b.addEventListener('click', () => {
+    const ks = Object.keys(PACKS).filter(k => PACKS[k].group === b.dataset.grp), cur = new Set(G.settings.packs || []), allOn = ks.every(k => cur.has(k));
+    ks.forEach(k => allOn ? cur.delete(k) : cur.add(k)); G.settings.packs = [...cur]; saveSettings(); renderHost();
   }));
   on('s-voice', 'change', e => { G.settings.voice = e.target.value === '1'; saveSettings(); if (G.settings.voice) speak('Ääni päällä. Tervetuloa kartanoon.'); });
   on('editq', 'click', () => openQPanel());
