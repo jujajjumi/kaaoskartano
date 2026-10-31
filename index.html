@@ -707,6 +707,60 @@ details.packgrp>.packrow{margin-top:6px}
 .pcf{flex:none;width:44px;height:44px;border-radius:12px;display:grid;place-items:center;overflow:hidden;font-size:1.6rem;background:radial-gradient(circle at 50% 35%,#fff 0 30%,var(--tc) 75%);border:2px solid var(--line)}
 .pcf img{width:100%;height:100%;object-fit:cover}
 @media (prefers-reduced-motion:reduce){.cheer{opacity:1;animation:none}}
+/* liikunta */
+.cgbig{font-family:var(--f-display);font-size:clamp(1.6rem,6vw,2.4rem);color:var(--y);-webkit-text-stroke:2px var(--line);paint-order:stroke fill}
+.track{position:relative;width:100%;height:90px;border-radius:14px;background:repeating-linear-gradient(90deg,#b5452d 0 46px,#c24f35 46px 48px);border:3px solid var(--line);overflow:hidden}
+.track .lane{position:absolute;left:0;right:0;top:50%;border-top:3px dashed rgba(255,255,255,.6)}
+.track .finish{position:absolute;right:6px;top:50%;transform:translateY(-50%);font-size:2.2rem}
+.runner{position:absolute;left:0;top:50%;font-size:3rem;transform:translateY(-50%) scaleX(-1);transition:left .08s linear}
+.runner.stride{transform:translateY(-58%) scaleX(-1)}
+.runner.trip{animation:trip .4s}
+@keyframes trip{30%{transform:translateY(-50%) scaleX(-1) rotate(35deg)}}
+.runbtns{display:grid;grid-template-columns:1fr 1fr;gap:10px;width:100%}
+.rb{padding:22px 8px;border-radius:18px;font-family:var(--f-display);font-size:clamp(1.1rem,4.5vw,1.6rem);background:#2f7dff;color:#fff;border:4px solid var(--line);box-shadow:5px 5px 0 var(--line);touch-action:none;-webkit-user-select:none;user-select:none}
+.rb+.rb{background:#ff8a1f;color:#120b1a}
+.rb:active,.rb.on{transform:translate(3px,3px);box-shadow:2px 2px 0 var(--line);filter:brightness(1.15)}
+.jumpinfo{display:flex;justify-content:space-between;width:100%;font-weight:800}
+.meter{display:grid;gap:4px;width:100%}
+.mlbl{font-family:var(--f-display);color:var(--y);letter-spacing:.06em}
+.mbar{position:relative;height:30px;border-radius:999px;background:var(--ink);border:3px solid var(--line);overflow:hidden}
+.mbar i{position:absolute;left:0;top:0;bottom:0;width:0;background:linear-gradient(90deg,#22c46b,#ffd23a,#ff3b5c)}
+.mbar i.ang{background:linear-gradient(90deg,#2f7dff,#22c46b 45%,#22c46b 55%,#2f7dff)}
+.mbar i.ang::after{content:attr(data-deg) '°';position:absolute;right:6px;top:50%;transform:translateY(-50%);font-weight:800;color:#fff;font-size:.85rem}
+.sandpit{position:relative;width:100%;height:80px;border-radius:14px;background:linear-gradient(90deg,#8a5a2b 0 8%,#e8c98a 8%);border:3px solid var(--line);overflow:hidden}
+.sandpit .board{position:absolute;left:7%;top:0;bottom:0;width:6px;background:#fff}
+.jumper{position:absolute;left:4%;bottom:6px;font-size:2.4rem;transform:scaleX(-1)}
+.jumper.fly{animation:jumparc .9s ease-out}
+@keyframes jumparc{50%{bottom:42px}}
+.jmark{position:absolute;bottom:2px;transform:translateX(-50%);font-weight:800;color:#120b1a;font-size:.85rem;opacity:0}
+.jmark.on{opacity:1}
+.btn.bigpress{font-size:1.4rem;padding:16px 30px}
+.goal{position:relative;width:min(380px,100%);height:180px;border:6px solid #fff;border-bottom:0;border-radius:6px 6px 0 0;background:repeating-linear-gradient(45deg,rgba(255,255,255,.08) 0 2px,transparent 2px 14px),#1d5f2c;margin:0 auto;overflow:hidden}
+.keeper{position:absolute;left:50%;bottom:20px;font-size:3.2rem;transform:translateX(-50%);transition:transform .18s ease-out}
+.keeper.k0{transform:translateX(-170%) rotate(-30deg)} .keeper.k1{transform:translate(-50%,-55%)} .keeper.k2{transform:translateX(70%) rotate(30deg)}
+.ball{position:absolute;left:50%;bottom:-6px;font-size:2rem;transform:translate(-50%,40px) scale(1.4);opacity:0}
+.ball.go{opacity:1;transition:transform var(--w,800ms) linear}
+.ball.go.d0{transform:translate(-460%,-110px) scale(.8)} .ball.go.d1{transform:translate(-50%,-135px) scale(.8)} .ball.go.d2{transform:translate(360%,-110px) scale(.8)}
+.ball.saved{opacity:.25} .ball.goalin{filter:drop-shadow(0 0 12px #ffd23a)}
+.dirbtns{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;width:100%}
+.db{padding:18px 0;border-radius:16px;font-size:2rem;background:var(--wall2);border:4px solid var(--line);box-shadow:4px 4px 0 var(--line);touch-action:none}
+.db:active{transform:translate(2px,2px);box-shadow:1px 1px 0 var(--line);background:var(--y)}
+.court{position:relative;width:min(380px,100%);height:170px;margin:0 auto;border-radius:14px;background:linear-gradient(#2a1a3d,#5a3a1f 75%,#8a5a2b 75%);border:3px solid var(--line);overflow:hidden}
+.court .board{position:absolute;right:30px;top:14px;width:76px;height:54px;background:#fff;border:3px solid var(--line);border-radius:4px}
+.court .rim{position:absolute;left:8px;bottom:-10px;width:56px;height:10px;border:4px solid #ff5a1f;border-radius:50%}
+.court .netk{position:absolute;left:14px;bottom:-34px;width:44px;height:26px;background:repeating-linear-gradient(60deg,#fff 0 2px,transparent 2px 7px),repeating-linear-gradient(-60deg,#fff 0 2px,transparent 2px 7px);clip-path:polygon(0 0,100% 0,80% 100%,20% 100%);opacity:.8}
+.bb{position:absolute;left:30px;bottom:12px;font-size:2.3rem}
+.bb.in{animation:shotin .8s ease-in-out forwards} .bb.short{animation:shotshort .8s ease-in-out forwards} .bb.long{animation:shotlong .8s ease-in-out forwards}
+@keyframes shotin{50%{left:55%;bottom:150px}100%{left:calc(100% - 92px);bottom:60px}}
+@keyframes shotshort{50%{left:45%;bottom:110px}100%{left:60%;bottom:12px}}
+@keyframes shotlong{50%{left:60%;bottom:160px}100%{left:calc(100% - 30px);bottom:110px}}
+.mbar.pw .zone{position:absolute;top:0;bottom:0;background:rgba(34,196,107,.6);border-left:2px solid #fff;border-right:2px solid #fff}
+.mbar.pw i{width:6px;background:#fff;box-shadow:0 0 8px #fff;transform:translateX(-50%)}
+.beamwrap{position:relative;width:100%;height:150px;display:grid;place-items:center}
+.beam{position:relative;width:min(340px,90%);height:14px;border-radius:8px;background:#c9893a;border:3px solid var(--line);transition:transform .04s linear}
+.beam .gym{position:absolute;left:50%;bottom:8px;transform:translateX(-50%);font-size:3rem}
+.beam.fall{animation:shake .4s}
+.pivot{position:absolute;top:calc(50% + 10px);width:0;height:0;border-left:22px solid transparent;border-right:22px solid transparent;border-bottom:36px solid #7a7a8a}
 @keyframes pop{0%{transform:scale(.2);opacity:0}100%{transform:scale(1);opacity:1}}
 @keyframes pulse{50%{outline-color:var(--y)}}
 @keyframes shake{0%,100%{transform:translateX(0)}20%{transform:translateX(-14px) rotate(-2deg)}40%{transform:translateX(12px) rotate(2deg)}60%{transform:translateX(-8px)}80%{transform:translateX(6px)}}
@@ -3247,13 +3301,18 @@ const TEACHERS = {
    intro: ['Tervetuloa, rakkaat. Tänään sanat ovat työkalumme.', 'Muistakaa: yhdyssanat kirjoitetaan yhteen. Aina. Melkein.', 'Kieli on ihana leikkikalu. Leikitään sillä huolellisesti.'],
    tip: ['Lue sana kahdesti, vastaa kerran.', 'Hyvä kieli on selkeää kieltä.', 'Pilkku kuuluu sivulauseen eteen, rakkaat.'],
    good: ['Kaunista työtä, {n}! Pilkkukin oli oikeassa kohdassa.', 'Ihastuttavaa, {n}. Sanasto kunnossa!', '{n}, sinusta tulee vielä kirjailija.']}},
+ liikunta: {subject: 'Liikunta', name: 'Liikunnan opettaja', emoji: '🏃', color: '#ff8a1f', trait: 'Pilli kaulassa ja aina liikkeellä',
+  lines: {
+   intro: ['PRIIT! Pilli soi! Verkkarit jalkaan, nyt liikutaan!', 'Lämmittely alkaa: sormet, ranteet ja vähän mieltäkin.', 'Hyvä ryhti, katse eteen! Tänään mitataan sormien kunto.'],
+   tip: ['Muistakaa: tärkeintä on osallistua. Ja voittaa.', 'Sykkeet ylös ja hengitys tasaisena!', 'Reilu peli, kaikki! Ei etuilla.'],
+   good: ['Huippusuoritus, {n}! Tuo menee koulun ennätyskirjoihin!', 'PRIIT! {n} voitti! Muut, viisi punnerrusta. Leikki, leikki.', 'Hienoa, {n}! Tuolla kunnolla pärjää vaikka koulujen kenttäkisoissa.']}},
  erityis: {subject: 'Välituokio', name: 'Erityisopettaja', emoji: '🧘', color: '#7fd8f0', trait: 'Lempeä ja rauhallinen',
   lines: {
    intro: ['Hei kaikki. Kaaoksen keskelläkin saa pysähtyä. Hengitetään yhdessä.', 'Nyt on välituokio. Kenenkään ei tarvitse olla nopein.', 'Kaikki osaavat jotain. Tässä huoneessa riittää, että yrittää.'],
    tip: ['Pidä katse pallossa. Häiriöt saavat tulla ja mennä.'],
    good: ['Ihanan rauhallista. Jokainen teistä teki tämän hienosti.', 'Huomasitteko? Hengitys tasaantui. Hyvä te!']}},
 };
-const ROOM_ORDER = ['englanti', 'historia', 'matematiikka', 'aidinkieli'];
+const ROOM_ORDER = ['englanti', 'historia', 'matematiikka', 'aidinkieli', 'liikunta'];
 const CG_ENGINES = {
  pari:      {emoji: '🃏', name: 'Parimuisti', dur: 40000, desc: 'Käännä kortteja ja etsi parit. Kun kaikki parit löytyvät, jäljellä oleva aika tuo lisäpisteitä.'},
  lajittelu: {emoji: '🗂️', name: 'Lajittelu', dur: 25000, desc: 'Lajittele kortit oikeaan laatikkoon niin nopeasti kuin pystyt. Väärä lajittelu vie pisteitä.'},
@@ -3262,6 +3321,11 @@ const CG_ENGINES = {
  kuuntele:  {emoji: '🎧', name: 'Kuuntele ja kirjoita', dur: 45000, desc: 'Kone lausuu englanninkielisen sanan. Kirjoita se oikein. Kuulokkeet auttavat!'},
  jarjesta:  {emoji: '⏳', name: 'Aikajanasprintti', dur: 40000, desc: 'Napauta asiat oikeassa järjestyksessä. Kolme sarjaa. Väärä napautus vie vähän pisteitä.'},
  laske:     {emoji: '🧮', name: 'Laskukilpa', dur: 30000, desc: 'Laske niin monta laskua kuin ehdit.'},
+ juoksu:    {emoji: '🏃', name: 'Pikajuoksu', dur: 26000, desc: 'Juokse 100 metriä! Napauta VASEN ja OIKEA vuorotellen (tai nuolinäppäimiä ← →). Sama nappi kahdesti = kompastus.'},
+ pituus:    {emoji: '🦘', name: 'Pituushyppy', dur: 36000, desc: 'Kolme hyppyä. Pysäytä ensin vauhtimittari mahdollisimman korkealle ja sitten hyppykulma keskelle. Paras hyppy jää voimaan.'},
+ maali:     {emoji: '🧤', name: 'Maalivahti', dur: 36000, desc: 'Olet maalivahti! Katso mihin pallo lähtee ja torju oikeaan suuntaan: ⬅ ⬆ ➡. Nopea torjunta tuo lisäpisteitä.'},
+ kori:      {emoji: '🏀', name: 'Vapaaheitot', dur: 32000, desc: 'Kymmenen vapaaheittoa. Pysäytä voimamittari vihreälle alueelle. Keskelle osuva on SWISH ja tuo lisäpisteitä.'},
+ tasa:      {emoji: '🤸', name: 'Puomitasapaino', dur: 26000, desc: 'Pidä puomi suorassa kallistamalla vasemmalle ja oikealle. Jos putoat, nouset uudelleen. Mitä kauemmin pysyt suorassa, sitä paremmin.'},
  hengitys:  {emoji: '🫧', name: 'Hengitystauko', dur: 31000, desc: 'Pidä nappia pohjassa, kun pallo kasvaa, ja päästä irti, kun se pienenee. Älä välitä häiriöistä!'},
 };
 const histPacks = () => Object.keys(PACKS).filter(k => k === 'historia' || k === 'teollistuminen' || /^h[78]/.test(k)).map(k => PACKS[k]);
@@ -3299,6 +3363,13 @@ const CG = {
   {e: 'pari', t: 'Sananlaskut', d: 'Yhdistä sananlaskun alku ja loppu.', data: [['Joka toiselle kuoppaa kaivaa,','itse siihen lankeaa'],['Ei oppi ojaan kaada,','eikä tieto tieltä työnnä'],['Parempi myöhään','kuin ei milloinkaan'],['Hiljaa hyvä','tulee'],['Oma maa mansikka,','muu maa mustikka'],['Ei savua','ilman tulta'],['Vierivä kivi','ei sammaloidu'],['Niin metsä vastaa','kuin sinne huudetaan'],['Ahkeruus kovankin','onnen voittaa'],['Rapatessa','roiskuu'],['Tyhjä tynnyri','kolisee eniten'],['Aika','parantaa haavat']]},
   {e: 'pari', t: 'Synonyymit', d: 'Yhdistä sanat, jotka tarkoittavat samaa.', data: [['iloinen','riemukas'],['nopea','vikkelä'],['kaunis','sievä'],['iso','suuri'],['pelokas','arka'],['viisas','fiksu'],['vihainen','suuttunut'],['hauska','huvittava'],['väsynyt','uupunut'],['hiljainen','äänetön']]},
   {e: 'sotku', t: 'Äidinkielen sanasotku', data: [['SANAKIRJA','Sanojen selitykset'],['LAUSE','Alkaa isolla, päättyy pisteeseen'],['RUNO','Säkeitä ja säkeistöjä'],['ROMAANI','Pitkä kertomus'],['VERBI','Tekemisen sana'],['ADJEKTIIVI','Ominaisuuden sana'],['KIELIOPPI','Kielen säännöt'],['KIRJASTO','Täältä lainataan kirjoja'],['SUBSTANTIIVI','Asian tai olion nimi'],['PILKKU','Erottaa lauseita'],['SATU','Olipa kerran…'],['OTSIKKO','Tekstin nimi']]},
+ ],
+ liikunta: [
+  {e: 'juoksu', t: 'Pikajuoksu 100 m'},
+  {e: 'pituus', t: 'Pituushyppy'},
+  {e: 'maali', t: 'Maalivahti'},
+  {e: 'kori', t: 'Koripallon vapaaheitot'},
+  {e: 'tasa', t: 'Puomitasapaino'},
  ],
  erityis: [
   {e: 'hengitys', t: 'Hengitystauko'},
@@ -3352,6 +3423,11 @@ function cgBuild(room, def) {
     case 'jarjesta': data.sets = shuffle(src).slice(0, 3).map(([t, items]) => { const it = items.slice(0, 5).map(x => String(x).split('|')[0]); return {t, items: it, order: shuffle(it.map((_, i) => i))}; }); break;
     case 'laske': data.items = src; break;
     case 'hengitys': data = {cycles: 3, inhale: 4000, exhale: 4000, lead: 3000}; break;
+    case 'juoksu': data = {goal: 100}; break;
+    case 'pituus': data = {att: 3}; break;
+    case 'maali': data = {shots: Array.from({length: 12}, (_, i) => ({d: rnd(3), wait: 500 + rnd(900), w: Math.max(480, 1150 - i * 55)}))}; break;
+    case 'kori': data = {shots: Array.from({length: 10}, () => ({c: .35 + Math.random() * .45}))}; break;
+    case 'tasa': data = {}; break;
   }
   return {id: uid(), room, engine: def.e, title: def.t, desc: def.d || E.desc, emoji: E.emoji, dur: def.dur || E.dur, data, results: {}};
 }
@@ -3409,13 +3485,14 @@ const CHEERS = {
   englanti: ['OH MY GOODNESS, {n}!!! Congratulations! Olet ihan SUPERSTAR!', 'Wheee! Well done, {n}! High five! Molemmilla käsillä!', '{n}, you are AMAZING! Mä itken onnesta!'],
   matematiikka: ['Onneksi olkoon, {n}. Laskin juuri: voitto oli täsmälleen ansaittu.', 'Hienoa, {n}! Tulos on sata prosenttia oikein.', 'Onnittelut, {n}. Tämä oli selvä kuin yksi plus yksi.'],
   aidinkieli: ['Onnittelut, {n}! Ja muistakaa: onnittelut kirjoitetaan kahdella n:llä.', 'Ihastuttavaa, {n}! Tästä riittää kirjoitettavaa.', 'Bravo, {n}! Huutomerkki on tässä kohtaa täysin paikallaan!'],
+  liikunta: ['Mahtavaa, {n}! Kunniakierros juoksuradalle, NYT!', 'Onneksi olkoon, {n}! Ansaitsit kultamitalin ja ylimääräisen välitunnin!', 'Huippua, {n}! Tuo oli kuin olympiafinaali.'],
   erityis: ['Onnea, {n}! Ja kaikki muutkin: te teitte hienoa työtä.', 'Hyvä {n}! Muistetaan hengittää, voittajakin.', 'Lämpimät onnittelut, {n}. Olen ylpeä koko porukasta.'],
 };
 const SULK = ['Hmph. Onneksi olkoon kai, {n}. En minä ole yhtään kateellinen.', 'No niin. {n} voitti. Minä menen murjottamaan opettajainhuoneeseen.', '…Hyvä on, {n}. Mutta ensi kerralla kysymykset ovat vaikeampia.', 'Pöh. {n} voitti. Kirjoitan tästä valituksen rehtorille.', 'Mmh. Ihan sama. Ei tämä minua harmita. Yhtään. {n}.'];
 function prepCheers() {
   const w = G.winner && G.players[G.winner]; G.cheers = [];
   if (!w) return;
-  G.cheers = ['englanti', 'matematiikka', 'aidinkieli', 'erityis'].filter(k => TEACHERS[k] && CHEERS[k]).map(k => ({k, text: fmt(pick(CHEERS[k]), {n: w.name})}));
+  G.cheers = ['englanti', 'matematiikka', 'aidinkieli', 'liikunta', 'erityis'].filter(k => TEACHERS[k] && CHEERS[k]).map(k => ({k, text: fmt(pick(CHEERS[k]), {n: w.name})}));
   G.quip = fmt(pick(SULK), {n: w.name}); G.mood = 'angry';
 }
 function cheersHTML() {
@@ -3429,7 +3506,7 @@ function classEnd() {
   quip('classEnd', {n: top ? top.name : ''});
   setPhase('end');
 }
-const cgBotScore = e => ({pari: 400 + rnd(600), lajittelu: 600 + rnd(900), pika: 600 + rnd(1000), sotku: 300 + rnd(750), kuuntele: 300 + rnd(750), jarjesta: 300 + rnd(500), laske: 500 + rnd(1000), hengitys: 250 + rnd(250)})[e] || 300;
+const cgBotScore = e => ({juoksu: 450 + rnd(400), pituus: 500 + rnd(330), maali: 700 + rnd(1200), kori: 400 + rnd(700), tasa: 200 + rnd(250), pari: 400 + rnd(600), lajittelu: 600 + rnd(900), pika: 600 + rnd(1000), sotku: 300 + rnd(750), kuuntele: 300 + rnd(750), jarjesta: 300 + rnd(500), laske: 500 + rnd(1000), hengitys: 250 + rnd(250)})[e] || 300;
 function hostSoon() { if (G.hostT) return; G.hostT = setTimeout(() => { G.hostT = null; renderHost(); }, 250); }
 
 /* ---------- host: näkymät ---------- */
@@ -3503,7 +3580,7 @@ function startCG(v) {
   const push = fin => { clearTimeout(pend); const now = Date.now(); if (!fin && now - lastSend < 350) { pend = setTimeout(() => push(false), 400); return; } lastSend = now; pSend({t: 'cg', id: g.id, r: {score, prog, final: !!fin}}); };
   const sc = () => { const e = $('#cgsc'); if (e) e.textContent = score + ' p'; };
   const add = (d, pr) => { score = Math.max(0, score + d); if (pr != null) prog = pr; sc(); push(false); };
-  const A = () => $('#cga');
+  const A = () => $('#cga'), fmt2 = n => Number(n).toFixed(2).replace('.', ',');
   const finish = msg => { if (done) return; done = true; push(true); timers.forEach(clearTimeout); ivs.forEach(clearInterval); const a = A(); if (a) a.innerHTML = `<div class="cgdone"><div class="big">✅</div><h2>${score} p</h2><p class="dim">${esc(msg || 'Valmis!')} Odota muita…</p></div>`; };
   box.innerHTML = `<div class="cghead"><b>${g.emoji} ${esc(g.title)}</b>${eff.has('hidaste') ? '<small>🐌 Hidaste: vähemmän aikaa</small>' : ''}<span id="cgsc" class="cgsc">0 p</span></div>
     <div class="cgwrap" id="cgw"><div id="cga" class="cga"></div><div id="cgfx" class="cgfx"></div></div><div class="timerbar"><i data-from="${ends - g.dur}" data-until="${ends}"></i></div>`;
@@ -3574,6 +3651,94 @@ function startCG(v) {
         const inp = $('#li'); inp.focus();
         $('#lf').onsubmit = e => { e.preventDefault(); const val = inp.value.trim().replace(',', '.').replace('−', '-'); if (val === '') return; const right = Number(val) === I[i].a; if (right) { ok++; add(100, `${ok} oikein`); } i++; draw(); if (!right) { const m = $('#lmsg'); if (m) m.innerHTML = `❌ Edellinen oli ${esc(I[i - 1].q)} = ${I[i - 1].a}`; } }; };
       draw();
+    },
+    juoksu() {
+      const goal = D.goal || 100; let m = 0, last = -1, t0 = 0;
+      A().innerHTML = `<div class="track"><div class="lane"></div><div class="runner" id="rn">🏃</div><div class="finish">🏁</div></div><div class="cgbig" id="rm">0 m</div>
+        <div class="runbtns"><button class="rb" data-k="0">⬅ VASEN</button><button class="rb" data-k="1">OIKEA ➡</button></div><p class="dim" style="margin:0">Vuorotellen vasen – oikea – vasen – oikea! Nuolinäppäimet ← → toimivat.</p>`;
+      const rn = $('#rn'), rm = $('#rm');
+      const step = k => { if (done || m >= goal) return; if (!t0) t0 = Date.now();
+        if (k === last) { rn.classList.remove('trip'); void rn.offsetWidth; rn.classList.add('trip'); return; }
+        last = k; m++; rn.style.left = (m / goal * 88) + '%'; rn.classList.toggle('stride'); rm.textContent = m + ' m'; score = m * 3; prog = m + ' m';
+        if (m >= goal) { const secs = (Date.now() - t0) / 1000; score = Math.round(10000 / secs); prog = fmt2(secs) + ' s'; sc(); return finish(`Maalissa ajassa ${prog}!`); }
+        if (m % 5 === 0) { sc(); push(false); } };
+      $$('.rb').forEach(b => b.addEventListener('pointerdown', e => { e.preventDefault(); step(+b.dataset.k); }));
+      onKey(e => { if (e.repeat) return; if (e.key === 'ArrowLeft' || e.key === 'a' || e.key === 'A') { e.preventDefault(); step(0); } if (e.key === 'ArrowRight' || e.key === 'd' || e.key === 'D' || e.key === 'l' || e.key === 'L') { e.preventDefault(); step(1); } });
+    },
+    pituus() {
+      let att = 0, best = 0, stage = 0, sp = 0, raf = 0, t0 = 0;
+      A().innerHTML = `<div class="jumpinfo"><span id="ja">Hyppy 1 / 3</span><span>Paras: <b id="jb">0,00 m</b></span></div>
+        <div class="meter"><div class="mlbl" id="ml">VAUHTI</div><div class="mbar"><i id="mi"></i></div></div>
+        <div class="sandpit"><div class="board"></div><div class="jumper" id="jj">🏃</div><div class="jmark" id="jm"></div></div>
+        <button class="btn primary bigpress" id="jp">⏹ PYSÄYTÄ</button><p class="dim" id="jt" style="margin:0">Pysäytä vauhtimittari mahdollisimman korkealle. Välilyönti toimii.</p>`;
+      const mi = $('#mi'), ml = $('#ml'), jt = $('#jt');
+      const loop = () => { const t = (Date.now() - t0) / 1000, v = (Math.sin(t * (stage === 0 ? 4.4 : 3.2) - Math.PI / 2) + 1) / 2; mi.style.width = (v * 100) + '%'; mi.dataset.v = v; if (stage === 1) mi.dataset.deg = Math.round(v * 90); raf = requestAnimationFrame(loop); };
+      const startStage = st => { stage = st; t0 = Date.now(); ml.textContent = st === 0 ? 'VAUHTI' : 'HYPPYKULMA'; mi.className = st === 0 ? '' : 'ang';
+        jt.textContent = st === 0 ? 'Pysäytä vauhtimittari mahdollisimman korkealle.' : 'Pysäytä kulma keskelle: paras hyppy lähtee noin 45 asteen kulmassa.'; cancelAnimationFrame(raf); loop(); };
+      P.cleanup.push(() => cancelAnimationFrame(raf));
+      const press = () => { if (done || stage < 0) return; const v = +mi.dataset.v || 0;
+        if (stage === 0) { sp = v; return startStage(1); }
+        cancelAnimationFrame(raf); stage = -1; const ang = v * 90, d = Math.round(Math.max(0, (0.25 + 0.75 * sp) * 8.6 * Math.sin(2 * ang * Math.PI / 180)) * 100) / 100;
+        att++; const jj = $('#jj'), jm = $('#jm'), x = Math.min(88, 8 + d / 9 * 80);
+        jj.style.transition = 'left .9s cubic-bezier(.3,.8,.5,1)'; jj.style.left = x + '%'; jj.classList.add('fly'); jm.style.left = x + '%'; jm.textContent = fmt2(d) + ' m'; jm.classList.add('on');
+        if (d > best) { best = d; $('#jb').textContent = fmt2(best) + ' m'; score = Math.round(best * 100); prog = fmt2(best) + ' m'; sc(); push(false); }
+        jt.textContent = `Hyppy ${att}: ${fmt2(d)} m (vauhti ${Math.round(sp * 100)} %, kulma ${Math.round(ang)}°)`;
+        T(() => { if (done) return; if (att >= (D.att || 3)) return finish(`Paras hyppy ${fmt2(best)} m!`); jj.style.transition = 'none'; jj.style.left = '4%'; jj.classList.remove('fly'); jm.classList.remove('on'); $('#ja').textContent = `Hyppy ${att + 1} / ${D.att || 3}`; startStage(0); }, 1900); };
+      $('#jp').onclick = press; onKey(e => { if (e.code === 'Space' && !e.repeat) { e.preventDefault(); press(); } });
+      startStage(0);
+    },
+    maali() {
+      const S = D.shots; let i = 0, saves = 0, open = false, tShot = 0, dir = 0;
+      A().innerHTML = `<div class="goal"><div class="net"></div><div class="keeper" id="kp">🧤</div><div class="ball" id="bl">⚽</div></div><div class="cgbig" id="gs">0 / ${S.length}</div>
+        <div class="dirbtns"><button class="db" data-d="0">⬅</button><button class="db" data-d="1">⬆</button><button class="db" data-d="2">➡</button></div><p class="dim" id="gt" style="margin:0">Katso mihin pallo lähtee ja torju! Nuolinäppäimet ← ↑ → toimivat.</p>`;
+      const bl = $('#bl'), kp = $('#kp'), gt = $('#gt');
+      const resolve = k => { if (!open) return; open = false; const ok = k === dir, rt = Date.now() - tShot;
+        kp.className = 'keeper k' + (k < 0 ? 1 : k);
+        if (ok) { saves++; add(100 + Math.max(0, Math.round((S[i].w - rt) / 6)), `${saves} torjuntaa`); bl.classList.add('saved'); gt.textContent = '🧤 TORJUNTA!'; }
+        else { bl.classList.add('goalin'); gt.textContent = k < 0 ? '⚽ Liian hidas… MAALI!' : '⚽ Väärä suunta… MAALI!'; }
+        $('#gs').textContent = `${saves} / ${S.length}`; i++; T(next, 850); };
+      const next = () => { if (done) return; if (i >= S.length) return finish(`Torjuit ${saves} / ${S.length}!`);
+        const sh = S[i]; dir = sh.d; bl.className = 'ball'; kp.className = 'keeper'; gt.textContent = 'Valmiina…';
+        T(() => { if (done) return; bl.style.setProperty('--w', sh.w + 'ms'); bl.classList.add('go', 'd' + dir); open = true; tShot = Date.now(); gt.textContent = 'TORJU!';
+          const shotNo = i; T(() => { if (open && i === shotNo) resolve(-1); }, sh.w + 120); }, sh.wait); };
+      $$('.db').forEach(b => b.addEventListener('pointerdown', e => { e.preventDefault(); resolve(+b.dataset.d); }));
+      onKey(e => { const m = {ArrowLeft: 0, ArrowUp: 1, ArrowRight: 2}[e.key]; if (m != null) { e.preventDefault(); resolve(m); } });
+      next();
+    },
+    kori() {
+      const S = D.shots; let i = 0, made = 0, raf = 0, t0 = Date.now(), lock = false;
+      A().innerHTML = `<div class="court"><div class="board"><div class="rim"></div><div class="netk"></div></div><div class="bb" id="kb">🏀</div></div>
+        <div class="meter"><div class="mlbl">VOIMA</div><div class="mbar pw"><span class="zone" id="kz"></span><i id="ki"></i></div></div>
+        <button class="btn primary bigpress" id="kpb">🏀 HEITÄ</button><p class="dim" id="kt" style="margin:0">Heitto 1 / ${S.length} · välilyönti toimii</p>`;
+      const ki = $('#ki'), kz = $('#kz'), kb = $('#kb'), kt = $('#kt'), ZW = .14;
+      const setZone = () => { kz.style.left = ((S[i].c - ZW / 2) * 100) + '%'; kz.style.width = (ZW * 100) + '%'; };
+      const loop = () => { const t = (Date.now() - t0) / 1000, v = (Math.sin(t * 3.4 - Math.PI / 2) + 1) / 2; ki.style.left = (v * 100) + '%'; ki.dataset.v = v; raf = requestAnimationFrame(loop); };
+      P.cleanup.push(() => cancelAnimationFrame(raf));
+      const shoot = () => { if (done || lock || i >= S.length) return; lock = true; const v = +ki.dataset.v || 0, diff = Math.abs(v - S[i].c);
+        const swish = diff <= .025, inn = diff <= ZW / 2;
+        kb.className = 'bb ' + (inn ? 'in' : v < S[i].c ? 'short' : 'long');
+        if (inn) { made++; add(swish ? 150 : 100, `${made} koria`); kt.textContent = swish ? '🔥 SWISH!' : '🏀 KORI!'; } else kt.textContent = v < S[i].c ? 'Liian lyhyt…' : 'Liian pitkä…';
+        i++; T(() => { if (done) return; if (i >= S.length) return finish(`${made} / ${S.length} koria!`); kb.className = 'bb'; setZone(); lock = false; kt.textContent = `Heitto ${i + 1} / ${S.length} · välilyönti toimii`; }, 1000); };
+      $('#kpb').onclick = shoot; onKey(e => { if (e.code === 'Space' && !e.repeat) { e.preventDefault(); shoot(); } });
+      setZone(); loop();
+    },
+    tasa() {
+      let a = 0, v = 0, pl = false, pr = false, good = 0, n = 0, falls = 0, last = Date.now(), seed = Math.random() * 10;
+      A().innerHTML = `<div class="beamwrap"><div class="beam" id="bm"><span class="gym">🤸</span></div><div class="pivot"></div></div><div class="cgbig" id="tpc">–</div>
+        <div class="runbtns"><button class="rb" id="tl">⬅ KALLISTA</button><button class="rb" id="tr">KALLISTA ➡</button></div><p class="dim" id="tt" style="margin:0">Pidä puomi suorassa! Paina ja pidä pohjassa. Nuolinäppäimet toimivat.</p>`;
+      const bm = $('#bm'), tl = $('#tl'), tr = $('#tr');
+      const hold = (el, side) => { const on = e => { e.preventDefault(); side === 0 ? pl = true : pr = true; el.classList.add('on'); }, off = () => { side === 0 ? pl = false : pr = false; el.classList.remove('on'); };
+        el.addEventListener('pointerdown', on); ['pointerup', 'pointerleave', 'pointercancel'].forEach(ev => el.addEventListener(ev, off)); };
+      hold(tl, 0); hold(tr, 1);
+      onKey(e => { if (e.key === 'ArrowLeft') { e.preventDefault(); pl = true; tl.classList.add('on'); } if (e.key === 'ArrowRight') { e.preventDefault(); pr = true; tr.classList.add('on'); } });
+      onKey(e => { if (e.key === 'ArrowLeft') { pl = false; tl.classList.remove('on'); } if (e.key === 'ArrowRight') { pr = false; tr.classList.remove('on'); } }, 'keyup');
+      const iv = setInterval(() => { if (done) return clearInterval(iv); const now = Date.now(), dt = Math.min(.06, (now - last) / 1000); last = now;
+        const drift = Math.sin(now / 650 + seed) * 9 + Math.sin(now / 1700 + seed * 2) * 7 + (Math.random() - .5) * 18;
+        v += (a * 1.6 + drift + (pr ? 70 : 0) - (pl ? 70 : 0)) * dt; v *= .97; a += v * dt;
+        if (Math.abs(a) > 40) { falls++; a = 0; v = 0; const t = $('#tt'); if (t) t.textContent = `💥 Putosit! (${falls}) Uudestaan!`; bm.classList.remove('fall'); void bm.offsetWidth; bm.classList.add('fall'); }
+        n++; if (Math.abs(a) < 12) good++; const pc = Math.round(good / n * 100); bm.style.transform = `rotate(${a.toFixed(1)}deg)`; const tp = $('#tpc'); if (tp) tp.textContent = pc + ' % suorassa';
+        if (n % 12 === 0) { score = pc * 5; prog = pc + ' %'; sc(); push(false); } }, 40);
+      ivs.push(iv);
     },
     hengitys() {
       const {cycles, inhale, exhale, lead} = D, t0 = Date.now() + lead, cyc = inhale + exhale, total = cycles * cyc; let held = false, good = 0, n = 0;
@@ -3716,7 +3881,7 @@ function speak(text) {
 /* ================= HOST STATE ================= */
 const G = {
   role: null, code: '', phase: 'lobby', players: {}, order: [], conns: {}, connOf: {},
-  settings: Object.assign({rounds: 12, timer: 15, packs: ['yleis'], voice: false, plan: ['nopein', 'bluffi', 'buzz', 'vihje'], per: 3, mode: 'quiz', rooms: ['englanti', 'historia', 'matematiikka', 'aidinkieli'], cgPer: 2, erityis: true}, store.get('kk-settings', {})),
+  settings: Object.assign({rounds: 12, timer: 15, packs: ['yleis'], voice: false, plan: ['nopein', 'bluffi', 'buzz', 'vihje'], per: 3, mode: 'quiz', rooms: ['englanti', 'historia', 'matematiikka', 'aidinkieli', 'liikunta'], cgPer: 2, erityis: true}, store.get('kk-settings', {})),
   sets: [], joinUrl: store.get('kk-url', ''),
   sound: true, qi: 0, fq: 0, qList: [], cur: null, roundType: null, phaseEnd: 0, phaseDur: 0, timer: null,
   cellar: [], mg: null, lastMg: null, finale: false, quip: '', winner: null, lastDeaths: [], netOk: false, netErr: '', bc: null, peer: null,
