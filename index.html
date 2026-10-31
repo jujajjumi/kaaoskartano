@@ -514,6 +514,28 @@ body{background:#1a0f24}
 .millbtn{width:min(200px,55vw);aspect-ratio:1;border-radius:50%;margin:0 auto;font-size:5.5rem;background:var(--wall2);border:5px solid var(--line);box-shadow:0 8px 0 var(--line);transition:transform .05s;touch-action:manipulation;user-select:none}
 .bombclock{font-family:var(--f-display);font-size:clamp(3.5rem,16vw,6rem);color:var(--blood);-webkit-text-stroke:2px var(--line);paint-order:stroke fill;line-height:1}
 .bombclock.hidden{color:var(--dim)}
+.qwithimg{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,1fr);gap:18px;align-items:center;width:100%}
+.qwithimg .qside{display:grid;gap:12px;justify-items:center}
+.qwithimg .qtext{font-size:clamp(1.3rem,2.6vw,2.4rem)}
+.qwithimg .opts{grid-template-columns:1fr}
+.qimg{position:relative;border:4px solid var(--line);border-radius:18px;box-shadow:var(--sh);background:#fff;overflow:hidden;display:grid;place-items:center;min-height:120px}
+.qimg img{display:block;max-width:100%;max-height:min(58vh,560px);object-fit:contain}
+.qimg.small img{max-height:min(30vh,280px)}
+.qimg .qimgerr{display:none;padding:20px;color:#1b1b1f;font-weight:800}
+.qimg.broken{background:var(--wall2)} .qimg.broken img{display:none} .qimg.broken .qimgerr{display:block;color:var(--y)}
+.revimg{display:grid;grid-template-columns:minmax(0,.7fr) minmax(0,1.3fr);gap:16px;align-items:center;width:100%}
+.revimg .revmain>.center{width:100%}
+@media (max-width:900px){.qwithimg,.revimg{grid-template-columns:1fr}}
+.imgnote{padding:8px 12px;border-radius:12px;background:var(--y);color:var(--ink);font-weight:800;border:3px solid var(--line);box-shadow:var(--sh-sm);animation:pop .4s ease-out}
+.imgtools{display:grid;gap:6px;padding:8px;border-radius:12px;border:2px dashed var(--line)}
+.imggal{display:flex;gap:8px;overflow-x:auto;padding-bottom:4px}
+.gi{position:relative;flex:none}
+.giins{display:grid;gap:2px;width:96px;padding:4px;border-radius:10px;background:var(--wall2);border:2px solid var(--line)}
+.giins:hover{border-color:var(--y)}
+.giins img{width:100%;height:64px;object-fit:cover;border-radius:6px;background:#fff}
+.giins small{font-size:.65rem;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.gidel{position:absolute;top:-6px;right:-6px;width:22px;height:22px;border-radius:50%;background:var(--blood);color:#fff;font-size:.7rem;border:2px solid var(--line)}
+textarea.drop{outline:4px dashed var(--y);outline-offset:-4px}
 @keyframes pop{0%{transform:scale(.2);opacity:0}100%{transform:scale(1);opacity:1}}
 @keyframes pulse{50%{outline-color:var(--y)}}
 @keyframes shake{0%,100%{transform:translateX(0)}20%{transform:translateX(-14px) rotate(-2deg)}40%{transform:translateX(12px) rotate(2deg)}60%{transform:translateX(-8px)}80%{transform:translateX(6px)}}
@@ -1786,6 +1808,28 @@ const pick = a => a[rnd(a.length)];
 const shuffle = a => { a = a.slice(); for (let i = a.length - 1; i > 0; i--) { const j = rnd(i + 1); [a[i], a[j]] = [a[j], a[i]]; } return a; };
 const uid = () => Math.random().toString(36).slice(2, 10) + Date.now().toString(36).slice(-4);
 const fmt = (s, o) => s.replace(/\{(\w+)\}/g, (_, k) => o[k] ?? '');
+/* Kuvakirjasto: opettajan lisäämät kuvat tämän koneen selaimeen (IndexedDB). */
+const IMGDB = {
+  db: null,
+  open() { if (this.db) return this.db; this.db = new Promise((res, rej) => { try { const r = indexedDB.open('kaaoskartano-kuvat', 1); r.onupgradeneeded = () => r.result.createObjectStore('img'); r.onsuccess = () => res(r.result); r.onerror = () => rej(r.error); } catch (e) { rej(e); } }); return this.db; },
+  async tx(mode, fn) { const db = await this.open(); return new Promise((res, rej) => { const t = db.transaction('img', mode), st = t.objectStore('img'); const out = fn(st); t.oncomplete = () => res(out && out.result !== undefined ? out.result : out); t.onerror = () => rej(t.error); }); },
+  put(k, v) { return this.tx('readwrite', st => st.put(v, k)); },
+  del(k) { return this.tx('readwrite', st => st.delete(k)); },
+  async all() { const db = await this.open(); return new Promise((res, rej) => { const out = {}, t = db.transaction('img', 'readonly'), c = t.objectStore('img').openCursor(); c.onsuccess = () => { const cur = c.result; if (cur) { out[cur.key] = cur.value; cur.continue(); } }; t.oncomplete = () => res(out); t.onerror = () => rej(t.error); }); },
+};
+const imgKey = n => String(n || '').trim().toLowerCase();
+const isUrl = n => /^https?:\/\//i.test(String(n || '').trim());
+function imgSrc(ref) { if (!ref) return null; if (isUrl(ref)) return ref.trim(); return (G.imgs || {})[imgKey(ref)] || null; }
+function shrinkImage(file) {
+  return new Promise((res, rej) => {
+    const fr = new FileReader();
+    fr.onload = () => { const im = new Image(); im.onload = () => {
+      const max = 1280, sc = Math.min(1, max / Math.max(im.width, im.height)), cv = document.createElement('canvas');
+      cv.width = Math.round(im.width * sc); cv.height = Math.round(im.height * sc); const cx = cv.getContext('2d'); cx.fillStyle = '#fff'; cx.fillRect(0, 0, cv.width, cv.height); cx.drawImage(im, 0, 0, cv.width, cv.height);
+      res(cv.toDataURL('image/jpeg', .85)); }; im.onerror = rej; im.src = fr.result; };
+    fr.onerror = rej; fr.readAsDataURL(file);
+  });
+}
 const store = {
   get(k, d) { try { const v = localStorage.getItem(k); return v == null ? d : JSON.parse(v); } catch (e) { return d; } },
   set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) {} }
@@ -2684,7 +2728,7 @@ function viewFor(p) {
   if (G.phase === 'prep') { v.round = G.finale ? 'pako' : G.roundType; v.cat = G.cur.cat; v.bet = p.bet; }
   if (G.phase === 'question') {
     v.round = G.finale ? 'pako' : G.roundType;
-    v.q = G.cur.q; v.opts = G.cur.opts; v.cat = G.cur.cat; v.answer = p.answer; v.num = !!G.cur.num; v.kind = G.cur.kind || 'mc';
+    v.q = G.cur.q; v.opts = G.cur.opts; v.cat = G.cur.cat; v.answer = p.answer; v.num = !!G.cur.num; v.kind = G.cur.kind || 'mc'; v.hasImg = !!G.cur.img;
     if (v.kind === 'order') v.items = G.cur.items;
     v.hide = p.hide || []; v.tupla = !!p.tuplaNow;
     if (v.kind === 'tf') { v.statements = G.cur.sts.map(x => x.s); v.tfDone = (p.tfAns || []).length; }
@@ -2765,21 +2809,23 @@ function buildQuestions() {
   let base = [], nbase = [], obase = [], tbase = [], lbase = [], cbase = [];
   for (const k of sel) {
     const st = setOf(k), pk = st ? parseCustom(st.text) : PACKS[k], nm = st ? st.name : pk.name;
-    base = base.concat((pk.mc || []).map(q => st ? [...q.slice(0, 5), nm] : q.length >= 6 ? q : [...q, nm]));
-    nbase = nbase.concat((pk.num || []).map(q => [q[0], q[1], st ? nm : q[2] || nm]));
+    base = base.concat((pk.mc || []).map(q => st ? [...q.slice(0, 5), nm, q[6] || ''] : q.length >= 6 ? q : [...q, nm]));
+    nbase = nbase.concat((pk.num || []).map(q => [q[0], q[1], st ? nm : q[2] || nm, q[3] || '']));
     obase = obase.concat((pk.order || []).map(q => [q[0], q[1], nm]));
     tbase = tbase.concat((pk.tf || []).map(q => [q[0], q[1], q[2] || '', nm]));
     lbase = lbase.concat((pk.list || []).map(q => [q[0], q[1], nm]));
     cbase = cbase.concat((pk.clue || []).map(q => [q[0], q[1], q[2], nm]));
   }
-  const dedupe = arr => { const seen = new Set(); return arr.filter(q => !seen.has(q[0]) && seen.add(q[0])); };
-  base = dedupe(base); nbase = dedupe(nbase);
+  const dedupe = (arr, ii) => { const seen = new Set(); return arr.filter(q => { const k = q[0] + '|' + (ii != null ? q[ii] || '' : ''); return !seen.has(k) && seen.add(k); }); };
+  base = dedupe(base, 6); nbase = dedupe(nbase, 3);
   G.orderList = shuffle(dedupe(obase)); G.tfList = shuffle(dedupe(tbase)); G.listList = shuffle(dedupe(lbase)); G.oi = G.ti = G.li = 0;
   if (!base.length) base = QBANK.slice();
   const need = G.settings.rounds + 16; let out = [];
   while (out.length < need) out = out.concat(shuffle(base));
   G.numList = nbase.length ? shuffle(nbase) : []; G.ni = 0;
   const shortOk = q => { const a = String(q[1] || ''); return a.length >= 1 && a.length <= 22 && a.split(/\s+/).length <= 3 && !/näistä|seuraavista/i.test(q[0]); };
+  G.missingImgs = [...new Set(base.map(q => q[6]).concat(nbase.map(q => q[3])).filter(r => r && !imgSrc(r)))];
+  if (G.missingImgs.length) toast(`Kuvia puuttuu tältä koneelta: ${G.missingImgs.slice(0, 3).join(', ')}${G.missingImgs.length > 3 ? '…' : ''}`, '🖼️', true);
   G.typeList = shuffle(base.filter(shortOk)); G.bluffList = shuffle(base.filter(shortOk)); G.clueList = shuffle(dedupe(cbase)); G.yi = G.bi = G.ci = 0; G.usedQ = new Set();
   return out;
 }
@@ -2790,6 +2836,13 @@ function parseCustom(text) {
     if ((m = l.match(/^(totta|tarua)\s*:\s*(.+)$/i))) {
       const parts = m[2].split(/[;|\t]/).map(s => s.trim());
       if (parts[0]) tf.push([parts[0], m[1].toLowerCase() === 'totta', parts[1] || '']);
+      return;
+    }
+    if ((m = l.match(/^k\s*:\s*(.+)$/i))) {
+      const parts = m[1].split(/[;|\t]/).map(s => s.trim()).filter(Boolean); const img = parts.shift();
+      if (!img || parts.length < 2) return;
+      if (parts.length === 2) { const n = Number(parts[1].replace(/\s/g, '').replace(',', '.')); if (isFinite(n)) num.push([parts[0], n, 'Omat', img]); return; }
+      const ans = parts.slice(1, 5); mc.push([parts[0], ans[0], ans[1] || '', ans[2] || '', ans[3] || '', 'Omat', img]);
       return;
     }
     if ((m = l.match(/^v\s*:\s*(.+)$/i))) {
@@ -2819,7 +2872,7 @@ function makeQ(raw) {
   const answers = raw.slice(1, 5).filter(x => x !== '' && x != null);
   const correctText = answers[0];
   const opts = shuffle(answers);
-  return {kind: 'mc', q: raw[0], opts, correct: opts.indexOf(correctText), cat: raw[5] || 'Sekalaiset'};
+  return {kind: 'mc', q: raw[0], opts, correct: opts.indexOf(correctText), cat: raw[5] || 'Sekalaiset', img: raw[6] || ''};
 }
 function dealCards(all) {
   for (const p of plist()) if ((p.ghost || all) && p.cards.length < 3) p.cards.push(pick(ATK));
@@ -2876,8 +2929,9 @@ function roundAvail(t) {
   return ({lahin: G.numList.length > 0, aikajana: G.orderList.length > 0, tottatarua: G.tfList.length >= 5, lista: G.listList.length > 0,
     vihje: G.clueList.length > 0, kirjoita: G.typeList.length > 0, bluffi: G.bluffList.length > 0})[t] ?? true;
 }
+const qKey = r => r[0] + '|' + (r[6] || '');
 function drawQ(list, key) {
-  for (let k = 0; k < list.length; k++) { const r = list[G[key]++ % list.length]; if (!G.usedQ.has(r[0])) { G.usedQ.add(r[0]); return r; } }
+  for (let k = 0; k < list.length; k++) { const r = list[G[key]++ % list.length]; if (!G.usedQ.has(qKey(r))) { G.usedQ.add(qKey(r)); return r; } }
   return list[G[key]++ % list.length];
 }
 function typeNorms(ans) {
@@ -2901,7 +2955,7 @@ function nextQuestion() {
   if (rt === 'sekalainen') { const types = ['nopein', 'nopein', 'pommi', 'ryosto', 'kirjoita', 'bluffi', 'vihje', 'buzz', 'lahin', 'aikajana', 'tottatarua', 'lista'].filter(roundAvail); rt = pick(types); if (rt === G.lastRound) rt = pick(types); }
   if (G.forceRound) rt = G.forceRound;
   G.lastRound = rt; G.roundType = rt; G.step = step;
-  if (rt === 'lahin') { const r = G.numList[G.ni++ % G.numList.length]; G.cur = {kind: 'num', num: true, q: r[0], ans: Number(r[1]), cat: r[2] || 'Arvaus', opts: []}; }
+  if (rt === 'lahin') { const r = G.numList[G.ni++ % G.numList.length]; G.cur = {kind: 'num', num: true, q: r[0], ans: Number(r[1]), cat: r[2] || 'Arvaus', opts: [], img: r[3] || ''}; }
   else if (rt === 'aikajana') G.cur = makeOrder(G.orderList[G.oi++ % G.orderList.length]);
   else if (rt === 'tottatarua') {
     const sts = []; for (let i = 0; i < 5; i++) { const r = G.tfList[G.ti++ % G.tfList.length]; sts.push({s: r[0], v: !!r[1], e: r[2] || ''}); }
@@ -2911,11 +2965,11 @@ function nextQuestion() {
     const r = G.listList[G.li++ % G.listList.length];
     G.cur = {kind: 'list', q: r[0], cat: r[2] || 'Lista', opts: [], answers: r[1].map(a => a.split('/')[0].trim()), norms: r[1].map(a => a.split('/').map(normTxt).filter(Boolean))};
   }
-  else if (rt === 'kirjoita') { const r = drawQ(G.typeList, 'yi'); G.cur = {kind: 'type', q: r[0], ans: r[1], cat: r[5] || 'Kirjoita', opts: [], norms: [typeNorms(r[1])]}; }
-  else if (rt === 'bluffi') { const r = drawQ(G.bluffList, 'bi'); G.cur = {kind: 'bluff', step: 'write', q: r[0], ans: r[1], wrongs: r.slice(2, 5).filter(Boolean), cat: r[5] || 'Bluffi', opts: [], norms: [typeNorms(r[1])]}; }
+  else if (rt === 'kirjoita') { const r = drawQ(G.typeList, 'yi'); G.cur = {kind: 'type', q: r[0], ans: r[1], cat: r[5] || 'Kirjoita', opts: [], norms: [typeNorms(r[1])], img: r[6] || ''}; }
+  else if (rt === 'bluffi') { const r = drawQ(G.bluffList, 'bi'); G.cur = {kind: 'bluff', step: 'write', q: r[0], ans: r[1], wrongs: r.slice(2, 5).filter(Boolean), cat: r[5] || 'Bluffi', opts: [], norms: [typeNorms(r[1])], img: r[6] || ''}; }
   else if (rt === 'vihje') { const r = G.clueList[G.ci++ % G.clueList.length]; const opts = shuffle([r[0], ...r[2]]); G.cur = {kind: 'clue', q: 'Kuka tai mikä on kyseessä?', clues: r[1], opts, correct: opts.indexOf(r[0]), shown: 1, cat: r[3] || 'Vihje'}; }
-  else if (rt === 'buzz') { let r = G.qList[G.qi]; if (G.usedQ.has(r[0])) r = drawQ(G.qList, 'qi2'); G.usedQ.add(r[0]); const c = makeQ(r); Object.assign(c, {kind: 'buzz', queue: [], turn: null, tried: [], done: false, winner: null, turnKey: ''}); G.cur = c; }
-  else { G.usedQ.add(G.qList[G.qi][0]); G.cur = makeQ(G.qList[G.qi]); }
+  else if (rt === 'buzz') { let r = G.qList[G.qi]; if (G.usedQ.has(qKey(r))) r = drawQ(G.qList, 'qi2'); G.usedQ.add(qKey(r)); const c = makeQ(r); Object.assign(c, {kind: 'buzz', queue: [], turn: null, tried: [], done: false, winner: null, turnKey: ''}); G.cur = c; }
+  else { G.usedQ.add(qKey(G.qList[G.qi])); G.cur = makeQ(G.qList[G.qi]); }
   dealCards(false);
   quip('prep');
   setPhase('prep', G.roundType === 'pommi' ? 11000 : 9000, startQuestion);
@@ -3555,7 +3609,8 @@ function stageHTML() {
     case 'question': return `<div class="center"><div class="row" style="justify-content:center"><span class="cat">${esc(G.cur.cat)}</span><span class="label">${G.finale ? 'Pakomatka' : rt.emoji + ' ' + rt.name}</span></div>
         ${hostQuestionBody()}
         <div class="row" style="width:100%;flex-wrap:nowrap"><div class="secs" data-secs="${G.phaseEnd}"></div><div style="flex:1">${timerBar()}</div></div></div>`;
-    case 'reveal': if (G.cur.num) return numRevealHTML();
+    case 'reveal': if (G.cur.img && !G.noImgWrap && ['mc', 'num', 'buzz', 'type'].includes(G.cur.kind)) { G.noImgWrap = true; let b; try { b = stageHTML(); } finally { G.noImgWrap = false; } return `<div class="revimg">${qImgHTML(true)}<div class="revmain">${b}</div></div>`; }
+      if (G.cur.num) return numRevealHTML();
       if (G.cur.kind === 'order') return orderRevealHTML();
       if (G.cur.kind === 'tf') return tfRevealHTML();
       if (G.cur.kind === 'list') return listRevealHTML();
@@ -3606,7 +3661,17 @@ function stageHTML() {
   }
   return '';
 }
+function qImgHTML(small) {
+  const c = G.cur; if (!c || !c.img) return '';
+  const src = imgSrc(c.img);
+  return src ? `<div class="qimg ${small ? 'small' : ''}"><img src="${esc(src)}" alt="Kysymyksen kuva" onerror="this.parentNode.classList.add('broken')"><span class="qimgerr">🖼️ Kuvaa ei saatu ladattua</span></div>`
+    : `<div class="qimg broken"><span class="qimgerr">🖼️ Kuva puuttuu tältä koneelta: ${esc(c.img)}</span></div>`;
+}
 function hostQuestionBody() {
+  const b = hostQuestionBody0(); if (!G.cur.img) return b;
+  return `<div class="qwithimg">${qImgHTML()}<div class="qside">${b}</div></div>`;
+}
+function hostQuestionBody0() {
   const c = G.cur, done = plist().filter(p => p.answer != null).length, tot = present().length;
   if (c.kind === 'type') return `<div class="qtext">${esc(c.q)}</div><div class="guesshint">⌨️ Kirjoita vastaus Chromebookilla · ${done} / ${tot} vastannut</div>`;
   if (c.kind === 'bluff' && c.step === 'write') return `<div class="qtext">${esc(c.q)}</div><div class="guesshint">🤥 Keksi uskottava VÄÄRÄ vastaus · ${plist().filter(p => p.fake).length} / ${tot} valhetta valmiina</div>`;
@@ -3812,20 +3877,51 @@ V: Jean Sibelius; Syntyi 1865; Asui Ainolassa; Sävelsi Finlandian; Oskar Merika
 Missä teollinen vallankumous alkoi?; Britannia; Ranska; Saksa
 ## Talvisota
 Minä vuonna talvisota alkoi?; 1939; 1941; 1918</code>
+      <p class="dim" style="margin:0"><b>Kuvakysymys:</b> alkuun K:, sitten kuvan nimi (tai nettiosoite), kysymys ja vastaukset. Kuva näkyy isona valkokankaalla, ja pelaajat vastaavat Chromebookilla. Jos vastauksena on pelkkä luku, kysymyksestä tulee Lähimmäs voittaa -arvaus.</p>
+      <code class="qcode">K: ruutukaava.jpg; Mikä kaupunki kartassa on?; Turku; Tampere; Oulu; Vaasa
+K: purkki.jpg; Montako karkkia purkissa on?; 137
+K: https://upload.wikimedia.org/…/Sibelius.jpg; Kuka säveltäjä?; Sibelius; Mozart; Bach</code>
     </details>
+    <div class="imgtools"><div class="row"><span class="label">🖼️ Kuvat (${Object.keys(G.imgs || {}).length})</span><span style="flex:1"></span><label class="btn small" for="imgadd">📷 Lisää kuvia</label><input type="file" id="imgadd" accept="image/*" multiple hidden></div>
+      <div class="imggal" id="imggal">${Object.entries(G.imgs || {}).map(([k, src]) => `<div class="gi"><button class="giins" data-ins="${esc(k)}" title="Lisää kuvakysymys tästä kuvasta"><img src="${src}" alt=""><small>${esc(k)}</small></button><button class="gidel" data-idel="${esc(k)}" aria-label="Poista kuva ${esc(k)}">✕</button></div>`).join('') || '<p class="dim" style="margin:0">Lisää kuvia tai pudota ne tekstikenttään. Jokaisesta kuvasta tulee valmis kysymysrivi, jonka täydennät.</p>'}</div></div>
     <textarea id="qtext" placeholder="Kysymys; oikea; väärä; väärä; väärä">${esc(cur ? cur.text : '')}</textarea>
     <div class="row"><span class="dim" id="qcount"></span></div>
     <div class="row"><button class="btn primary" id="qsave">Tallenna</button>${cur ? '<button class="btn small danger" id="qdel">Poista kategoria</button>' : ''}<span style="flex:1"></span>
       <button class="btn small" id="qexport" ${G.sets.length ? '' : 'disabled'}>Lataa varmuuskopio</button><label class="btn small" for="qimport">Tuo tiedostosta</label><input type="file" id="qimport" accept=".txt,text/plain" hidden></div>
-    <p class="dim" id="qmsg" style="margin:0">Kategoriat tallentuvat tämän koneen selaimeen. Varmuuskopiolla saat ne siirrettyä toiselle koneelle.</p></div>`;
+    <p class="dim" id="qmsg" style="margin:0">Kategoriat ja kuvat tallentuvat tämän koneen selaimeen. Varmuuskopio sisältää tekstit; kuvat lisätään toisella koneella uudelleen samoilla nimillä (tai käytä kuvien nettiosoitteita).</p></div>`;
   document.body.appendChild(wrap);
   const ta = $('#qtext', wrap), cnt = $('#qcount', wrap), msg = $('#qmsg', wrap);
   const upd = () => {
     const parts = splitSets(ta.value, '');
     if (parts.length > 1 || (parts[0] && parts[0].name)) { cnt.textContent = `${parts.length} kategoriaa: ` + parts.map(p => `${p.name || '(nimetön)'} ${parseCustom(p.text).count}`).join(', '); return; }
-    const c = parseCustom(ta.value); cnt.textContent = `${c.mc.length} monivalintaa, ${c.num.length} arvausta, ${c.order.length} aikajanaa, ${c.tf.length} väitettä, ${c.list.length} listaa, ${c.clue.length} vihjesarjaa`;
+    const c = parseCustom(ta.value); const nImg = c.mc.filter(q => q[6]).length + c.num.filter(q => q[3]).length, miss = [...c.mc.map(q => q[6]), ...c.num.map(q => q[3])].filter(r => r && !imgSrc(r));
+    cnt.textContent = (nImg ? `🖼️ ${nImg} kuvakysymystä${miss.length ? ` (puuttuu: ${[...new Set(miss)].join(', ')})` : ''} · ` : '') + `${c.mc.length} monivalintaa, ${c.num.length} arvausta, ${c.order.length} aikajanaa, ${c.tf.length} väitettä, ${c.list.length} listaa, ${c.clue.length} vihjesarjaa`;
   };
   ta.addEventListener('input', upd); upd();
+  const insLine = names => { names = [].concat(names); const lines = names.map(n => `K: ${n}; Kysymys?; oikea; väärä; väärä; väärä`).join('\n');
+    const v = ta.value; let pos = ta.selectionEnd != null ? ta.selectionEnd : v.length; const nl = v.indexOf('\n', pos); pos = nl < 0 ? v.length : nl;
+    const before = v.slice(0, pos), after = v.slice(pos); const pre = before && !before.endsWith('\n') ? '\n' : '';
+    ta.value = before + pre + lines + (after.startsWith('\n') || !after ? '' : '\n') + after; const st = before.length + pre.length + names[0].length + 5; ta.focus(); ta.setSelectionRange(st, st + 9); upd(); };
+  const addFiles = async files => {
+    const imgs = [...files].filter(f => /^image\//.test(f.type)); if (!imgs.length) return;
+    msg.textContent = 'Käsitellään kuvia…'; msg.className = 'dim';
+    const keep = ta.value, selS = ta.selectionStart, names = [];
+    for (const f of imgs) { try { const k = imgKey(f.name.replace(/\s+/g, '_')); const d = await shrinkImage(f); await IMGDB.put(k, d); G.imgs[k] = d; names.push(k); } catch (e) { msg.textContent = 'Kuvan ' + f.name + ' tallennus epäonnistui.'; msg.className = 'err'; } }
+    const nameVal = $('#sname', wrap).value; openQPanel(cur ? cur.id : 'new');
+    const ta2 = $('#qtext'); ta2.value = keep; $('#sname').value = nameVal; ta2.setSelectionRange(selS || keep.length, selS || keep.length);
+    if (names.length) { const ta3 = $('#qtext'); ta3.focus(); ta3.setSelectionRange(selS ?? keep.length, selS ?? keep.length); $(`[data-ins="${CSS.escape(names[0])}"]`).dispatchEvent(new CustomEvent('insmany', {detail: names})); }
+    const m2 = $('#qmsg'); if (m2 && names.length) { m2.textContent = `${names.length} kuvaa lisätty. Täydennä kysymysrivit ja tallenna.`; m2.className = ''; m2.style.color = 'var(--g)'; }
+  };
+  $('#imgadd', wrap).onchange = e => addFiles(e.target.files);
+  ta.addEventListener('dragover', e => { e.preventDefault(); ta.classList.add('drop'); });
+  ta.addEventListener('dragleave', () => ta.classList.remove('drop'));
+  ta.addEventListener('drop', e => { if (e.dataTransfer && e.dataTransfer.files.length) { e.preventDefault(); ta.classList.remove('drop'); addFiles(e.dataTransfer.files); } });
+  ta.addEventListener('paste', e => { const fs = [...(e.clipboardData ? e.clipboardData.files : [])]; if (fs.length) { e.preventDefault(); addFiles(fs.map((f, i) => new File([f], f.name && f.name !== 'image.png' ? f.name : `liitetty_${Date.now().toString(36)}${i}.png`, {type: f.type}))); } });
+  $$('[data-ins]', wrap).forEach(b => { b.onclick = () => insLine(b.dataset.ins); b.addEventListener('insmany', e => insLine(e.detail)); });
+  $$('[data-idel]', wrap).forEach(b => b.onclick = async () => {
+    const k = b.dataset.idel; if (!b.dataset.sure) { b.dataset.sure = '1'; b.textContent = '?'; b.title = 'Paina uudelleen poistaaksesi'; return; }
+    await IMGDB.del(k).catch(() => {}); delete G.imgs[k]; const keep = ta.value, nm = $('#sname', wrap).value; openQPanel(cur ? cur.id : 'new'); $('#qtext').value = keep; $('#sname').value = nm; $('#qtext').dispatchEvent(new Event('input'));
+  });
   $('#qcancel', wrap).onclick = () => { wrap.remove(); renderHost(); };
   $$('[data-set]', wrap).forEach(b => b.onclick = () => openQPanel(b.dataset.set));
   $('#qsave', wrap).onclick = () => {
@@ -4042,7 +4138,7 @@ function renderPlayer(full) {
     case 'roundintro': main = v.rIntro ? `<div class="label">Kierros ${v.rIntro.n} / ${v.rIntro.total}</div><div class="big">${v.rIntro.emoji}</div><h2>${esc(v.rIntro.name)}</h2><p>${esc(v.rIntro.desc)}</p>` : ''; break;
     case 'prep': main = prepHTML(v, others); break;
     case 'shop': main = shopHTML(v); break;
-    case 'question': main = questionHTML(v); break;
+    case 'question': main = (v.hasImg ? '<div class="imgnote">🖼️ Katso kuva valkokankaalta!</div>' : '') + questionHTML(v); break;
     case 'reveal': {
       const ok = v.answer === v.correct;
       if (['order', 'tf', 'list', 'type', 'bluff', 'clue', 'buzz'].includes(v.kind)) { main = playerRevealHTML(v) + goldLine(v); foot = reactBar(); break; }
@@ -4662,7 +4758,8 @@ function renderLanding() {
   $('#r-host').onclick = startHost;
 }
 function startHost() {
-  G.sets = loadSets();
+  G.sets = loadSets(); G.imgs = {};
+  IMGDB.all().then(m => { G.imgs = m || {}; if (G.phase === 'lobby') renderHost(); }).catch(() => {});
   G.settings.packs = (G.settings.packs || []).map(k => k === 'omat' ? 'c:omat' : k).filter(k => PACKS[k] || G.sets.some(x => 'c:' + x.id === k));
   if (!G.settings.packs.length) G.settings.packs = ['yleis'];
   G.role = 'host'; G.code = newCode(); G.quip = 'Kartano on auki. Liittykää, jos uskallatte.';
