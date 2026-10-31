@@ -537,7 +537,74 @@ body{background:#1a0f24}
 .gidel{position:absolute;top:-6px;right:-6px;width:22px;height:22px;border-radius:50%;background:var(--blood);color:#fff;font-size:.7rem;border:2px solid var(--line)}
 textarea.drop{outline:4px dashed var(--y);outline-offset:-4px}
 .packgrp{margin-top:8px;gap:10px}
-.packgrp+.packrow .pack span:nth-child(2){font-size:.9em}
+.packgrp .packrow .pack span:nth-child(2){font-size:.9em}
+/* --- sujuvuus: napautukset --- */
+html{touch-action:manipulation;-webkit-tap-highlight-color:transparent}
+button,.btn,label.btn,summary{-webkit-user-select:none;user-select:none}
+.pack,.rtype,.ltab,.setchip,.planchip button,.chip button,.vbtn,.chest,.kcell,.mpad{transition:transform .07s ease-out,filter .07s}
+.pack:active,.rtype:active,.ltab:active,.setchip:active,.vbtn:active,.chest:active,.kcell:active{transform:scale(.95);filter:brightness(1.15)}
+.pad:active:not([disabled]),.opt:active,.bopt:active:not([disabled]),.tfb:active{transform:translate(2px,2px) scale(.98);filter:brightness(1.1)}
+.pmain.pfade{animation:pfade .22s ease-out}
+@keyframes pfade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+.stage>.center.enter{animation:stagein .4s cubic-bezier(.2,1.15,.4,1)}
+/* --- aula: yhteenveto, osiot, taittuvat ryhmät --- */
+.lobbysum{display:flex;flex-wrap:wrap;gap:6px;justify-content:center;width:100%}
+.lobbysum .sm{padding:5px 12px;border-radius:999px;background:var(--wall2);border:2px solid var(--line);font-weight:700;font-size:.85rem;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.ltabs{display:none}
+.lobbygrid>[data-ltab],.lobbygrid>.panel>[data-ltab]{display:contents}
+.lobbygrid>[data-ltab]>.panel{align-self:start}
+details.packgrp{border-top:2px dashed var(--line);padding-top:6px;margin-top:6px}
+details.packgrp>summary{display:flex;align-items:center;gap:10px;cursor:pointer;list-style:none;padding:4px 0;flex-wrap:wrap}
+details.packgrp>summary::-webkit-details-marker{display:none}
+details.packgrp>summary::before{content:'▸';font-size:1.1rem;color:var(--y);transition:transform .15s}
+details.packgrp[open]>summary::before{transform:rotate(90deg)}
+details.packgrp>.packrow{margin-top:6px}
+.gcount{font-size:.8rem;font-weight:800;color:var(--dim);padding:2px 8px;border-radius:999px;background:var(--wall2)}
+.gcount.on{color:var(--ink);background:var(--y)}
+.packgrp .grow{flex:1}
+@media (max-width:820px){
+  .ltabs{display:flex;gap:6px;width:100%;position:sticky;top:-14px;z-index:5;padding:6px 0;background:linear-gradient(#24163a 70%,transparent)}
+  .ltab{flex:1;display:flex;align-items:center;justify-content:center;gap:6px;padding:10px 6px;border-radius:14px;background:var(--wall2);border:3px solid var(--line);font-weight:800;font-size:.9rem}
+  .ltab b{min-width:22px;padding:0 6px;border-radius:999px;background:var(--ink);color:var(--y);font-size:.8rem}
+  .ltab.on{background:var(--y);color:var(--ink)}
+  .ltab.on b{background:var(--ink)}
+  .lobbygrid [data-ltab]:not(.lon){display:none}
+  .lobbygrid{gap:14px}
+  .lobbygrid>.panel:first-child,.lobbygrid>.panel:last-child,.lobbygrid>[data-ltab]>.panel{transform:none}
+  .stage{padding:12px}
+  .lobbysum .sm.wide{white-space:normal}
+}
+/* --- puhelin: yläpalkki, pelaajanauha, efektit --- */
+@media (max-width:600px){
+  .host{gap:8px}
+  .hbar{flex-wrap:nowrap;gap:8px;min-width:0}
+  .hbar .logo{font-size:1.05rem;flex:none}
+  .host:not(.ph-lobby) .hbar .logo{display:none}
+  .hbar>.dim{min-width:0;flex:0 1 auto;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:.9rem;font-weight:800}
+  .hbar .hstat .lng{display:none} .hbar .hstat .sht{display:inline}
+  .hbar .grow{display:none}
+  .hbar .codechip{flex:none}
+  .btn.icon{padding:7px 10px}
+  .btn.icon .lbl{display:none}
+  .hbar .skipbtn{flex:none;margin-left:auto;padding:10px 16px;font-size:1rem;background:var(--y);color:var(--ink)}
+  .rail{flex-wrap:nowrap;overflow-x:auto;justify-content:flex-start;min-height:0;gap:6px;padding:2px 2px 6px;scrollbar-width:none;-webkit-overflow-scrolling:touch}
+  .rail::-webkit-scrollbar{display:none}
+  .rail .chip{flex:none;padding:3px 10px 3px 3px;gap:5px;font-size:.82rem;box-shadow:2px 2px 0 var(--line)}
+  .rail .chip .av{width:28px;height:28px;font-size:1.1rem}
+  .rail .chip .av .avimg{width:26px;height:26px}
+  .rail .chip .cards{display:none}
+  .fxword span{font-size:1.5rem;-webkit-text-stroke:2px #07040b}
+  .fxword.big span{font-size:2.4rem}
+  .fxword{animation-duration:1s}
+  .throwfx .thrower{height:min(40vh,300px);left:0}
+  .throwfx .hole{width:60vw;height:20vw;left:58%}
+  .throwfx .hole b{font-size:1.3rem;top:-38px}
+  .thrown .tav{font-size:2.4rem}
+  .thrown small{font-size:.95rem}
+  .kmaster{width:110px}
+  .hostfull{width:130px}
+}
+.hstat .sht{display:none}
 @keyframes pop{0%{transform:scale(.2);opacity:0}100%{transform:scale(1);opacity:1}}
 @keyframes pulse{50%{outline-color:var(--y)}}
 @keyframes shake{0%,100%{transform:translateX(0)}20%{transform:translateX(-14px) rotate(-2deg)}40%{transform:translateX(12px) rotate(2deg)}60%{transform:translateX(-8px)}80%{transform:translateX(6px)}}
@@ -4421,11 +4488,25 @@ function roundsBuilderHTML() {
     <div class="rtypes">${ROUND_ORDER.map(t => `<button class="rtype" data-rt="${t}" ${plan.length >= 8 ? 'disabled' : ''} title="${esc(ROUNDS[t].desc)}"><span class="pe">${ROUNDS[t].emoji}</span><span>${ROUNDS[t].name}</span></button>`).join('')}</div>
     <p class="dim" style="margin:0;font-size:.8rem">Lisää kierros napauttamalla. Puoti aukeaa jokaisen kierroksen jälkeen.</p></div>`;
 }
+function lobbySummary() {
+  const plan = G.settings.plan || [], per = G.settings.per || 3, pr = PRESETS.find(p => p.plan.join() === plan.join() && p.per === per);
+  const sel = G.settings.packs || [], parts = [];
+  for (const k of sel.filter(k => PACKS[k] && !PACKS[k].group)) parts.push(PACKS[k].name);
+  const grp = {}; sel.filter(k => PACKS[k] && PACKS[k].group).forEach(k => { grp[PACKS[k].group] = (grp[PACKS[k].group] || 0) + 1; });
+  for (const [g, c] of Object.entries(grp)) { const tot = Object.values(PACKS).filter(p => p.group === g).length; parts.push(c === tot ? g : `${g} (${c}/${tot})`); }
+  sel.filter(k => k.startsWith('c:')).forEach(k => { const st = G.sets.find(x => 'c:' + x.id === k); if (st) parts.push('✏️ ' + st.name); });
+  const est = Math.round(plan.length * per * 1.05 + plan.length * .5 + 3);
+  return `<span class="sm">${pr ? pr.name : '🎬 Oma kierrosjärjestys'}</span><span class="sm">${plan.length} kierrosta · ${plan.length * per} kys.</span><span class="sm wide">📚 ${parts.length ? esc(parts.join(', ')) : '<span class="err">ei aiheita</span>'}</span><span class="sm">⏱ noin ${est} min</span>`;
+}
 function lobbyHTML() {
   const url = G.joinUrl || (location.origin + location.pathname).replace(/index\.html$/, '');
   const n = plist().length;
-  return `<div class="center"><div class="lobbygrid">
-    <div class="panel" style="text-align:center;justify-items:center">
+  const tab = G.lobbyTab || 'pelaajat', tb = t => `data-ltab="${t}" class="${tab === t ? 'lon' : ''}"`;
+  return `<div class="center"><div class="lobbysum" aria-label="Valinnat">${lobbySummary()}</div>
+    <div class="ltabs" role="tablist">${[['pelaajat', '👥 Pelaajat', n], ['kierrokset', '🎬 Kierrokset', (G.settings.plan || []).length], ['aiheet', '📚 Aiheet', (G.settings.packs || []).length]].map(([t, l, c]) =>
+      `<button role="tab" aria-selected="${tab === t}" class="ltab ${tab === t ? 'on' : ''}" data-tab="${t}">${l}<b>${c}</b></button>`).join('')}</div>
+    <div class="lobbygrid">
+    <div ${tb('pelaajat')}><div class="panel" style="text-align:center;justify-items:center">
       <div class="joinhead"><div><div class="label">Liittymiskoodi</div><div class="bigcode">${G.code}</div></div>
         <figure class="qr">${qrSVG(url + (url.includes('#') ? '' : '#' + G.code))}<figcaption>Skannaa, niin koodi täyttyy valmiiksi</figcaption></figure></div>
       <div class="joinsteps" style="text-align:left">
@@ -4434,26 +4515,30 @@ function lobbyHTML() {
         <div>3. Keksi nimi ja valitse hahmo</div>
       </div>
       <span class="netstat ${G.netOk ? 'ok' : G.netErr ? 'err' : ''}">${G.netOk ? '● Verkko valmis: ' + G.net.filter(n => n.state === 'ok').map(n => n.name).join(', ') : G.netErr ? esc(G.netErr) : '○ Avataan verkkoyhteyttä…'}</span>
-    </div>
+    </div></div>
     <div class="panel">
-      <div class="row"><h3 style="font-size:1.3rem">Pelaajat</h3><span class="dim">${n} / 24</span></div>
-      <div class="lobbyplayers">${n ? railHTML() : '<span class="dim">Odotetaan ensimmäistä uhria… Voit kokeilla peliä yksin lisäämällä testibotteja.</span>'}</div>
+      <div ${tb('pelaajat')}><div class="row"><h3 style="font-size:1.3rem">Pelaajat</h3><span class="dim">${n} / 24</span></div>
+      <div class="lobbyplayers">${n ? railHTML() : '<span class="dim">Odotetaan ensimmäistä uhria… Voit kokeilla peliä yksin lisäämällä testibotteja.</span>'}</div></div>
+      <div ${tb('kierrokset')}><div class="ltabbody">
       <div class="settings">
         <label>Kysymyksiä per kierros<select id="s-per">${[2, 3, 4, 5].map(v => `<option ${v == (G.settings.per || 3) ? 'selected' : ''}>${v}</option>`).join('')}</select></label>
         <label>Vastausaika (s)<select id="s-timer">${[10, 15, 20, 30].map(v => `<option ${v == G.settings.timer ? 'selected' : ''}>${v}</option>`).join('')}</select></label>
         <label>Juontajan ääni<select id="s-voice"><option value="0" ${!G.settings.voice ? 'selected' : ''}>Pois</option><option value="1" ${G.settings.voice ? 'selected' : ''}>Päällä</option></select></label>
       </div>
-      ${roundsBuilderHTML()}
+      ${roundsBuilderHTML()}</div></div>
+      <div ${tb('aiheet')}>
       <div class="packs" role="group" aria-label="Kysymysaiheet"><div class="label">Aiheet (valitse yksi tai useampi)</div><div class="packrow">
         ${(() => { const cnt = pk => ['mc', 'num', 'order', 'tf', 'list', 'clue'].reduce((a, f) => a + (pk[f] || []).length, 0);
           const btn = ([k, e, nm, c, own]) => `<button class="pack ${own ? 'own' : ''} ${(G.settings.packs || []).includes(k) ? 'on' : ''}" data-pack="${k}" aria-pressed="${(G.settings.packs || []).includes(k)}" ${!c ? 'disabled' : ''}><span class="pe">${e}</span><span>${esc(nm)}</span><small>${c} tehtävää</small></button>`;
           const gen = Object.entries(PACKS).filter(([, pk]) => !pk.group), groups = [...new Set(Object.values(PACKS).map(pk => pk.group).filter(Boolean))];
           return gen.map(([k, pk]) => btn([k, pk.emoji, pk.name, cnt(pk), false])).join('') + G.sets.map(x => btn(['c:' + x.id, '✏️', x.name, setCount(x), true])).join('')
             + `<button class="pack addpack" id="newset"><span class="pe">＋</span><span>Oma kategoria</span><small>lisää kysymyksiä</small></button></div>`
-            + groups.map(g => { const ks = Object.keys(PACKS).filter(k => PACKS[k].group === g), allOn = ks.every(k => (G.settings.packs || []).includes(k));
-              return `<div class="row packgrp"><span class="label">📚 ${esc(g)} · OPS</span><button class="btn small" data-grp="${esc(g)}">${allOn ? 'Poista kaikki' : 'Valitse kaikki'}</button></div><div class="packrow">${ks.map(k => btn([k, PACKS[k].emoji, PACKS[k].name, cnt(PACKS[k]), false])).join('')}`; }).join('</div>'); })()}
+            + groups.map(g => { const ks = Object.keys(PACKS).filter(k => PACKS[k].group === g), on = ks.filter(k => (G.settings.packs || []).includes(k)).length, allOn = on === ks.length;
+              const open = G.grpOpen ? G.grpOpen.has(g) : on > 0;
+              return `<details class="packgrp" data-g="${esc(g)}" ${open ? 'open' : ''}><summary><span class="label">📚 ${esc(g)} · OPS</span><span class="gcount ${on ? 'on' : ''}">${on} / ${ks.length} valittu</span><span class="grow"></span><button class="btn small" data-grp="${esc(g)}">${allOn ? 'Poista kaikki' : 'Valitse kaikki'}</button></summary><div class="packrow">${ks.map(k => btn([k, PACKS[k].emoji, PACKS[k].name, cnt(PACKS[k]), false])).join('')}</div></details>`; }).join('') + '<div>'; })()}
       </div></div>
-      <div class="row">
+      </div>
+      <div class="row startrow">
         <button class="btn primary" id="start" ${n && (G.settings.plan || []).length ? '' : 'disabled'}>Aloita peli</button>
         <button class="btn small" id="addbot">+ Testibotti</button>
         <button class="btn small" id="editq">Omat kysymyssarjat${G.sets.length ? ' (' + G.sets.length + ')' : ''}</button>
@@ -4464,15 +4549,18 @@ function lobbyHTML() {
 function renderHost() {
   if (G.role !== 'host') return;
   const focusId = document.activeElement && document.activeElement.id;
+  const samePhase = G.renderedKey === phaseKey(), stOld = $('.stage'), railOld = $('.rail');
+  const keepY = samePhase && stOld ? stOld.scrollTop : 0, keepX = railOld ? railOld.scrollLeft : 0, keepApp = samePhase ? app.scrollTop : 0;
   const top = `<div class="hbar"><div class="logo"><span class="a">KAAOS</span><span class="b">KARTANO</span></div>
     <span class="codechip" aria-label="Liittymiskoodi">${G.code}</span>
-    <span class="dim">${G.phase === 'lobby' ? 'Aula' : G.finale ? 'Pakomatka' : G.step ? `${ROUNDS[G.step.t].emoji} Kierros ${G.step.rno + 1} / ${G.step.rounds} · ${ROUNDS[G.step.t].name}` : `Kysymys ${Math.min(G.qi + 1, G.settings.rounds)} / ${G.settings.rounds}`}</span>
+    <span class="dim hstat"><span class="lng">${G.phase === 'lobby' ? 'Aula' : G.finale ? 'Pakomatka' : G.step ? `${ROUNDS[G.step.t].emoji} Kierros ${G.step.rno + 1} / ${G.step.rounds} · ${ROUNDS[G.step.t].name}` : `Kysymys ${Math.min(G.qi + 1, G.settings.rounds)} / ${G.settings.rounds}`}</span><span class="sht">${G.phase === 'lobby' ? 'Aula' : G.finale ? '🚪' : G.step ? `${ROUNDS[G.step.t].emoji} ${G.step.rno + 1}/${G.step.rounds}` : ''}</span></span>
     <span class="grow"></span>
-    <button class="btn small" id="mus" title="Aulamusiikki päälle tai pois">${G.settings.music === false ? '🔕' : '🎵'} Musiikki</button>
-    <button class="btn small" id="snd">${G.sound ? '🔊' : '🔇'} Äänet</button>
-    ${G.phase !== 'lobby' && G.phase !== 'end' ? '<button class="btn small" id="skip">⏭ Seuraava</button>' : ''}</div>`;
-  app.innerHTML = `<div class="host">${top}<div class="stage">${stageHTML()}</div>${G.phase === 'lobby' ? '<div></div>' : `<div class="rail">${railHTML()}</div>`}</div>`;
+    <button class="btn small icon" id="mus" title="Aulamusiikki päälle tai pois" aria-label="Musiikki">${G.settings.music === false ? '🔕' : '🎵'}<span class="lbl"> Musiikki</span></button>
+    <button class="btn small icon" id="snd" aria-label="Äänet">${G.sound ? '🔊' : '🔇'}<span class="lbl"> Äänet</span></button>
+    ${G.phase !== 'lobby' && G.phase !== 'end' ? '<button class="btn small skipbtn" id="skip">⏭ Seuraava</button>' : ''}</div>`;
+  app.innerHTML = `<div class="host ph-${G.phase}">${top}<div class="stage">${stageHTML()}</div>${G.phase === 'lobby' ? '<div></div>' : `<div class="rail">${railHTML()}</div>`}</div>`;
   const pk = phaseKey(); if (G.renderedKey !== pk) { G.renderedKey = pk; const c = $('.stage > .center'); if (c) c.classList.add('enter'); }
+  if (keepY) $('.stage').scrollTop = keepY; if (keepApp) app.scrollTop = keepApp; if (keepX && $('.rail')) $('.rail').scrollLeft = keepX;
   bindHost(); tickTimers();
   if (focusId && document.getElementById(focusId)) document.getElementById(focusId).focus();
 }
@@ -4494,9 +4582,13 @@ function bindHost() {
     const k = b.dataset.pack, cur = new Set(G.settings.packs || []);
     cur.has(k) ? cur.delete(k) : cur.add(k); G.settings.packs = [...cur]; saveSettings(); renderHost();
   }));
+  $$('[data-tab]').forEach(b => b.addEventListener('click', () => { G.lobbyTab = b.dataset.tab; const st = $('.stage'); renderHost(); if ($('.stage')) $('.stage').scrollTop = 0; }));
+  $$('details.packgrp').forEach(d => d.addEventListener('toggle', () => { if (!G.grpOpen) G.grpOpen = new Set($$('details.packgrp').filter(x => x !== d && x.open).map(x => x.dataset.g)); d.open ? G.grpOpen.add(d.dataset.g) : G.grpOpen.delete(d.dataset.g); }));
+  $$('[data-grp]').forEach(b => b.addEventListener('click', e => { e.preventDefault(); e.stopPropagation(); }));
   $$('[data-grp]').forEach(b => b.addEventListener('click', () => {
     const ks = Object.keys(PACKS).filter(k => PACKS[k].group === b.dataset.grp), cur = new Set(G.settings.packs || []), allOn = ks.every(k => cur.has(k));
-    ks.forEach(k => allOn ? cur.delete(k) : cur.add(k)); G.settings.packs = [...cur]; saveSettings(); renderHost();
+    ks.forEach(k => allOn ? cur.delete(k) : cur.add(k)); G.settings.packs = [...cur]; saveSettings();
+    if (!G.grpOpen) G.grpOpen = new Set($$('details.packgrp').filter(x => x.open).map(x => x.dataset.g)); if (!allOn) G.grpOpen.add(b.dataset.grp); renderHost();
   }));
   on('s-voice', 'change', e => { G.settings.voice = e.target.value === '1'; saveSettings(); if (G.settings.voice) speak('Ääni päällä. Tervetuloa kartanoon.'); });
   on('editq', 'click', () => openQPanel());
@@ -4865,7 +4957,9 @@ function renderPlayer(full) {
     case 'finale_intro': main = `<div class="big">🚪</div><h2>Pakomatka!</h2><p>Oikea vastaus = askel. Nopein oikea = kaksi askelta. ${me.ghost ? 'Saat elävän kiinni, niin heräät henkiin!' : 'Ensimmäinen elävä ovella voittaa.'}</p><p>Olet ruudussa <b>${me.pos}</b> / ${TRACK}</p>`; break;
     case 'end': main = v.iWon ? `<div class="big">🏆</div><h2>Pakenit kartanosta!</h2>` : `<div class="big">${me.ghost ? '👻' : '🏚️'}</div><h2>${v.winner ? esc(v.winner.name) + ' voitti' : 'Peli päättyi'}</h2><p class="dim">Katso tulokset kankaalta.</p>`; break;
   }
-  app.innerHTML = `<div class="player">${bar}<div class="pmain">${main}</div><div>${foot}</div></div>`;
+  const pSame = P.renderedKey === P.key, pY = pSame ? app.scrollTop : 0;
+  app.innerHTML = `<div class="player">${bar}<div class="pmain ${pSame ? '' : 'pfade'}">${main}</div><div>${foot}</div></div>`;
+  P.renderedKey = P.key; if (pY) app.scrollTop = pY;
   if (v.phase === 'prep') { const inc = me.incoming.length; if (inc > (P.local.inc || 0)) { const last = me.incoming[inc - 1]; const fl = document.createElement('div'); fl.className = 'hitflash'; fl.innerHTML = `<em class="hfword">PAM!</em><span>${CARDS[last.k].emoji}</span><b>${esc(last.by)} kiusasi sinua!</b>`; document.body.appendChild(fl); setTimeout(() => fl.remove(), 1600); } P.local.inc = inc; }
   bindPlayer(v);
   tickTimers();
